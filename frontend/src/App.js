@@ -60,7 +60,7 @@ function App() {
           } />
           <Route path="/professional/settings" element={
             <ProtectedRoute allowedTypes={['professional']}>
-              <div className="p-8">Settings (Mock)</div>
+              <SettingsPage />
             </ProtectedRoute>
           } />
           
