@@ -1,9 +1,12 @@
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Circle, Droplet, Footprints, Dumbbell, AlertTriangle } from 'lucide-react';
-import { anamnesisAlerts } from '@/data/mockData';
+import { anamnesisAlerts, mockPatients } from '@/data/mockData';
 
 const PatientDashboard = () => {
+  const patientName = localStorage.getItem('fitjourney_patient_name') || 'Paciente';
+  const patientId = localStorage.getItem('fitjourney_patient_id');
+  const patient = mockPatients.find(p => p.id === parseInt(patientId));
   const tasks = [
     { id: 1, title: 'Beber 2.5L de água', completed: true, icon: Droplet },
     { id: 2, title: 'Caminhar 10.000 passos', completed: false, icon: Footprints },
