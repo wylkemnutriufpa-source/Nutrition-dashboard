@@ -49,70 +49,191 @@ const LoginPage = () => {
     navigate('/visitor/calculators');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
-      <div className="max-w-5xl w-full">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-700 to-teal-600 mb-4 shadow-lg">
-            <span className="text-white font-bold text-3xl">FJ</span>
+  if (!loginType) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
+        <div className="max-w-5xl w-full">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-700 to-teal-600 mb-4 shadow-lg">
+              <span className="text-white font-bold text-3xl">FJ</span>
+            </div>
+            <h1 className="text-5xl font-bold text-gray-900 mb-2">FitJourney</h1>
+            <p className="text-lg text-gray-600">Sua jornada para uma vida mais saudável</p>
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">FitJourney</h1>
-          <p className="text-lg text-gray-600">Sua jornada para uma vida mais saudável</p>
-        </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card data-testid="professional-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-teal-700 cursor-pointer" onClick={() => handleLogin('professional')}>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card data-testid="professional-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-teal-700 cursor-pointer" onClick={() => setLoginType('professional')}>
+              <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mb-4">
+                  <Stethoscope className="text-teal-700" size={32} />
+                </div>
+                <CardTitle className="text-xl">Profissional</CardTitle>
+                <CardDescription>Acesso para nutricionistas e profissionais de saúde</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button data-testid="professional-login-button" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
+                  Entrar como Profissional
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card data-testid="patient-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-green-600 cursor-pointer" onClick={() => setLoginType('patient')}>
+              <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                  <User className="text-green-700" size={32} />
+                </div>
+                <CardTitle className="text-xl">Paciente</CardTitle>
+                <CardDescription>Acesso para pacientes acompanharem seu plano alimentar</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button data-testid="patient-login-button" className="w-full bg-green-600 hover:bg-green-700" size="lg">
+                  Entrar como Paciente
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card data-testid="visitor-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-gray-600 cursor-pointer" onClick={handleVisitorLogin}>
+              <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                  <Eye className="text-gray-700" size={32} />
+                </div>
+                <CardTitle className="text-xl">Visitante</CardTitle>
+                <CardDescription>Experimente as calculadoras sem criar conta</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button data-testid="visitor-login-button" className="w-full bg-gray-700 hover:bg-gray-800" size="lg" variant="outline">
+                  Continuar como Visitante
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-8 text-center text-sm text-gray-600">
+            <p>Protótipo de interface • Dados mockados para demonstração</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loginType === 'professional') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Button
+            variant="ghost"
+            onClick={() => setLoginType(null)}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2" size={18} />
+            Voltar
+          </Button>
+
+          <Card className="shadow-xl">
             <CardHeader className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mb-4">
                 <Stethoscope className="text-teal-700" size={32} />
               </div>
-              <CardTitle className="text-xl">Profissional</CardTitle>
-              <CardDescription>Acesso para nutricionistas e profissionais de saúde</CardDescription>
+              <CardTitle className="text-2xl">Login Profissional</CardTitle>
+              <CardDescription>Acesso restrito para nutricionistas cadastrados</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button data-testid="professional-login-button" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
-                Entrar como Profissional
-              </Button>
+              <form onSubmit={handleProfessionalLogin} className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password">Senha</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
+                  Entrar
+                </Button>
+              </form>
+
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xs text-gray-600 font-semibold mb-2">Credenciais de teste:</p>
+                <p className="text-xs text-gray-600">Email: wylkem.nutri.ufpa@gmail.com</p>
+                <p className="text-xs text-gray-600">Senha: 123456</p>
+              </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
+    );
+  }
 
-          <Card data-testid="patient-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-green-600 cursor-pointer" onClick={() => handleLogin('patient')}>
+  if (loginType === 'patient') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Button
+            variant="ghost"
+            onClick={() => setLoginType(null)}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2" size={18} />
+            Voltar
+          </Button>
+
+          <Card className="shadow-xl">
             <CardHeader className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
                 <User className="text-green-700" size={32} />
               </div>
-              <CardTitle className="text-xl">Paciente</CardTitle>
-              <CardDescription>Acesso para pacientes acompanharem seu plano alimentar</CardDescription>
+              <CardTitle className="text-2xl">Login Paciente</CardTitle>
+              <CardDescription>Selecione seu nome da lista para acessar</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button data-testid="patient-login-button" className="w-full bg-green-600 hover:bg-green-700" size="lg">
-                Entrar como Paciente
-              </Button>
-            </CardContent>
-          </Card>
+              <form onSubmit={handlePatientLogin} className="space-y-4">
+                <div>
+                  <Label htmlFor="patient">Selecione seu nome</Label>
+                  <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                    <SelectTrigger id="patient">
+                      <SelectValue placeholder="Escolha seu nome" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockPatients.filter(p => p.status === 'Ativo').map((patient) => (
+                        <SelectItem key={patient.id} value={patient.id.toString()}>
+                          {patient.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" size="lg">
+                  Acessar Minha Conta
+                </Button>
+              </form>
 
-          <Card data-testid="visitor-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-gray-600 cursor-pointer" onClick={() => handleLogin('visitor')}>
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                <Eye className="text-gray-700" size={32} />
+              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-xs text-gray-600">
+                  Não encontrou seu nome? Entre em contato com seu nutricionista para ser cadastrado.
+                </p>
               </div>
-              <CardTitle className="text-xl">Visitante</CardTitle>
-              <CardDescription>Experimente as calculadoras sem criar conta</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button data-testid="visitor-login-button" className="w-full bg-gray-700 hover:bg-gray-800" size="lg" variant="outline">
-                Continuar como Visitante
-              </Button>
             </CardContent>
           </Card>
-        </div>
-
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <p>Protótipo de interface • Dados mockados para demonstração</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 };
 
 export default LoginPage;
