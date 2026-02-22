@@ -21,7 +21,7 @@ const PatientDashboard = () => {
   ];
 
   return (
-    <Layout title="Meu Dashboard" userType="patient">
+    <Layout title={`Olá, ${patientName.split(' ')[0]}!`} userType="patient">
       <div data-testid="patient-dashboard" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
