@@ -1,20 +1,52 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Stethoscope, Eye } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { User, Stethoscope, Eye, ArrowLeft } from 'lucide-react';
+import { mockPatients } from '@/data/mockData';
+import { toast } from 'sonner';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [loginType, setLoginType] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [selectedPatientId, setSelectedPatientId] = useState('');
 
-  const handleLogin = (type) => {
-    localStorage.setItem('fitjourney_user_type', type);
-    if (type === 'professional') {
+  const handleProfessionalLogin = (e) => {
+    e.preventDefault();
+    
+    if (email === 'wylkem.nutri.ufpa@gmail.com' && password === '123456') {
+      localStorage.setItem('fitjourney_user_type', 'professional');
+      localStorage.setItem('fitjourney_user_email', email);
+      toast.success('Login realizado com sucesso!');
       navigate('/professional/dashboard');
-    } else if (type === 'patient') {
+    } else {
+      toast.error('Email ou senha incorretos');
+    }
+  };
+
+  const handlePatientLogin = (e) => {
+    e.preventDefault();
+    
+    if (selectedPatientId) {
+      const patient = mockPatients.find(p => p.id === parseInt(selectedPatientId));
+      localStorage.setItem('fitjourney_user_type', 'patient');
+      localStorage.setItem('fitjourney_patient_id', selectedPatientId);
+      localStorage.setItem('fitjourney_patient_name', patient.name);
+      toast.success(`Bem-vindo(a), ${patient.name}!`);
       navigate('/patient/dashboard');
     } else {
-      navigate('/visitor/calculators');
+      toast.error('Selecione um paciente');
     }
+  };
+
+  const handleVisitorLogin = () => {
+    localStorage.setItem('fitjourney_user_type', 'visitor');
+    navigate('/visitor/calculators');
   };
 
   return (
