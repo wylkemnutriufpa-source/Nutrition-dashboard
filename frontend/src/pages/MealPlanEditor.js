@@ -329,6 +329,8 @@ const MealPlanEditor = () => {
     { ...mockMeals[4], foods: [] }
   ]);
 
+  const allFoods = getAllFoods();
+
   const addFoodToMeal = (mealId, food) => {
     setMeals(meals.map(m => 
       m.id === mealId ? { ...m, foods: [...m.foods, food] } : m
