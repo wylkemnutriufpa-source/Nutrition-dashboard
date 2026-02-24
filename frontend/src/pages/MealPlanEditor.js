@@ -369,7 +369,7 @@ const MealPlanEditor = () => {
   const calculateDayTotals = () => {
     return meals.reduce((totals, meal) => {
       meal.foods.forEach(food => {
-        const foodData = mockFoods.find(f => f.id === food.foodId);
+        const foodData = allFoods.find(f => f.id === food.foodId);
         if (foodData) {
           const multiplier = food.quantity / foodData.porcao;
           totals.calorias += foodData.calorias * multiplier;
