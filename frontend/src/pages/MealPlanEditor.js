@@ -12,7 +12,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, v
 import { CSS } from '@dnd-kit/utilities';
 import { mockMeals, householdMeasures, getAllFoods } from '@/data/mockData';
 
-const SortableFood = ({ food, onRemove, onUpdate }) => {
+const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: food.id });
   
   const style = {
@@ -21,7 +21,7 @@ const SortableFood = ({ food, onRemove, onUpdate }) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const foodData = mockFoods.find(f => f.id === food.foodId);
+  const foodData = allFoods.find(f => f.id === food.foodId);
   
   const calculateNutrients = () => {
     if (!foodData) return { calorias: 0, proteina: 0, carboidrato: 0, gordura: 0 };
