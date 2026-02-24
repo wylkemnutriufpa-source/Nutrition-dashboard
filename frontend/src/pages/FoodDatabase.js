@@ -91,29 +91,50 @@ const FoodDatabase = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name) {
       toast.error('Nome do alimento é obrigatório');
       return;
     }
 
-    if (editingFood) {
-      updateCustomFood(editingFood.id, formData);
-      toast.success('Alimento atualizado com sucesso!');
-    } else {
-      saveCustomFood(formData);
-      toast.success('Alimento criado com sucesso!');
+    if (!user) {
+      toast.error('Usuário não autenticado');
+      return;
     }
 
-    setIsDialogOpen(false);
-    loadCustomFoods();
+    setSaving(true);
+    try {
+      if (editingFood) {
+        const { error } = await updateCustomFood(editingFood.id, formData);
+        if (error) throw error;
+        toast.success('Alimento atualizado com sucesso!');
+      } else {
+        const { error } = await createCustomFood(user.id, formData);
+        if (error) throw error;
+        toast.success('Alimento criado com sucesso!');
+      }
+
+      setIsDialogOpen(false);
+      await loadCustomFoods();
+    } catch (error) {
+      console.error('Error saving food:', error);
+      toast.error(error.message || 'Erro ao salvar alimento');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este alimento?')) {
-      deleteCustomFood(id);
+  const handleDelete = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir este alimento?')) return;
+
+    try {
+      const { error } = await deleteCustomFood(id);
+      if (error) throw error;
       toast.success('Alimento excluído com sucesso!');
-      loadCustomFoods();
+      await loadCustomFoods();
+    } catch (error) {
+      console.error('Error deleting food:', error);
+      toast.error('Erro ao excluir alimento');
     }
   };
 
