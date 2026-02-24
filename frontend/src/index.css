@@ -46,6 +46,10 @@ h1, h2, h3, h4, h5, h6 {
         --chart-4: 170 55% 40%;
         --chart-5: 190 65% 35%;
         --radius: 0.5rem;
+        
+        /* Custom branding variables */
+        --color-primary: #0F766E;
+        --color-accent: #059669;
     }
 }
 
