@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Stethoscope, Eye, ArrowLeft } from 'lucide-react';
+import { User, Stethoscope, Eye, ArrowLeft, Loader2 } from 'lucide-react';
 import { mockPatients } from '@/data/mockData';
 import { toast } from 'sonner';
 import { useBranding } from '@/contexts/BrandingContext';
+import { signIn, signUp, getUserProfile } from '@/lib/supabase';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,33 +17,85 @@ const LoginPage = () => {
   const [loginType, setLoginType] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedPatientId, setSelectedPatientId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [signUpData, setSignUpData] = useState({
+    name: '',
+    role: 'professional'
+  });
 
-  const handleProfessionalLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    
-    if (email === 'wylkem.nutri.ufpa@gmail.com' && password === '123456') {
-      localStorage.setItem('fitjourney_user_type', 'professional');
-      localStorage.setItem('fitjourney_user_email', email);
-      toast.success('Login realizado com sucesso!');
-      navigate('/professional/dashboard');
-    } else {
-      toast.error('Email ou senha incorretos');
+    setLoading(true);
+
+    try {
+      const { data, error } = await signIn(email, password);
+      
+      if (error) {
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        const profile = await getUserProfile(data.user.id);
+        
+        if (!profile) {
+          toast.error('Perfil não encontrado');
+          setLoading(false);
+          return;
+        }
+
+        // Armazenar no localStorage (compatibilidade)
+        localStorage.setItem('fitjourney_user_type', profile.role);
+        localStorage.setItem('fitjourney_user_email', profile.email);
+
+        toast.success('Login realizado com sucesso!');
+
+        // Redirecionar baseado no role
+        if (profile.role === 'professional') {
+          navigate('/professional/dashboard');
+        } else if (profile.role === 'patient') {
+          localStorage.setItem('fitjourney_patient_id', profile.id);
+          localStorage.setItem('fitjourney_patient_name', profile.name);
+          navigate('/patient/dashboard');
+        } else if (profile.role === 'admin') {
+          navigate('/professional/dashboard'); // Admin usa mesma interface
+        }
+      }
+    } catch (error) {
+      toast.error('Erro ao fazer login');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePatientLogin = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    
-    if (selectedPatientId) {
-      const patient = mockPatients.find(p => p.id === parseInt(selectedPatientId));
-      localStorage.setItem('fitjourney_user_type', 'patient');
-      localStorage.setItem('fitjourney_patient_id', selectedPatientId);
-      localStorage.setItem('fitjourney_patient_name', patient.name);
-      toast.success(`Bem-vindo(a), ${patient.name}!`);
-      navigate('/patient/dashboard');
-    } else {
-      toast.error('Selecione um paciente');
+    setLoading(true);
+
+    try {
+      const { data, error } = await signUp(email, password, {
+        name: signUpData.name,
+        role: signUpData.role
+      });
+
+      if (error) {
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      toast.success('Conta criada! Verifique seu email para confirmar.');
+      setIsSignUp(false);
+      setEmail('');
+      setPassword('');
+    } catch (error) {
+      toast.error('Erro ao criar conta');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
