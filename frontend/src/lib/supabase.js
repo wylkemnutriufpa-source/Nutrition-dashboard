@@ -42,15 +42,24 @@ export const getUserProfile = async (userId) => {
 };
 
 export const signUp = async (email, password, metadata = {}) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: metadata
-    }
-  });
-  
-  return { data, error };
+  try {
+    console.log('Attempting signup with:', { email, metadata });
+    
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+        emailRedirectTo: window.location.origin
+      }
+    });
+    
+    console.log('Signup response:', { data, error });
+    return { data, error };
+  } catch (err) {
+    console.error('Signup exception:', err);
+    return { data: null, error: err };
+  }
 };
 
 export const signIn = async (email, password) => {
