@@ -75,7 +75,18 @@ const PatientsList = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
+          </div>
+        ) : filteredPatients.length === 0 ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-gray-600">Nenhum paciente encontrado</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
           {filteredPatients.map((patient) => (
             <Card key={patient.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/professional/patient/${patient.id}`)}>
               <CardContent className="p-6">
