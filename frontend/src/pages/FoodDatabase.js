@@ -21,8 +21,6 @@ const FoodDatabase = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFood, setEditingFood] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingFood, setEditingFood] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     unidade: 'g',
