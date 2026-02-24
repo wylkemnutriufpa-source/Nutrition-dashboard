@@ -60,9 +60,10 @@ const Sidebar = ({ userType, onLogout }) => {
               data-testid={`sidebar-link-${link.label.toLowerCase().replace(' ', '-')}`}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
-                  ? 'bg-teal-700 text-white shadow-md'
+                  ? 'text-white shadow-md'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
+              style={isActive ? { backgroundColor: branding.primaryColor } : {}}
             >
               <Icon size={20} />
               <span className="font-medium text-sm">{link.label}</span>
