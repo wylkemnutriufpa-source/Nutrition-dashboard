@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut } from 'lucide-react';
+import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Sidebar = ({ userType, onLogout }) => {
