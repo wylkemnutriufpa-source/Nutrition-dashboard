@@ -37,8 +37,9 @@ function App() {
 
   return (
     <div className="App">
-      <BrowserRouter>
-        <Routes>
+      <BrandingProvider>
+        <BrowserRouter>
+          <Routes>
           <Route path="/" element={<LoginPage />} />
           
           <Route path="/professional/dashboard" element={
