@@ -132,6 +132,7 @@ function App() {
       </BrowserRouter>
       <Toaster />
     </BrandingProvider>
+    </AuthProvider>
     </div>
   );
 }
