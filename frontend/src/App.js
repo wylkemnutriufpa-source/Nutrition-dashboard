@@ -72,6 +72,11 @@ function App() {
               <FoodDatabase />
             </ProtectedRoute>
           } />
+          <Route path="/professional/branding" element={
+            <ProtectedRoute allowedTypes={['professional']}>
+              <BrandingSettings />
+            </ProtectedRoute>
+          } />
           
           <Route path="/patient/dashboard" element={
             <ProtectedRoute allowedTypes={['patient']}>
