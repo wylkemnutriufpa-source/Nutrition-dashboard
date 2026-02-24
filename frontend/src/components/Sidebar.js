@@ -11,6 +11,7 @@ const Sidebar = ({ userType, onLogout }) => {
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/professional/patients', icon: Users, label: 'Pacientes' },
     { to: '/professional/food-database', icon: Database, label: 'Banco de Alimentos' },
+    { to: '/professional/branding', icon: Palette, label: 'Personalização' },
     { to: '/professional/settings', icon: Settings, label: 'Configurações' }
   ];
 
