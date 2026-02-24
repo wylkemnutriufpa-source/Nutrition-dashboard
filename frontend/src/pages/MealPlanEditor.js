@@ -219,11 +219,49 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
             
             <div className="space-y-4">
               <div>
+                <Label>Filtrar por Fonte</Label>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant={sourceFilter === 'ALL' ? 'default' : 'outline'}
+                    onClick={() => setSourceFilter('ALL')}
+                    className={sourceFilter === 'ALL' ? 'bg-teal-700' : ''}
+                  >
+                    Todos
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={sourceFilter === 'TACO' ? 'default' : 'outline'}
+                    onClick={() => setSourceFilter('TACO')}
+                    className={sourceFilter === 'TACO' ? 'bg-teal-700' : ''}
+                  >
+                    TACO
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={sourceFilter === 'CUSTOM' ? 'default' : 'outline'}
+                    onClick={() => setSourceFilter('CUSTOM')}
+                    className={sourceFilter === 'CUSTOM' ? 'bg-teal-700' : ''}
+                  >
+                    Meus Alimentos
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={sourceFilter === 'USDA' ? 'default' : 'outline'}
+                    onClick={() => setSourceFilter('USDA')}
+                    className={sourceFilter === 'USDA' ? 'bg-teal-700' : ''}
+                  >
+                    USDA
+                  </Button>
+                </div>
+              </div>
+              
+              <div>
                 <Label>Buscar Alimento</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 text-gray-400" size={18} />
                   <Input
-                    placeholder="Digite o nome do alimento ou fonte (TACO, USDA...)"
+                    placeholder="Digite o nome do alimento..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
