@@ -38,9 +38,10 @@ function App() {
 
   return (
     <div className="App">
-      <BrandingProvider>
-        <BrowserRouter>
-          <Routes>
+      <AuthProvider>
+        <BrandingProvider>
+          <BrowserRouter>
+            <Routes>
           <Route path="/" element={<LoginPage />} />
           
           <Route path="/professional/dashboard" element={
