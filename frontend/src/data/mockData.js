@@ -22,13 +22,14 @@ export const mockFoods = [
 ];
 
 // Helper functions para gerenciar alimentos customizados
-export const getCustomFoods = () => {
+// Mantido para compatibilidade com modo offline/sem Supabase
+export const getCustomFoodsLocal = () => {
   const stored = localStorage.getItem('fitjourney_custom_foods');
   return stored ? JSON.parse(stored) : [];
 };
 
-export const saveCustomFood = (food) => {
-  const customFoods = getCustomFoods();
+export const saveCustomFoodLocal = (food) => {
+  const customFoods = getCustomFoodsLocal();
   const newFood = {
     ...food,
     id: Date.now(),
@@ -41,8 +42,8 @@ export const saveCustomFood = (food) => {
   return newFood;
 };
 
-export const updateCustomFood = (id, updates) => {
-  const customFoods = getCustomFoods();
+export const updateCustomFoodLocal = (id, updates) => {
+  const customFoods = getCustomFoodsLocal();
   const index = customFoods.findIndex(f => f.id === id);
   if (index !== -1) {
     customFoods[index] = { ...customFoods[index], ...updates, updated_at: new Date().toISOString() };
@@ -52,16 +53,22 @@ export const updateCustomFood = (id, updates) => {
   return null;
 };
 
-export const deleteCustomFood = (id) => {
-  const customFoods = getCustomFoods();
+export const deleteCustomFoodLocal = (id) => {
+  const customFoods = getCustomFoodsLocal();
   const filtered = customFoods.filter(f => f.id !== id);
   localStorage.setItem('fitjourney_custom_foods', JSON.stringify(filtered));
   return true;
 };
 
 export const getAllFoods = () => {
-  return [...mockFoods, ...getCustomFoods()];
+  return [...mockFoods, ...getCustomFoodsLocal()];
 };
+
+// Funções mantidas para compatibilidade (redirect para local)
+export const getCustomFoods = getCustomFoodsLocal;
+export const saveCustomFood = saveCustomFoodLocal;
+export const updateCustomFood = updateCustomFoodLocal;
+export const deleteCustomFood = deleteCustomFoodLocal;
 
 export const mockMeals = [
   { id: 'm1', name: 'Café da Manhã', time: '07:00', color: '#F59E0B' },
