@@ -73,8 +73,13 @@ const LoginPage = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    
+    if (!signUpData.name || !email || !password) {
+      toast.error('Preencha todos os campos');
+      return;
+    }
 
+    setLoading(true);
     try {
       const { data, error } = await signUp(email, password, {
         name: signUpData.name,
@@ -82,18 +87,28 @@ const LoginPage = () => {
       });
 
       if (error) {
-        toast.error(error.message);
-        setLoading(false);
+        console.error('Signup error:', error);
+        toast.error(error.message || 'Erro ao criar conta');
         return;
       }
 
-      toast.success('Conta criada! Verifique seu email para confirmar.');
-      setIsSignUp(false);
-      setEmail('');
-      setPassword('');
+      // Sucesso - verificar se precisa confirmar email
+      if (data?.user) {
+        if (data.user.confirmed_at) {
+          toast.success('Conta criada e confirmada! Faça login agora.');
+        } else {
+          toast.success('Conta criada! Verifique seu email para confirmar.', {
+            duration: 5000
+          });
+        }
+        setIsSignUp(false);
+        setEmail('');
+        setPassword('');
+        setSignUpData({ name: '', role: 'professional' });
+      }
     } catch (error) {
-      toast.error('Erro ao criar conta');
-      console.error(error);
+      console.error('Signup exception:', error);
+      toast.error('Erro ao criar conta. Tente novamente.');
     } finally {
       setLoading(false);
     }
