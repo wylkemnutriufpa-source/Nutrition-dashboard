@@ -367,14 +367,23 @@ const FoodDatabase = () => {
                       variant="outline"
                       onClick={() => setIsDialogOpen(false)}
                       className="flex-1"
+                      disabled={saving}
                     >
                       Cancelar
                     </Button>
                     <Button
                       onClick={handleSave}
                       className="flex-1 bg-teal-700 hover:bg-teal-800"
+                      disabled={saving}
                     >
-                      {editingFood ? 'Atualizar' : 'Criar'} Alimento
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Salvando...
+                        </>
+                      ) : (
+                        <>{editingFood ? 'Atualizar' : 'Criar'} Alimento</>
+                      )}
                     </Button>
                   </div>
                 </div>
