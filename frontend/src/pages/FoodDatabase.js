@@ -37,11 +37,25 @@ const FoodDatabase = () => {
   });
 
   useEffect(() => {
-    loadCustomFoods();
-  }, []);
+    if (user) {
+      loadCustomFoods();
+    }
+  }, [user]);
 
-  const loadCustomFoods = () => {
-    setCustomFoods(getCustomFoods());
+  const loadCustomFoods = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await getCustomFoods(user.id);
+      if (error) throw error;
+      setCustomFoods(data || []);
+    } catch (error) {
+      console.error('Error loading custom foods:', error);
+      toast.error('Erro ao carregar alimentos customizados');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenDialog = (food = null) => {
