@@ -97,6 +97,9 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
   const [selectedFoodId, setSelectedFoodId] = useState(null);
   const [quantity, setQuantity] = useState(100);
   const [unit, setUnit] = useState('g');
+  const [sourceFilter, setSourceFilter] = useState('ALL');
+
+  const allFoods = getAllFoods();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
