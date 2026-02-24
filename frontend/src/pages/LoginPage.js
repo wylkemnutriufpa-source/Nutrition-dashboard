@@ -171,7 +171,7 @@ const LoginPage = () => {
     );
   }
 
-  if (loginType === 'professional') {
+  if (loginType === 'professional' || loginType === 'patient') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
@@ -187,13 +187,51 @@ const LoginPage = () => {
           <Card className="shadow-xl">
             <CardHeader className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mb-4">
-                <Stethoscope className="text-teal-700" size={32} />
+                {loginType === 'professional' ? (
+                  <Stethoscope className="text-teal-700" size={32} />
+                ) : (
+                  <User className="text-green-700" size={32} />
+                )}
               </div>
-              <CardTitle className="text-2xl">Login Profissional</CardTitle>
-              <CardDescription>Acesso restrito para nutricionistas cadastrados</CardDescription>
+              <CardTitle className="text-2xl">
+                {isSignUp ? 'Criar Conta' : 'Login'} {loginType === 'professional' ? 'Profissional' : 'Paciente'}
+              </CardTitle>
+              <CardDescription>
+                {isSignUp ? 'Cadastre-se no sistema' : 'Entre com suas credenciais'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleProfessionalLogin} className="space-y-4">
+              <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
+                {isSignUp && (
+                  <>
+                    <div>
+                      <Label htmlFor="name">Nome Completo</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        value={signUpData.name}
+                        onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
+                        required
+                        placeholder="Seu nome completo"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="role">Tipo de Conta</Label>
+                      <Select
+                        value={signUpData.role}
+                        onValueChange={(v) => setSignUpData({ ...signUpData, role: v })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="professional">Profissional</SelectItem>
+                          <SelectItem value="patient">Paciente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -216,71 +254,39 @@ const LoginPage = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
-                  Entrar
+                <Button
+                  type="submit"
+                  className="w-full bg-teal-700 hover:bg-teal-800"
+                  size="lg"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isSignUp ? 'Criando...' : 'Entrando...'}
+                    </>
+                  ) : (
+                    <>{isSignUp ? 'Criar Conta' : 'Entrar'}</>
+                  )}
                 </Button>
               </form>
 
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-600 font-semibold mb-2">Credenciais de teste:</p>
-                <p className="text-xs text-gray-600">Email: wylkem.nutri.ufpa@gmail.com</p>
-                <p className="text-xs text-gray-600">Senha: 123456</p>
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="text-sm text-teal-700 hover:underline"
+                >
+                  {isSignUp ? 'Já tem uma conta? Fazer login' : 'Não tem conta? Cadastre-se'}
+                </button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
-  if (loginType === 'patient') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <Button
-            variant="ghost"
-            onClick={() => setLoginType(null)}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2" size={18} />
-            Voltar
-          </Button>
-
-          <Card className="shadow-xl">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                <User className="text-green-700" size={32} />
-              </div>
-              <CardTitle className="text-2xl">Login Paciente</CardTitle>
-              <CardDescription>Selecione seu nome da lista para acessar</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handlePatientLogin} className="space-y-4">
-                <div>
-                  <Label htmlFor="patient">Selecione seu nome</Label>
-                  <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
-                    <SelectTrigger id="patient">
-                      <SelectValue placeholder="Escolha seu nome" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockPatients.filter(p => p.status === 'Ativo').map((patient) => (
-                        <SelectItem key={patient.id} value={patient.id.toString()}>
-                          {patient.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {!isSignUp && (
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-xs text-gray-600 font-semibold mb-2">🎯 Modo Demo (para testes):</p>
+                  <p className="text-xs text-gray-600">Configure suas credenciais Supabase no arquivo .env</p>
+                  <p className="text-xs text-gray-600 mt-1">Ou clique em "Cadastre-se" para criar sua conta</p>
                 </div>
-                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" size="lg">
-                  Acessar Minha Conta
-                </Button>
-              </form>
-
-              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-xs text-gray-600">
-                  Não encontrou seu nome? Entre em contato com seu nutricionista para ser cadastrado.
-                </p>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
