@@ -12,6 +12,7 @@ import CalculatorsList from '@/pages/CalculatorsList';
 import WeightCalculator from '@/pages/WeightCalculator';
 import WaterCalculator from '@/pages/WaterCalculator';
 import SettingsPage from '@/pages/SettingsPage';
+import FoodDatabase from '@/pages/FoodDatabase';
 
 const ProtectedRoute = ({ children, allowedTypes }) => {
   const userType = localStorage.getItem('fitjourney_user_type');
