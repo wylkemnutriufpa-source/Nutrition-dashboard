@@ -64,6 +64,11 @@ function App() {
               <SettingsPage />
             </ProtectedRoute>
           } />
+          <Route path="/professional/food-database" element={
+            <ProtectedRoute allowedTypes={['professional']}>
+              <FoodDatabase />
+            </ProtectedRoute>
+          } />
           
           <Route path="/patient/dashboard" element={
             <ProtectedRoute allowedTypes={['patient']}>
