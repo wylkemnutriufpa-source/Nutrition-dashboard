@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database } from 'lucide-react';
+import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useBranding } from '@/contexts/BrandingContext';
 
 const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
