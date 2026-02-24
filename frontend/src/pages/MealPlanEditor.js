@@ -192,6 +192,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
                 <SortableFood
                   key={food.id}
                   food={food}
+                  allFoods={allFoods}
                   onRemove={onRemoveFood}
                   onUpdate={onUpdateFood}
                 />
