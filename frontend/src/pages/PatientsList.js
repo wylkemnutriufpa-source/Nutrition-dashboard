@@ -1,17 +1,57 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
-import { mockPatients } from '@/data/mockData';
-import { useState } from 'react';
+import { Plus, Search, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getProfessionalPatients } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 const PatientsList = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPatients = mockPatients.filter(p =>
+  useEffect(() => {
+    if (user) {
+      loadPatients();
+    }
+  }, [user]);
+
+  const loadPatients = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await getProfessionalPatients(user.id);
+      if (error) throw error;
+      
+      // Mapear dados para formato esperado
+      const mappedPatients = (data || []).map(item => ({
+        id: item.patient.id,
+        name: item.patient.name,
+        email: item.patient.email,
+        phone: item.patient.phone || 'Não informado',
+        age: 0, // Pode adicionar campo idade no profile
+        status: 'Ativo',
+        lastVisit: item.created_at,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.patient.name)}&background=0F766E&color=fff`
+      }));
+      
+      setPatients(mappedPatients);
+    } catch (error) {
+      console.error('Error loading patients:', error);
+      toast.error('Erro ao carregar pacientes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
