@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { User, Stethoscope, Eye, ArrowLeft } from 'lucide-react';
 import { mockPatients } from '@/data/mockData';
 import { toast } from 'sonner';
+import { useBranding } from '@/contexts/BrandingContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { branding } = useBranding();
   const [loginType, setLoginType] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
