@@ -5,6 +5,7 @@ import { useBranding } from '@/contexts/BrandingContext';
 
 const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
+  const { branding } = useBranding();
 
   const professionalLinks = [
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
