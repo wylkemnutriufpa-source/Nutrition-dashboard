@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { BrandingProvider } from '@/contexts/BrandingContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 import LoginPage from '@/pages/LoginPage';
 import ProfessionalDashboard from '@/pages/ProfessionalDashboard';
