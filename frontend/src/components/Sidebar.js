@@ -32,11 +32,18 @@ const Sidebar = ({ userType, onLogout }) => {
     <div data-testid="sidebar" className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col shadow-sm">
       <div className="p-6 border-b border-gray-200">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-700 to-teal-600 flex items-center justify-center">
-            <span className="text-white font-bold text-xl">FJ</span>
-          </div>
+          {branding.logo ? (
+            <img src={branding.logo} alt={branding.brandName} className="w-10 h-10 rounded-lg object-contain" />
+          ) : (
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ background: `linear-gradient(to br, ${branding.primaryColor}, ${branding.accentColor})` }}
+            >
+              <span className="text-white font-bold text-xl">{branding.brandName?.substring(0, 2).toUpperCase()}</span>
+            </div>
+          )}
           <div>
-            <h1 className="text-xl font-bold text-gray-900">FitJourney</h1>
+            <h1 className="text-xl font-bold text-gray-900">{branding.brandName}</h1>
             <p className="text-xs text-gray-500">{userType === 'professional' ? 'Profissional' : userType === 'patient' ? 'Paciente' : 'Visitante'}</p>
           </div>
         </Link>
