@@ -112,6 +112,7 @@ const PatientsList = () => {
             </Card>
           ))}
         </div>
+        )}
       </div>
     </Layout>
   );
