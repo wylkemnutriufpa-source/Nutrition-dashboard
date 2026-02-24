@@ -8,12 +8,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, Database } from 'lucide-react';
-import { getCustomFoods, saveCustomFood, updateCustomFood, deleteCustomFood, mockFoods } from '@/data/mockData';
+import { Plus, Edit, Trash2, Database, Loader2 } from 'lucide-react';
+import { mockFoods } from '@/data/mockData';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { getCustomFoods, createCustomFood, updateCustomFood, deleteCustomFood } from '@/lib/supabase';
 
 const FoodDatabase = () => {
+  const { user } = useAuth();
   const [customFoods, setCustomFoods] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingFood, setEditingFood] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFood, setEditingFood] = useState(null);
   const [formData, setFormData] = useState({
