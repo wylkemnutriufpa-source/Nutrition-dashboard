@@ -1,25 +1,67 @@
 export const mockFoods = [
-  { id: 1, name: 'Arroz branco cozido', source: 'TACO', calorias: 128, proteina: 2.5, carboidrato: 28.1, gordura: 0.2, porcao: 100, unidade: 'g' },
-  { id: 2, name: 'Feijão preto cozido', source: 'TACO', calorias: 77, proteina: 4.5, carboidrato: 14, gordura: 0.5, porcao: 100, unidade: 'g' },
-  { id: 3, name: 'Peito de frango grelhado', source: 'TACO', calorias: 165, proteina: 31, carboidrato: 0, gordura: 3.6, porcao: 100, unidade: 'g' },
-  { id: 4, name: 'Ovo cozido', source: 'TACO', calorias: 155, proteina: 13, carboidrato: 1.1, gordura: 11, porcao: 50, unidade: 'unidade' },
-  { id: 5, name: 'Banana', source: 'TACO', calorias: 89, proteina: 1.1, carboidrato: 23, gordura: 0.3, porcao: 100, unidade: 'unidade' },
-  { id: 6, name: 'Batata doce cozida', source: 'TACO', calorias: 77, proteina: 0.6, carboidrato: 18.4, gordura: 0.1, porcao: 100, unidade: 'g' },
-  { id: 7, name: 'Brócolis cozido', source: 'TACO', calorias: 25, proteina: 1.9, carboidrato: 4.5, gordura: 0.2, porcao: 100, unidade: 'g' },
-  { id: 8, name: 'Azeite de oliva', source: 'TACO', calorias: 884, proteina: 0, carboidrato: 0, gordura: 100, porcao: 10, unidade: 'ml' },
-  { id: 9, name: 'Aveia em flocos', source: 'TACO', calorias: 394, proteina: 13.9, carboidrato: 66.6, gordura: 8.5, porcao: 50, unidade: 'g' },
-  { id: 10, name: 'Leite desnatado', source: 'TACO', calorias: 35, proteina: 3.4, carboidrato: 4.9, gordura: 0.1, porcao: 200, unidade: 'ml' },
-  { id: 11, name: 'Queijo minas frescal', source: 'TACO', calorias: 264, proteina: 17.4, carboidrato: 3.1, gordura: 20.8, porcao: 50, unidade: 'g' },
-  { id: 12, name: 'Maçã', source: 'TACO', calorias: 52, proteina: 0.3, carboidrato: 14, gordura: 0.2, porcao: 130, unidade: 'unidade' },
-  { id: 13, name: 'Pão integral', source: 'TACO', calorias: 253, proteina: 9, carboidrato: 49, gordura: 3.5, porcao: 50, unidade: 'fatia' },
-  { id: 14, name: 'Tomate', source: 'TACO', calorias: 18, proteina: 0.9, carboidrato: 3.9, gordura: 0.2, porcao: 100, unidade: 'g' },
-  { id: 15, name: 'Alface', source: 'TACO', calorias: 14, proteina: 1.4, carboidrato: 2.9, gordura: 0.2, porcao: 100, unidade: 'g' },
-  { id: 16, name: 'Filé de tilápia', source: 'TACO', calorias: 96, proteina: 20, carboidrato: 0, gordura: 1.5, porcao: 100, unidade: 'g' },
-  { id: 17, name: 'Castanha do Pará', source: 'TACO', calorias: 656, proteina: 14, carboidrato: 12, gordura: 63, porcao: 10, unidade: 'g' },
-  { id: 18, name: 'Iogurte natural', source: 'USDA', calorias: 61, proteina: 3.5, carboidrato: 4.7, gordura: 3.3, porcao: 150, unidade: 'ml' },
-  { id: 19, name: 'Whey Protein', source: 'Manual', calorias: 120, proteina: 24, carboidrato: 3, gordura: 1.5, porcao: 30, unidade: 'g' },
-  { id: 20, name: 'Carne moída (patinho)', source: 'TACO', calorias: 137, proteina: 21, carboidrato: 0, gordura: 5.5, porcao: 100, unidade: 'g' }
+  { id: 1, name: 'Arroz branco cozido', source: 'TACO', source_id: 'taco_001', calorias: 128, proteina: 2.5, carboidrato: 28.1, gordura: 0.2, fibra: 1.6, sodio: 1, porcao: 100, unidade: 'g' },
+  { id: 2, name: 'Feijão preto cozido', source: 'TACO', source_id: 'taco_002', calorias: 77, proteina: 4.5, carboidrato: 14, gordura: 0.5, fibra: 8.4, sodio: 2, porcao: 100, unidade: 'g' },
+  { id: 3, name: 'Peito de frango grelhado', source: 'TACO', source_id: 'taco_003', calorias: 165, proteina: 31, carboidrato: 0, gordura: 3.6, fibra: 0, sodio: 70, porcao: 100, unidade: 'g' },
+  { id: 4, name: 'Ovo cozido', source: 'TACO', source_id: 'taco_004', calorias: 155, proteina: 13, carboidrato: 1.1, gordura: 11, fibra: 0, sodio: 124, porcao: 50, unidade: 'unidade' },
+  { id: 5, name: 'Banana', source: 'TACO', source_id: 'taco_005', calorias: 89, proteina: 1.1, carboidrato: 23, gordura: 0.3, fibra: 2.6, sodio: 1, porcao: 100, unidade: 'unidade' },
+  { id: 6, name: 'Batata doce cozida', source: 'TACO', source_id: 'taco_006', calorias: 77, proteina: 0.6, carboidrato: 18.4, gordura: 0.1, fibra: 2.2, sodio: 9, porcao: 100, unidade: 'g' },
+  { id: 7, name: 'Brócolis cozido', source: 'TACO', source_id: 'taco_007', calorias: 25, proteina: 1.9, carboidrato: 4.5, gordura: 0.2, fibra: 3.4, sodio: 8, porcao: 100, unidade: 'g' },
+  { id: 8, name: 'Azeite de oliva', source: 'TACO', source_id: 'taco_008', calorias: 884, proteina: 0, carboidrato: 0, gordura: 100, fibra: 0, sodio: 0, porcao: 10, unidade: 'ml' },
+  { id: 9, name: 'Aveia em flocos', source: 'TACO', source_id: 'taco_009', calorias: 394, proteina: 13.9, carboidrato: 66.6, gordura: 8.5, fibra: 9.1, sodio: 5, porcao: 50, unidade: 'g' },
+  { id: 10, name: 'Leite desnatado', source: 'TACO', source_id: 'taco_010', calorias: 35, proteina: 3.4, carboidrato: 4.9, gordura: 0.1, fibra: 0, sodio: 50, porcao: 200, unidade: 'ml' },
+  { id: 11, name: 'Queijo minas frescal', source: 'TACO', source_id: 'taco_011', calorias: 264, proteina: 17.4, carboidrato: 3.1, gordura: 20.8, fibra: 0, sodio: 215, porcao: 50, unidade: 'g' },
+  { id: 12, name: 'Maçã', source: 'TACO', source_id: 'taco_012', calorias: 52, proteina: 0.3, carboidrato: 14, gordura: 0.2, fibra: 2.4, sodio: 1, porcao: 130, unidade: 'unidade' },
+  { id: 13, name: 'Pão integral', source: 'TACO', source_id: 'taco_013', calorias: 253, proteina: 9, carboidrato: 49, gordura: 3.5, fibra: 6.9, sodio: 400, porcao: 50, unidade: 'fatia' },
+  { id: 14, name: 'Tomate', source: 'TACO', source_id: 'taco_014', calorias: 18, proteina: 0.9, carboidrato: 3.9, gordura: 0.2, fibra: 1.2, sodio: 5, porcao: 100, unidade: 'g' },
+  { id: 15, name: 'Alface', source: 'TACO', source_id: 'taco_015', calorias: 14, proteina: 1.4, carboidrato: 2.9, gordura: 0.2, fibra: 2.1, sodio: 8, porcao: 100, unidade: 'g' },
+  { id: 16, name: 'Filé de tilápia', source: 'TACO', source_id: 'taco_016', calorias: 96, proteina: 20, carboidrato: 0, gordura: 1.5, fibra: 0, sodio: 52, porcao: 100, unidade: 'g' },
+  { id: 17, name: 'Castanha do Pará', source: 'TACO', source_id: 'taco_017', calorias: 656, proteina: 14, carboidrato: 12, gordura: 63, fibra: 7.5, sodio: 3, porcao: 10, unidade: 'g' },
+  { id: 18, name: 'Iogurte natural', source: 'USDA', source_id: 'usda_001', calorias: 61, proteina: 3.5, carboidrato: 4.7, gordura: 3.3, fibra: 0, sodio: 46, porcao: 150, unidade: 'ml' },
+  { id: 19, name: 'Whey Protein', source: 'CUSTOM', source_id: null, calorias: 120, proteina: 24, carboidrato: 3, gordura: 1.5, fibra: 0, sodio: 100, porcao: 30, unidade: 'g', observacoes: 'Suplemento proteico' },
+  { id: 20, name: 'Carne moída (patinho)', source: 'TACO', source_id: 'taco_020', calorias: 137, proteina: 21, carboidrato: 0, gordura: 5.5, fibra: 0, sodio: 59, porcao: 100, unidade: 'g' }
 ];
+
+// Helper functions para gerenciar alimentos customizados
+export const getCustomFoods = () => {
+  const stored = localStorage.getItem('fitjourney_custom_foods');
+  return stored ? JSON.parse(stored) : [];
+};
+
+export const saveCustomFood = (food) => {
+  const customFoods = getCustomFoods();
+  const newFood = {
+    ...food,
+    id: Date.now(),
+    source: 'CUSTOM',
+    source_id: null,
+    created_at: new Date().toISOString()
+  };
+  customFoods.push(newFood);
+  localStorage.setItem('fitjourney_custom_foods', JSON.stringify(customFoods));
+  return newFood;
+};
+
+export const updateCustomFood = (id, updates) => {
+  const customFoods = getCustomFoods();
+  const index = customFoods.findIndex(f => f.id === id);
+  if (index !== -1) {
+    customFoods[index] = { ...customFoods[index], ...updates, updated_at: new Date().toISOString() };
+    localStorage.setItem('fitjourney_custom_foods', JSON.stringify(customFoods));
+    return customFoods[index];
+  }
+  return null;
+};
+
+export const deleteCustomFood = (id) => {
+  const customFoods = getCustomFoods();
+  const filtered = customFoods.filter(f => f.id !== id);
+  localStorage.setItem('fitjourney_custom_foods', JSON.stringify(filtered));
+  return true;
+};
+
+export const getAllFoods = () => {
+  return [...mockFoods, ...getCustomFoods()];
+};
 
 export const mockMeals = [
   { id: 'm1', name: 'Café da Manhã', time: '07:00', color: '#F59E0B' },
