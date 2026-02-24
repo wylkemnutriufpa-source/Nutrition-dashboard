@@ -118,7 +118,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
 
   const calculateMealTotals = () => {
     return meal.foods.reduce((totals, food) => {
-      const foodData = mockFoods.find(f => f.id === food.foodId);
+      const foodData = allFoods.find(f => f.id === food.foodId);
       if (!foodData) return totals;
       const multiplier = food.quantity / foodData.porcao;
       return {
@@ -131,10 +131,13 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
   };
 
   const totals = calculateMealTotals();
-  const filteredFoods = mockFoods.filter(f => 
-    f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    f.source.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
+  const filteredFoods = allFoods.filter(f => {
+    const matchesSearch = f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.source.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSource = sourceFilter === 'ALL' || f.source === sourceFilter;
+    return matchesSearch && matchesSource;
+  });
 
   const handleAddFood = () => {
     if (selectedFoodId) {
