@@ -88,3 +88,128 @@ export const getProfessionalPatients = async (professionalId) => {
   
   return { data, error };
 };
+
+// ==================== CUSTOM FOODS ====================
+
+export const getCustomFoods = async (professionalId) => {
+  const { data, error } = await supabase
+    .from('custom_foods')
+    .select('*')
+    .eq('professional_id', professionalId)
+    .order('created_at', { ascending: false });
+  
+  return { data, error };
+};
+
+export const createCustomFood = async (professionalId, foodData) => {
+  const { data, error } = await supabase
+    .from('custom_foods')
+    .insert({
+      professional_id: professionalId,
+      ...foodData
+    })
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+export const updateCustomFood = async (foodId, updates) => {
+  const { data, error } = await supabase
+    .from('custom_foods')
+    .update(updates)
+    .eq('id', foodId)
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+export const deleteCustomFood = async (foodId) => {
+  const { error } = await supabase
+    .from('custom_foods')
+    .delete()
+    .eq('id', foodId);
+  
+  return { error };
+};
+
+// ==================== MEAL PLANS ====================
+
+export const getMealPlans = async (userId, userRole) => {
+  let query = supabase.from('meal_plans').select('*');
+  
+  if (userRole === 'professional') {
+    query = query.eq('professional_id', userId);
+  } else if (userRole === 'patient') {
+    query = query.eq('patient_id', userId);
+  }
+  
+  const { data, error } = await query.order('updated_at', { ascending: false });
+  return { data, error };
+};
+
+export const getMealPlan = async (planId) => {
+  const { data, error } = await supabase
+    .from('meal_plans')
+    .select('*')
+    .eq('id', planId)
+    .single();
+  
+  return { data, error };
+};
+
+export const createMealPlan = async (planData) => {
+  const { data, error } = await supabase
+    .from('meal_plans')
+    .insert(planData)
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+export const updateMealPlan = async (planId, updates) => {
+  const { data, error } = await supabase
+    .from('meal_plans')
+    .update(updates)
+    .eq('id', planId)
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+export const deleteMealPlan = async (planId) => {
+  const { error } = await supabase
+    .from('meal_plans')
+    .delete()
+    .eq('id', planId);
+  
+  return { error };
+};
+
+// ==================== BRANDING ====================
+
+export const getBranding = async (userId) => {
+  const { data, error } = await supabase
+    .from('branding_configs')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+  
+  return { data, error };
+};
+
+export const saveBranding = async (userId, brandingData) => {
+  const { data, error } = await supabase
+    .from('branding_configs')
+    .upsert({
+      user_id: userId,
+      ...brandingData
+    })
+    .select()
+    .single();
+  
+  return { data, error };
+};
