@@ -122,12 +122,47 @@ function App() {
               } />
               <Route path="/patient/meal-plan" element={
                 <ProtectedRoute allowedTypes={['patient']}>
-                  <PatientDashboard />
+                  <MealPlanEditor userType="patient" />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/tarefas" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientTarefas />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/feedbacks" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientFeedbacks />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/receitas" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientReceitas />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/lista-compras" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientListaCompras />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/suplementos" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientSuplementos />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/dicas" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientDicas />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/jornada" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientJornada />
                 </ProtectedRoute>
               } />
               <Route path="/patient/checklist" element={
                 <ProtectedRoute allowedTypes={['patient']}>
-                  <PatientDashboard />
+                  <PatientTarefas />
                 </ProtectedRoute>
               } />
               <Route path="/patient/messages" element={
