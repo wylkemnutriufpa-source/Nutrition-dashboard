@@ -196,12 +196,10 @@ export const getProfessionalPatients = async (professionalId, isAdmin = false, f
   console.log('📋 Buscando pacientes...', { professionalId, isAdmin, filters });
   
   try {
+    // Primeiro buscar os vínculos patient_profiles
     let query = supabase
       .from('patient_profiles')
-      .select(`
-        *,
-        patient:profiles!patient_id(*)
-      `);
+      .select('*');
     
     // Se não for admin, filtra apenas pelos pacientes do profissional
     if (!isAdmin) {
@@ -219,16 +217,38 @@ export const getProfessionalPatients = async (professionalId, isAdmin = false, f
     // Ordenação
     query = query.order('created_at', { ascending: false });
     
-    const { data, error } = await query;
+    const { data: links, error: linksError } = await query;
     
-    if (error) {
-      // Não tentar processar o erro, apenas retornar
-      console.error('❌ Erro ao buscar pacientes');
+    if (linksError) {
+      console.error('❌ Erro ao buscar vínculos');
       return { data: [], error: { message: 'Erro ao buscar pacientes' } };
     }
     
-    console.log(`✅ ${data?.length || 0} pacientes encontrados`);
-    return { data: data || [], error: null };
+    if (!links || links.length === 0) {
+      console.log('✅ 0 pacientes encontrados');
+      return { data: [], error: null };
+    }
+    
+    // Buscar os perfis dos pacientes
+    const patientIds = links.map(link => link.patient_id);
+    const { data: patients, error: patientsError } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('id', patientIds);
+    
+    if (patientsError) {
+      console.error('❌ Erro ao buscar perfis dos pacientes');
+      return { data: [], error: { message: 'Erro ao buscar dados dos pacientes' } };
+    }
+    
+    // Combinar dados
+    const combined = links.map(link => ({
+      ...link,
+      patient: patients.find(p => p.id === link.patient_id) || null
+    })).filter(item => item.patient !== null);
+    
+    console.log(`✅ ${combined.length} pacientes encontrados`);
+    return { data: combined, error: null };
     
   } catch (error) {
     console.error('❌ Erro fatal ao buscar pacientes');
