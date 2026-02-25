@@ -121,6 +121,30 @@ backend:
         comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://nutrient-monitor-1.preview.emergentagent.com with proper MongoDB integration."
 
 frontend:
+  - task: "Supabase Auth Lock Fix"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/lib/supabase.js, frontend/src/contexts/AuthContext.js, frontend/src/pages/LoginPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Corrigido NavigatorLockAcquireTimeoutError. Implementado singleton, eliminadas race conditions, único listener, tratamento de sessão corrompida"
+
+  - task: "Admin Navigation Architecture"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/AdminBar.js, frontend/src/App.js, frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criado AdminBar fixo. Admin mantém contexto ao navegar. Botão 'Voltar ao Painel Admin' sempre visível quando admin está em outras áreas"
+
   - task: "Supabase Auth Integration"
     implemented: true
     working: true
