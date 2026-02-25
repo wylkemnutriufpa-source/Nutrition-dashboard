@@ -4,12 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Stethoscope, Eye, ArrowLeft, Loader2 } from 'lucide-react';
-import { mockPatients } from '@/data/mockData';
+import { User, Stethoscope, Eye, ArrowLeft, Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBranding } from '@/contexts/BrandingContext';
-import { signIn, signUp, getUserProfile } from '@/lib/supabase';
+import { signIn, getUserProfile } from '@/lib/supabase';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,11 +16,6 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [signUpData, setSignUpData] = useState({
-    name: '',
-    role: 'professional'
-  });
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,7 +25,14 @@ const LoginPage = () => {
       const { data, error } = await signIn(email, password);
       
       if (error) {
-        toast.error(error.message);
+        console.error('Login error:', error);
+        if (error.message.includes('Invalid login')) {
+          toast.error('Email ou senha incorretos');
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Email não confirmado. Verifique sua caixa de entrada.');
+        } else {
+          toast.error(error.message || 'Erro ao fazer login');
+        }
         setLoading(false);
         return;
       }
@@ -41,26 +41,46 @@ const LoginPage = () => {
         const profile = await getUserProfile(data.user.id);
         
         if (!profile) {
-          toast.error('Perfil não encontrado');
+          toast.error('Perfil não encontrado. Contate o administrador.');
           setLoading(false);
           return;
         }
 
-        // Armazenar no localStorage (compatibilidade)
+        // Verificar se o tipo de login corresponde ao role do usuário
+        if (loginType === 'professional' && profile.role !== 'professional' && profile.role !== 'admin') {
+          toast.error('Esta conta não é de profissional');
+          setLoading(false);
+          return;
+        }
+
+        if (loginType === 'patient' && profile.role !== 'patient') {
+          toast.error('Esta conta não é de paciente');
+          setLoading(false);
+          return;
+        }
+
+        if (loginType === 'admin' && profile.role !== 'admin') {
+          toast.error('Esta conta não tem permissão de administrador');
+          setLoading(false);
+          return;
+        }
+
+        // Armazenar no localStorage
         localStorage.setItem('fitjourney_user_type', profile.role);
         localStorage.setItem('fitjourney_user_email', profile.email);
+        localStorage.setItem('fitjourney_user_id', profile.id);
 
         toast.success('Login realizado com sucesso!');
 
         // Redirecionar baseado no role
-        if (profile.role === 'professional') {
+        if (profile.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (profile.role === 'professional') {
           navigate('/professional/dashboard');
         } else if (profile.role === 'patient') {
           localStorage.setItem('fitjourney_patient_id', profile.id);
           localStorage.setItem('fitjourney_patient_name', profile.name);
           navigate('/patient/dashboard');
-        } else if (profile.role === 'admin') {
-          navigate('/professional/dashboard'); // Admin usa mesma interface
         }
       }
     } catch (error) {
@@ -71,54 +91,12 @@ const LoginPage = () => {
     }
   };
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    
-    if (!signUpData.name || !email || !password) {
-      toast.error('Preencha todos os campos');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error } = await signUp(email, password, {
-        name: signUpData.name,
-        role: signUpData.role
-      });
-
-      if (error) {
-        console.error('Signup error:', error);
-        toast.error(error.message || 'Erro ao criar conta');
-        return;
-      }
-
-      // Sucesso - verificar se precisa confirmar email
-      if (data?.user) {
-        if (data.user.confirmed_at) {
-          toast.success('Conta criada e confirmada! Faça login agora.');
-        } else {
-          toast.success('Conta criada! Verifique seu email para confirmar.', {
-            duration: 5000
-          });
-        }
-        setIsSignUp(false);
-        setEmail('');
-        setPassword('');
-        setSignUpData({ name: '', role: 'professional' });
-      }
-    } catch (error) {
-      console.error('Signup exception:', error);
-      toast.error('Erro ao criar conta. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleVisitorLogin = () => {
     localStorage.setItem('fitjourney_user_type', 'visitor');
     navigate('/visitor/calculators');
   };
 
+  // Tela inicial de seleção de tipo
   if (!loginType) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
@@ -131,14 +109,39 @@ const LoginPage = () => {
             <p className="text-lg text-gray-600">Sua jornada para uma vida mais saudável</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card data-testid="professional-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-teal-700 cursor-pointer" onClick={() => setLoginType('professional')}>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Admin */}
+            <Card 
+              data-testid="admin-login-card" 
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-700 cursor-pointer" 
+              onClick={() => setLoginType('admin')}
+            >
+              <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                  <Shield className="text-purple-700" size={32} />
+                </div>
+                <CardTitle className="text-xl">Administrador</CardTitle>
+                <CardDescription>Gerenciamento do sistema</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full bg-purple-700 hover:bg-purple-800" size="lg">
+                  Entrar como Admin
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Profissional */}
+            <Card 
+              data-testid="professional-login-card" 
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-teal-700 cursor-pointer" 
+              onClick={() => setLoginType('professional')}
+            >
               <CardHeader className="text-center">
                 <div className="mx-auto w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mb-4">
                   <Stethoscope className="text-teal-700" size={32} />
                 </div>
                 <CardTitle className="text-xl">Profissional</CardTitle>
-                <CardDescription>Acesso para nutricionistas e profissionais de saúde</CardDescription>
+                <CardDescription>Nutricionistas e profissionais de saúde</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button data-testid="professional-login-button" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
@@ -147,13 +150,18 @@ const LoginPage = () => {
               </CardContent>
             </Card>
 
-            <Card data-testid="patient-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-green-600 cursor-pointer" onClick={() => setLoginType('patient')}>
+            {/* Paciente */}
+            <Card 
+              data-testid="patient-login-card" 
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-green-600 cursor-pointer" 
+              onClick={() => setLoginType('patient')}
+            >
               <CardHeader className="text-center">
                 <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
                   <User className="text-green-700" size={32} />
                 </div>
                 <CardTitle className="text-xl">Paciente</CardTitle>
-                <CardDescription>Acesso para pacientes acompanharem seu plano alimentar</CardDescription>
+                <CardDescription>Acompanhe seu plano alimentar</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button data-testid="patient-login-button" className="w-full bg-green-600 hover:bg-green-700" size="lg">
@@ -162,13 +170,18 @@ const LoginPage = () => {
               </CardContent>
             </Card>
 
-            <Card data-testid="visitor-login-card" className="hover:shadow-xl transition-all duration-300 border-2 hover:border-gray-600 cursor-pointer" onClick={handleVisitorLogin}>
+            {/* Visitante */}
+            <Card 
+              data-testid="visitor-login-card" 
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-gray-600 cursor-pointer" 
+              onClick={handleVisitorLogin}
+            >
               <CardHeader className="text-center">
                 <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                   <Eye className="text-gray-700" size={32} />
                 </div>
                 <CardTitle className="text-xl">Visitante</CardTitle>
-                <CardDescription>Experimente as calculadoras sem criar conta</CardDescription>
+                <CardDescription>Experimente as calculadoras</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button data-testid="visitor-login-button" className="w-full bg-gray-700 hover:bg-gray-800" size="lg" variant="outline">
@@ -179,137 +192,136 @@ const LoginPage = () => {
           </div>
 
           <div className="mt-8 text-center text-sm text-gray-600">
-            <p>Protótipo de interface • Dados mockados para demonstração</p>
+            <p>Sistema de Nutrição • FitJourney</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (loginType === 'professional' || loginType === 'patient') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <Button
-            variant="ghost"
-            onClick={() => setLoginType(null)}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2" size={18} />
-            Voltar
-          </Button>
+  // Formulário de login
+  const getLoginConfig = () => {
+    switch (loginType) {
+      case 'admin':
+        return {
+          icon: <Shield className="text-purple-700" size={32} />,
+          title: 'Login Administrador',
+          description: 'Acesso ao painel administrativo',
+          color: 'bg-purple-700 hover:bg-purple-800',
+          bgColor: 'bg-purple-100'
+        };
+      case 'professional':
+        return {
+          icon: <Stethoscope className="text-teal-700" size={32} />,
+          title: 'Login Profissional',
+          description: 'Acesso para nutricionistas',
+          color: 'bg-teal-700 hover:bg-teal-800',
+          bgColor: 'bg-teal-100'
+        };
+      case 'patient':
+        return {
+          icon: <User className="text-green-700" size={32} />,
+          title: 'Login Paciente',
+          description: 'Acesse seu plano alimentar',
+          color: 'bg-green-600 hover:bg-green-700',
+          bgColor: 'bg-green-100'
+        };
+      default:
+        return {};
+    }
+  };
 
-          <Card className="shadow-xl">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mb-4">
-                {loginType === 'professional' ? (
-                  <Stethoscope className="text-teal-700" size={32} />
-                ) : (
-                  <User className="text-green-700" size={32} />
-                )}
+  const config = getLoginConfig();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <Button
+          variant="ghost"
+          onClick={() => {
+            setLoginType(null);
+            setEmail('');
+            setPassword('');
+          }}
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2" size={18} />
+          Voltar
+        </Button>
+
+        <Card className="shadow-xl">
+          <CardHeader className="text-center">
+            <div className={`mx-auto w-16 h-16 rounded-full ${config.bgColor} flex items-center justify-center mb-4`}>
+              {config.icon}
+            </div>
+            <CardTitle className="text-2xl">{config.title}</CardTitle>
+            <CardDescription>{config.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
               </div>
-              <CardTitle className="text-2xl">
-                {isSignUp ? 'Criar Conta' : 'Login'} {loginType === 'professional' ? 'Profissional' : 'Paciente'}
-              </CardTitle>
-              <CardDescription>
-                {isSignUp ? 'Cadastre-se no sistema' : 'Entre com suas credenciais'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
-                {isSignUp && (
+              <div>
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+              <Button
+                type="submit"
+                className={`w-full ${config.color}`}
+                size="lg"
+                disabled={loading}
+              >
+                {loading ? (
                   <>
-                    <div>
-                      <Label htmlFor="name">Nome Completo</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        value={signUpData.name}
-                        onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })}
-                        required
-                        placeholder="Seu nome completo"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="role">Tipo de Conta</Label>
-                      <Select
-                        value={signUpData.role}
-                        onValueChange={(v) => setSignUpData({ ...signUpData, role: v })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="professional">Profissional</SelectItem>
-                          <SelectItem value="patient">Paciente</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Entrando...
                   </>
+                ) : (
+                  'Entrar'
                 )}
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-teal-700 hover:bg-teal-800"
-                  size="lg"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {isSignUp ? 'Criando...' : 'Entrando...'}
-                    </>
-                  ) : (
-                    <>{isSignUp ? 'Criar Conta' : 'Entrar'}</>
-                  )}
-                </Button>
-              </form>
+              </Button>
+            </form>
 
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="text-sm text-teal-700 hover:underline"
-                >
-                  {isSignUp ? 'Já tem uma conta? Fazer login' : 'Não tem conta? Cadastre-se'}
-                </button>
-              </div>
-
-              {!isSignUp && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-xs text-gray-600 font-semibold mb-2">🎯 Modo Demo (para testes):</p>
-                  <p className="text-xs text-gray-600">Configure suas credenciais Supabase no arquivo .env</p>
-                  <p className="text-xs text-gray-600 mt-1">Ou clique em "Cadastre-se" para criar sua conta</p>
-                </div>
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              {loginType === 'admin' && (
+                <p className="text-xs text-gray-600">
+                  <strong>Administrador:</strong> Gerencia profissionais e configurações do sistema.
+                </p>
               )}
-            </CardContent>
-          </Card>
-        </div>
+              {loginType === 'professional' && (
+                <p className="text-xs text-gray-600">
+                  <strong>Profissional:</strong> Cadastrado pelo administrador. Gerencia seus pacientes e planos alimentares.
+                </p>
+              )}
+              {loginType === 'patient' && (
+                <p className="text-xs text-gray-600">
+                  <strong>Paciente:</strong> Cadastrado pelo seu nutricionista. Acesse para ver seu plano alimentar.
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 };
 
 export default LoginPage;
