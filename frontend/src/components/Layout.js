@@ -1,20 +1,35 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Layout = ({ children, title, showBack = false, userType }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { profile } = useAuth();
 
   const handleLogout = () => {
     localStorage.removeItem('fitjourney_user_type');
+    localStorage.removeItem('fitjourney_user_email');
+    localStorage.removeItem('fitjourney_user_id');
+    localStorage.removeItem('fitjourney_patient_id');
+    localStorage.removeItem('fitjourney_patient_name');
     navigate('/');
   };
+
+  // Verificar se é admin fora da área admin (para adicionar padding-top)
+  const isAdmin = profile?.role === 'admin';
+  const isInAdminArea = location.pathname.startsWith('/admin');
+  const shouldCompensateAdminBar = isAdmin && !isInAdminArea;
 
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar userType={userType} onLogout={handleLogout} />
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Compensar espaço da AdminBar quando necessário */}
+        {shouldCompensateAdminBar && <div className="h-16" />}
+        
         <header className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
           <div className="flex items-center space-x-4">
             {showBack && (
