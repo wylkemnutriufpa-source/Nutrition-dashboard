@@ -7,43 +7,53 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Supabase credentials not found.');
 }
 
-// Configuração que evita o problema de NavigatorLock timeout
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'implicit',
-    // Desabilitar o lock do navigator para evitar timeout
-    lock: {
-      acquireLockTimeoutMs: 5000
-    },
-    // Storage customizado para evitar conflitos
-    storage: {
-      getItem: (key) => {
-        try {
-          return window.localStorage.getItem(key);
-        } catch {
-          return null;
-        }
-      },
-      setItem: (key, value) => {
-        try {
-          window.localStorage.setItem(key, value);
-        } catch {
-          // Ignore storage errors
-        }
-      },
-      removeItem: (key) => {
-        try {
-          window.localStorage.removeItem(key);
-        } catch {
-          // Ignore storage errors
+// SINGLETON: garantir que o client seja criado apenas uma vez
+let supabaseInstance = null;
+
+const createSupabaseClient = () => {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false, // Evitar múltiplas detecções
+      flowType: 'pkce', // Mais seguro que implicit
+      // Storage customizado com tratamento de erros
+      storage: {
+        getItem: (key) => {
+          try {
+            return window.localStorage.getItem(key);
+          } catch (error) {
+            console.warn('Storage getItem error:', error);
+            return null;
+          }
+        },
+        setItem: (key, value) => {
+          try {
+            window.localStorage.setItem(key, value);
+          } catch (error) {
+            console.warn('Storage setItem error:', error);
+          }
+        },
+        removeItem: (key) => {
+          try {
+            window.localStorage.removeItem(key);
+          } catch (error) {
+            console.warn('Storage removeItem error:', error);
+          }
         }
       }
     }
-  }
-});
+  });
+
+  return supabaseInstance;
+};
+
+// Exportar o client singleton
+export const supabase = createSupabaseClient();
 
 // ==================== AUTH HELPERS ====================
 
