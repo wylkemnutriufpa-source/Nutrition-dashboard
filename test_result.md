@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Migrar aplicação de dados mock/localStorage para Supabase real. Implementar multi-tenant com RLS para professional, patient e admin."
+user_problem_statement: "Implementar Checklist Diário MVP editável com Supabase. Profissional cria/edita/apaga tarefas no perfil do paciente. Paciente marca/desmarca no dashboard."
 
 backend:
   - task: "API Status endpoint"
@@ -121,6 +121,18 @@ backend:
         comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://patient-tracker-160.preview.emergentagent.com with proper MongoDB integration."
 
 frontend:
+  - task: "Checklist Diário MVP"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/ChecklistSimple.js, frontend/src/lib/supabase.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/PatientDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ CHECKLIST MVP COMPLETO: SQL com updated_at+trigger, funções CRUD (incluindo updateChecklistTask), ChecklistSimple com edição inline, PatientProfile simplificado, PatientDashboard OK. Professional cria/edita/apaga, paciente marca/desmarca. Sistema antigo de templates removido."
+
   - task: "Supabase Auth Lock Fix"
     implemented: true
     working: "NA"
@@ -237,15 +249,44 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Supabase Auth Lock Fix"
-    - "Admin Navigation Architecture"
-    - "PatientsList com CRUD real"
-    - "MealPlanEditor com persistência Supabase"
+    - "Checklist Diário MVP"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "✅ CHECKLIST DIÁRIO MVP IMPLEMENTADO
+    
+    Implementações completas:
+    
+    1. SQL (/app/supabase_checklist.sql):
+    - Tabela checklist_tasks com updated_at
+    - Trigger automático para updated_at
+    - RLS: paciente SELECT/UPDATE suas tarefas, admin/professional tudo
+    
+    2. Backend (frontend/src/lib/supabase.js):
+    - getChecklistTasks() - listar
+    - createChecklistTask() - criar
+    - updateChecklistTask() - NOVA função para editar título
+    - toggleChecklistTask() - marcar/desmarcar
+    - deleteChecklistTask() - excluir
+    - getChecklistAdherence() - calcular % de conclusão
+    
+    3. Componente (frontend/src/components/ChecklistSimple.js):
+    - Modo PACIENTE: marcar/desmarcar apenas
+    - Modo PROFESSIONAL: criar + editar título inline + excluir
+    - Edição inline com botões salvar/cancelar
+    - Barra de progresso e contador
+    
+    4. Páginas:
+    - PatientDashboard: ChecklistSimple em modo paciente
+    - PatientProfile: ChecklistTab simplificada usando ChecklistSimple em modo profissional
+    
+    Sistema antigo (templates/entries) removido.
+    Documentação criada em CHECKLIST_MVP_IMPLEMENTATION.md
+    
+    PRONTO PARA TESTE: testar criação/edição/exclusão pelo profissional e marcação pelo paciente"
   - agent: "main"
     message: "Implementada migração completa de mock para Supabase. Arquivos alterados: supabase.js, PatientsList.js, ProfessionalDashboard.js, PatientProfile.js, MealPlanEditor.js, PatientDashboard.js. Schema SQL completo criado em supabase_schema_complete.sql"
   - agent: "testing"
