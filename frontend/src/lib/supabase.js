@@ -28,11 +28,39 @@ export const getCurrentUser = async () => {
 };
 
 export const getUserProfile = async (userId) => {
-  const { data, error } = await supabase
+  // Tentar buscar por id primeiro (compatibilidade com id = auth.uid)
+  let { data, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', userId)
     .single();
+  
+  // Se não encontrou, tentar por auth_user_id
+  if (error || !data) {
+    const result = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('auth_user_id', userId)
+      .single();
+    
+    data = result.data;
+    error = result.error;
+  }
+  
+  // Se ainda não encontrou, tentar buscar pelo email do auth user
+  if (error || !data) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      const result = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', user.email)
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    }
+  }
   
   if (error) {
     console.error('Error getting profile:', error);
