@@ -193,36 +193,46 @@ export const updateProfile = async (profileId, updates) => {
 
 // Buscar pacientes do profissional (ou todos se admin)
 export const getProfessionalPatients = async (professionalId, isAdmin = false, filters = {}) => {
-  let query = supabase
-    .from('patient_profiles')
-    .select(`
-      *,
-      patient:profiles!patient_id(*)
-    `)
-    .is('patient.deleted_at', null);
+  console.log('📋 Buscando pacientes...', { professionalId, isAdmin, filters });
   
-  // Se não for admin, filtra apenas pelos pacientes do profissional
-  if (!isAdmin) {
-    query = query.eq('professional_id', professionalId);
-  } else if (filters.professionalId) {
-    // Admin pode filtrar por profissional específico
-    query = query.eq('professional_id', filters.professionalId);
-  }
-  
-  // Filtro de status
-  if (filters.status) {
-    query = query.eq('status', filters.status);
-  }
-  
-  // Ordenação
-  if (filters.orderBy === 'name') {
-    query = query.order('patient(name)', { ascending: true });
-  } else {
+  try {
+    let query = supabase
+      .from('patient_profiles')
+      .select(`
+        *,
+        patient:patient_id(*)
+      `);
+    
+    // Se não for admin, filtra apenas pelos pacientes do profissional
+    if (!isAdmin) {
+      query = query.eq('professional_id', professionalId);
+    } else if (filters.professionalId) {
+      // Admin pode filtrar por profissional específico
+      query = query.eq('professional_id', filters.professionalId);
+    }
+    
+    // Filtro de status
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+    
+    // Ordenação
     query = query.order('created_at', { ascending: false });
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('❌ Erro ao buscar pacientes:', error);
+      return { data: [], error };
+    }
+    
+    console.log(`✅ ${data?.length || 0} pacientes encontrados`);
+    return { data: data || [], error: null };
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar pacientes:', error);
+    return { data: [], error };
   }
-  
-  const { data, error } = await query;
-  return { data, error };
 };
 
 export const getPatientById = async (patientId) => {
