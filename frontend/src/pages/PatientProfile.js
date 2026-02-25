@@ -17,7 +17,8 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, updateAnamnesis,
-  getMealPlans, getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage
+  getMealPlans, getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage,
+  getChecklistAdherence
 } from '@/lib/supabase';
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
