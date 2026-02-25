@@ -46,15 +46,16 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <AuthProvider>
-        <BrandingProvider>
-          <BrowserRouter>
-            {/* AdminBar: aparece automaticamente quando admin está em outras áreas */}
-            <AdminBar />
-            
-            <Routes>
-              <Route path="/" element={<LoginPage />} />
+    <ErrorBoundary>
+      <div className="App">
+        <AuthProvider>
+          <BrandingProvider>
+            <BrowserRouter>
+              {/* AdminBar: aparece automaticamente quando admin está em outras áreas */}
+              <AdminBar />
+              
+              <Routes>
+                <Route path="/" element={<LoginPage />} />
               
               {/* Admin Routes */}
               <Route path="/admin/dashboard" element={
