@@ -44,7 +44,16 @@ const Sidebar = ({ userType, onLogout }) => {
     }
   };
 
-  const links = userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
+  const links = userType === 'admin' ? adminLinks : userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
+
+  const getUserTypeLabel = () => {
+    switch(userType) {
+      case 'admin': return 'Administrador';
+      case 'professional': return 'Profissional';
+      case 'patient': return 'Paciente';
+      default: return 'Visitante';
+    }
+  };
 
   return (
     <div data-testid="sidebar" className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col shadow-sm">
@@ -55,14 +64,14 @@ const Sidebar = ({ userType, onLogout }) => {
           ) : (
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ background: `linear-gradient(to br, ${branding.primaryColor}, ${branding.accentColor})` }}
+              style={{ background: userType === 'admin' ? 'linear-gradient(to br, #7C3AED, #6D28D9)' : `linear-gradient(to br, ${branding.primaryColor}, ${branding.accentColor})` }}
             >
               <span className="text-white font-bold text-xl">{branding.brandName?.substring(0, 2).toUpperCase()}</span>
             </div>
           )}
           <div>
             <h1 className="text-xl font-bold text-gray-900">{branding.brandName}</h1>
-            <p className="text-xs text-gray-500">{userType === 'professional' ? 'Profissional' : userType === 'patient' ? 'Paciente' : 'Visitante'}</p>
+            <p className="text-xs text-gray-500">{getUserTypeLabel()}</p>
           </div>
         </Link>
       </div>
