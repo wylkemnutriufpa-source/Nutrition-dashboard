@@ -7,11 +7,41 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Supabase credentials not found.');
 }
 
+// Configuração que evita o problema de NavigatorLock timeout
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'implicit',
+    // Desabilitar o lock do navigator para evitar timeout
+    lock: {
+      acquireLockTimeoutMs: 5000
+    },
+    // Storage customizado para evitar conflitos
+    storage: {
+      getItem: (key) => {
+        try {
+          return window.localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      },
+      setItem: (key, value) => {
+        try {
+          window.localStorage.setItem(key, value);
+        } catch {
+          // Ignore storage errors
+        }
+      },
+      removeItem: (key) => {
+        try {
+          window.localStorage.removeItem(key);
+        } catch {
+          // Ignore storage errors
+        }
+      }
+    }
   }
 });
 
