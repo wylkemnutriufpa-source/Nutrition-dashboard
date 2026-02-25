@@ -94,17 +94,6 @@ const SettingsPage = () => {
           <CardContent>
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
-                <Label htmlFor="current-password">Senha Atual</Label>
-                <Input
-                  id="current-password"
-                  type="password"
-                  placeholder="Digite sua senha atual"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
                 <Label htmlFor="new-password">Nova Senha</Label>
                 <Input
                   id="new-password"
@@ -113,6 +102,7 @@ const SettingsPage = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
+                  disabled={loading}
                 />
                 <p className="text-xs text-gray-500 mt-1">Mínimo de 6 caracteres</p>
               </div>
@@ -125,16 +115,22 @@ const SettingsPage = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
-              <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
-                Alterar Senha
+              <Button 
+                type="submit" 
+                className="w-full bg-teal-700 hover:bg-teal-800" 
+                size="lg"
+                disabled={loading}
+              >
+                {loading ? 'Alterando...' : 'Alterar Senha'}
               </Button>
             </form>
 
-            <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-              <p className="text-sm text-amber-800">
-                <strong>Nota:</strong> Esta é uma funcionalidade mock. A senha atual é <code className="bg-amber-100 px-1 rounded">123456</code>
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800">
+                <strong>Dica de Segurança:</strong> Use uma senha forte com letras, números e caracteres especiais.
               </p>
             </div>
           </CardContent>
