@@ -42,33 +42,29 @@ const PatientsList = () => {
   const [saving, setSaving] = useState(false);
   const [orderBy, setOrderBy] = useState('recent');
   const [filterProfessional, setFilterProfessional] = useState('all');
-  const [lastArchived, setLastArchived] = useState(null);
   
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    birth_date: '',
-    gender: '',
-    height: '',
-    current_weight: '',
-    goal_weight: '',
-    goal: '',
-    notes: ''
-  });
+  // Form state separado para não causar re-render do dialog
+  const [formName, setFormName] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formPhone, setFormPhone] = useState('');
+  const [formBirthDate, setFormBirthDate] = useState('');
+  const [formGender, setFormGender] = useState('');
+  const [formHeight, setFormHeight] = useState('');
+  const [formCurrentWeight, setFormCurrentWeight] = useState('');
+  const [formGoalWeight, setFormGoalWeight] = useState('');
+  const [formGoal, setFormGoal] = useState('');
+  const [formNotes, setFormNotes] = useState('');
 
   const loadData = useCallback(async () => {
     if (!user || !profile) return;
     
     setLoading(true);
     try {
-      // Buscar profissionais se admin
       if (isAdmin) {
         const { data: profsData } = await getAllProfessionals();
         setProfessionals(profsData || []);
       }
       
-      // Buscar pacientes
       const filters = {
         orderBy: orderBy === 'name' ? 'name' : undefined,
         professionalId: isAdmin && filterProfessional !== 'all' ? filterProfessional : undefined
@@ -95,7 +91,6 @@ const PatientsList = () => {
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.patient.name)}&background=0F766E&color=fff`
       }));
       
-      // Ordenar localmente se necessário
       if (orderBy === 'name') {
         mappedPatients.sort((a, b) => a.name.localeCompare(b.name));
       }
@@ -114,14 +109,20 @@ const PatientsList = () => {
   }, [loadData]);
 
   const resetForm = () => {
-    setFormData({
-      name: '', email: '', phone: '', birth_date: '', gender: '',
-      height: '', current_weight: '', goal_weight: '', goal: '', notes: ''
-    });
+    setFormName('');
+    setFormEmail('');
+    setFormPhone('');
+    setFormBirthDate('');
+    setFormGender('');
+    setFormHeight('');
+    setFormCurrentWeight('');
+    setFormGoalWeight('');
+    setFormGoal('');
+    setFormNotes('');
   };
 
   const handleCreatePatient = async () => {
-    if (!formData.name || !formData.email) {
+    if (!formName || !formEmail) {
       toast.error('Nome e email são obrigatórios');
       return;
     }
@@ -129,10 +130,16 @@ const PatientsList = () => {
     setSaving(true);
     try {
       const patientData = {
-        ...formData,
-        height: formData.height ? parseFloat(formData.height) : null,
-        current_weight: formData.current_weight ? parseFloat(formData.current_weight) : null,
-        goal_weight: formData.goal_weight ? parseFloat(formData.goal_weight) : null,
+        name: formName,
+        email: formEmail,
+        phone: formPhone || null,
+        birth_date: formBirthDate || null,
+        gender: formGender || null,
+        height: formHeight ? parseFloat(formHeight) : null,
+        current_weight: formCurrentWeight ? parseFloat(formCurrentWeight) : null,
+        goal_weight: formGoalWeight ? parseFloat(formGoalWeight) : null,
+        goal: formGoal || null,
+        notes: formNotes || null
       };
 
       const { data, error } = await createPatientByProfessional(profile.id, patientData);
@@ -156,15 +163,15 @@ const PatientsList = () => {
     setSaving(true);
     try {
       const updates = {
-        name: formData.name,
-        phone: formData.phone || null,
-        birth_date: formData.birth_date || null,
-        gender: formData.gender || null,
-        height: formData.height ? parseFloat(formData.height) : null,
-        current_weight: formData.current_weight ? parseFloat(formData.current_weight) : null,
-        goal_weight: formData.goal_weight ? parseFloat(formData.goal_weight) : null,
-        goal: formData.goal || null,
-        notes: formData.notes || null
+        name: formName,
+        phone: formPhone || null,
+        birth_date: formBirthDate || null,
+        gender: formGender || null,
+        height: formHeight ? parseFloat(formHeight) : null,
+        current_weight: formCurrentWeight ? parseFloat(formCurrentWeight) : null,
+        goal_weight: formGoalWeight ? parseFloat(formGoalWeight) : null,
+        goal: formGoal || null,
+        notes: formNotes || null
       };
 
       const { error } = await updatePatient(selectedPatient.id, updates);
@@ -190,7 +197,7 @@ const PatientsList = () => {
       const { error } = await archivePatient(selectedPatient.id);
       if (error) throw error;
 
-      setLastArchived(selectedPatient);
+      const archivedPatient = selectedPatient;
       toast.success(
         <div className="flex items-center justify-between w-full">
           <span>Paciente arquivado</span>
@@ -198,7 +205,7 @@ const PatientsList = () => {
             variant="ghost" 
             size="sm" 
             className="ml-2 text-teal-700"
-            onClick={() => handleUndoArchive(selectedPatient.id)}
+            onClick={() => handleUndoArchive(archivedPatient.id)}
           >
             <Undo2 size={14} className="mr-1" /> Desfazer
           </Button>
@@ -221,7 +228,6 @@ const PatientsList = () => {
       if (error) throw error;
       
       toast.success('Paciente restaurado!');
-      setLastArchived(null);
       await loadData();
     } catch (error) {
       console.error('Error restoring patient:', error);
@@ -231,18 +237,16 @@ const PatientsList = () => {
 
   const openEditDialog = (patient) => {
     setSelectedPatient(patient);
-    setFormData({
-      name: patient.name,
-      email: patient.email,
-      phone: patient.phone || '',
-      birth_date: patient.birth_date || '',
-      gender: patient.gender || '',
-      height: patient.height || '',
-      current_weight: patient.current_weight || '',
-      goal_weight: patient.goal_weight || '',
-      goal: patient.goal || '',
-      notes: patient.notes || ''
-    });
+    setFormName(patient.name || '');
+    setFormEmail(patient.email || '');
+    setFormPhone(patient.phone || '');
+    setFormBirthDate(patient.birth_date || '');
+    setFormGender(patient.gender || '');
+    setFormHeight(patient.height || '');
+    setFormCurrentWeight(patient.current_weight || '');
+    setFormGoalWeight(patient.goal_weight || '');
+    setFormGoal(patient.goal || '');
+    setFormNotes(patient.notes || '');
     setIsEditDialogOpen(true);
   };
 
@@ -278,137 +282,6 @@ const PatientsList = () => {
     p.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const PatientFormFields = ({ isEdit = false }) => (
-    <div className="space-y-4">
-      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-        <h4 className="font-semibold text-gray-900 flex items-center">
-          <User className="mr-2" size={18} />
-          Dados Pessoais
-        </h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <Label>Nome Completo *</Label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Nome do paciente"
-            />
-          </div>
-          <div>
-            <Label>Email {!isEdit && '*'}</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 text-gray-400" size={16} />
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="email@exemplo.com"
-                className="pl-10"
-                disabled={isEdit}
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Telefone</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 text-gray-400" size={16} />
-              <Input
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="(11) 99999-9999"
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Data de Nascimento</Label>
-            <Input
-              type="date"
-              value={formData.birth_date}
-              onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label>Sexo</Label>
-            <Select value={formData.gender} onValueChange={(v) => setFormData({ ...formData, gender: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Masculino</SelectItem>
-                <SelectItem value="female">Feminino</SelectItem>
-                <SelectItem value="other">Outro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-blue-50 p-4 rounded-lg space-y-3">
-        <h4 className="font-semibold text-gray-900 flex items-center">
-          <Ruler className="mr-2" size={18} />
-          Dados Físicos
-        </h4>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Label>Altura (cm)</Label>
-            <Input
-              type="number"
-              value={formData.height}
-              onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-              placeholder="170"
-            />
-          </div>
-          <div>
-            <Label>Peso Atual (kg)</Label>
-            <Input
-              type="number"
-              step="0.1"
-              value={formData.current_weight}
-              onChange={(e) => setFormData({ ...formData, current_weight: e.target.value })}
-              placeholder="70.5"
-            />
-          </div>
-          <div>
-            <Label>Peso Meta (kg)</Label>
-            <Input
-              type="number"
-              step="0.1"
-              value={formData.goal_weight}
-              onChange={(e) => setFormData({ ...formData, goal_weight: e.target.value })}
-              placeholder="65.0"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-teal-50 p-4 rounded-lg space-y-3">
-        <h4 className="font-semibold text-gray-900 flex items-center">
-          <Target className="mr-2" size={18} />
-          Objetivo
-        </h4>
-        <Select value={formData.goal} onValueChange={(v) => setFormData({ ...formData, goal: v })}>
-          <SelectTrigger><SelectValue placeholder="Selecione o objetivo" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="weight_loss">Emagrecimento</SelectItem>
-            <SelectItem value="muscle_gain">Ganho de Massa Muscular</SelectItem>
-            <SelectItem value="maintenance">Manutenção</SelectItem>
-            <SelectItem value="health">Saúde/Reeducação Alimentar</SelectItem>
-            <SelectItem value="sports">Performance Esportiva</SelectItem>
-            <SelectItem value="other">Outro</SelectItem>
-          </SelectContent>
-        </Select>
-        <div>
-          <Label>Observações</Label>
-          <Textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            placeholder="Observações gerais..."
-            rows={3}
-          />
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <Layout title="Pacientes" userType={profile?.role || 'professional'}>
       <div data-testid="patients-list" className="space-y-6">
@@ -424,9 +297,7 @@ const PatientsList = () => {
             />
           </div>
           
-          {/* Filtros */}
           <div className="flex items-center gap-2">
-            {/* Filtro por profissional (só admin) */}
             {isAdmin && professionals.length > 0 && (
               <Select value={filterProfessional} onValueChange={setFilterProfessional}>
                 <SelectTrigger className="w-[180px]">
@@ -442,7 +313,6 @@ const PatientsList = () => {
               </Select>
             )}
             
-            {/* Ordenação */}
             <Select value={orderBy} onValueChange={setOrderBy}>
               <SelectTrigger className="w-[150px]">
                 <ArrowUpDown size={16} className="mr-2" />
@@ -455,10 +325,12 @@ const PatientsList = () => {
             </Select>
           </div>
           
-          {/* Botão criar */}
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
+            setIsCreateDialogOpen(open);
+            if (open) resetForm();
+          }}>
             <DialogTrigger asChild>
-              <Button className="bg-teal-700 hover:bg-teal-800" size="lg" onClick={resetForm}>
+              <Button className="bg-teal-700 hover:bg-teal-800" size="lg">
                 <Plus size={20} className="mr-2" />
                 Novo Paciente
               </Button>
@@ -468,7 +340,139 @@ const PatientsList = () => {
                 <DialogTitle>Novo Paciente</DialogTitle>
                 <DialogDescription>Cadastre um novo paciente</DialogDescription>
               </DialogHeader>
-              <PatientFormFields />
+              
+              <div className="space-y-4">
+                {/* Dados Pessoais */}
+                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <h4 className="font-semibold text-gray-900 flex items-center">
+                    <User className="mr-2" size={18} />
+                    Dados Pessoais
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <Label>Nome Completo *</Label>
+                      <Input
+                        value={formName}
+                        onChange={(e) => setFormName(e.target.value)}
+                        placeholder="Nome do paciente"
+                        autoFocus
+                      />
+                    </div>
+                    <div>
+                      <Label>Email *</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 text-gray-400" size={16} />
+                        <Input
+                          type="email"
+                          value={formEmail}
+                          onChange={(e) => setFormEmail(e.target.value)}
+                          placeholder="email@exemplo.com"
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Telefone</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 text-gray-400" size={16} />
+                        <Input
+                          value={formPhone}
+                          onChange={(e) => setFormPhone(e.target.value)}
+                          placeholder="(11) 99999-9999"
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Data de Nascimento</Label>
+                      <Input
+                        type="date"
+                        value={formBirthDate}
+                        onChange={(e) => setFormBirthDate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Sexo</Label>
+                      <Select value={formGender} onValueChange={setFormGender}>
+                        <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="male">Masculino</SelectItem>
+                          <SelectItem value="female">Feminino</SelectItem>
+                          <SelectItem value="other">Outro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dados Físicos */}
+                <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+                  <h4 className="font-semibold text-gray-900 flex items-center">
+                    <Ruler className="mr-2" size={18} />
+                    Dados Físicos
+                  </h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label>Altura (cm)</Label>
+                      <Input
+                        type="number"
+                        value={formHeight}
+                        onChange={(e) => setFormHeight(e.target.value)}
+                        placeholder="170"
+                      />
+                    </div>
+                    <div>
+                      <Label>Peso Atual (kg)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={formCurrentWeight}
+                        onChange={(e) => setFormCurrentWeight(e.target.value)}
+                        placeholder="70.5"
+                      />
+                    </div>
+                    <div>
+                      <Label>Peso Meta (kg)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={formGoalWeight}
+                        onChange={(e) => setFormGoalWeight(e.target.value)}
+                        placeholder="65.0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Objetivo */}
+                <div className="bg-teal-50 p-4 rounded-lg space-y-3">
+                  <h4 className="font-semibold text-gray-900 flex items-center">
+                    <Target className="mr-2" size={18} />
+                    Objetivo
+                  </h4>
+                  <Select value={formGoal} onValueChange={setFormGoal}>
+                    <SelectTrigger><SelectValue placeholder="Selecione o objetivo" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="weight_loss">Emagrecimento</SelectItem>
+                      <SelectItem value="muscle_gain">Ganho de Massa Muscular</SelectItem>
+                      <SelectItem value="maintenance">Manutenção</SelectItem>
+                      <SelectItem value="health">Saúde/Reeducação Alimentar</SelectItem>
+                      <SelectItem value="sports">Performance Esportiva</SelectItem>
+                      <SelectItem value="other">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div>
+                    <Label>Observações</Label>
+                    <Textarea
+                      value={formNotes}
+                      onChange={(e) => setFormNotes(e.target.value)}
+                      placeholder="Observações gerais..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </div>
+              
               <div className="flex gap-3 pt-4">
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="flex-1" disabled={saving}>
                   Cancelar
@@ -542,7 +546,6 @@ const PatientsList = () => {
                           )}
                         </div>
                         
-                        {/* Menu de ações */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -588,7 +591,118 @@ const PatientsList = () => {
               <DialogTitle>Editar Paciente</DialogTitle>
               <DialogDescription>Atualize os dados do paciente</DialogDescription>
             </DialogHeader>
-            <PatientFormFields isEdit />
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center">
+                  <User className="mr-2" size={18} />
+                  Dados Pessoais
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label>Nome Completo</Label>
+                    <Input
+                      value={formName}
+                      onChange={(e) => setFormName(e.target.value)}
+                      placeholder="Nome do paciente"
+                    />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input value={formEmail} disabled className="bg-gray-100" />
+                  </div>
+                  <div>
+                    <Label>Telefone</Label>
+                    <Input
+                      value={formPhone}
+                      onChange={(e) => setFormPhone(e.target.value)}
+                      placeholder="(11) 99999-9999"
+                    />
+                  </div>
+                  <div>
+                    <Label>Data de Nascimento</Label>
+                    <Input
+                      type="date"
+                      value={formBirthDate}
+                      onChange={(e) => setFormBirthDate(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Sexo</Label>
+                    <Select value={formGender} onValueChange={setFormGender}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Masculino</SelectItem>
+                        <SelectItem value="female">Feminino</SelectItem>
+                        <SelectItem value="other">Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center">
+                  <Ruler className="mr-2" size={18} />
+                  Dados Físicos
+                </h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label>Altura (cm)</Label>
+                    <Input
+                      type="number"
+                      value={formHeight}
+                      onChange={(e) => setFormHeight(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Peso Atual (kg)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={formCurrentWeight}
+                      onChange={(e) => setFormCurrentWeight(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Peso Meta (kg)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={formGoalWeight}
+                      onChange={(e) => setFormGoalWeight(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-teal-50 p-4 rounded-lg space-y-3">
+                <h4 className="font-semibold text-gray-900 flex items-center">
+                  <Target className="mr-2" size={18} />
+                  Objetivo
+                </h4>
+                <Select value={formGoal} onValueChange={setFormGoal}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o objetivo" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weight_loss">Emagrecimento</SelectItem>
+                    <SelectItem value="muscle_gain">Ganho de Massa Muscular</SelectItem>
+                    <SelectItem value="maintenance">Manutenção</SelectItem>
+                    <SelectItem value="health">Saúde/Reeducação Alimentar</SelectItem>
+                    <SelectItem value="sports">Performance Esportiva</SelectItem>
+                    <SelectItem value="other">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div>
+                  <Label>Observações</Label>
+                  <Textarea
+                    value={formNotes}
+                    onChange={(e) => setFormNotes(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+            
             <div className="flex gap-3 pt-4">
               <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="flex-1" disabled={saving}>
                 Cancelar
