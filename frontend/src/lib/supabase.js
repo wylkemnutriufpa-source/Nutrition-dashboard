@@ -293,92 +293,48 @@ export const getPatientById = async (patientId) => {
 };
 
 export const createPatientByProfessional = async (professionalId, patientData) => {
-  console.log('🆕 Criando paciente...', { professionalId, email: patientData.email });
+  console.log('🆕 Criando paciente...');
+  
+  const patientId = crypto.randomUUID();
   
   try {
-    // Verificar email existente
-    const existingResult = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', patientData.email)
-      .maybeSingle()
-      .catch(() => ({ data: null, error: null }));
+    // 1. Criar profile direto
+    await supabase.from('profiles').insert({
+      id: patientId,
+      email: patientData.email,
+      name: patientData.name,
+      phone: patientData.phone || null,
+      role: 'patient',
+      birth_date: patientData.birth_date || null,
+      gender: patientData.gender || null,
+      height: patientData.height || null,
+      current_weight: patientData.current_weight || null,
+      goal_weight: patientData.goal_weight || null,
+      goal: patientData.goal || null,
+      notes: patientData.notes || null,
+      status: 'active'
+    });
     
-    if (existingResult.data) {
-      console.warn('⚠️ Email já existe');
-      return { data: null, error: { message: 'Email já cadastrado' } };
-    }
-
-    const patientId = crypto.randomUUID();
+    // 2. Criar vínculo
+    await supabase.from('patient_profiles').insert({
+      patient_id: patientId,
+      professional_id: professionalId,
+      status: 'active'
+    });
     
-    // Criar profile
-    const profileResult = await supabase
-      .from('profiles')
-      .insert({
-        id: patientId,
-        email: patientData.email,
-        name: patientData.name,
-        phone: patientData.phone || null,
-        role: 'patient',
-        birth_date: patientData.birth_date || null,
-        gender: patientData.gender || null,
-        height: patientData.height || null,
-        current_weight: patientData.current_weight || null,
-        goal_weight: patientData.goal_weight || null,
-        goal: patientData.goal || null,
-        notes: patientData.notes || null,
-        status: 'active'
-      })
-      .catch(() => ({ data: null, error: { message: 'Erro ao criar perfil' } }));
-    
-    if (profileResult.error) {
-      console.error('❌ Erro ao criar profile');
-      return { data: null, error: { message: 'Erro ao criar paciente' } };
-    }
-    
-    // Criar vínculo
-    const linkResult = await supabase
-      .from('patient_profiles')
-      .insert({
-        patient_id: patientId,
-        professional_id: professionalId,
-        status: 'active'
-      })
-      .catch(() => ({ data: null, error: { message: 'Erro ao criar vínculo' } }));
-    
-    if (linkResult.error) {
-      console.error('❌ Erro ao criar vínculo');
-      // Limpar profile
-      await supabase.from('profiles').delete().eq('id', patientId).catch(() => {});
-      return { data: null, error: { message: 'Erro ao vincular paciente' } };
-    }
-    
-    // Criar anamnese (não bloquear se falhar)
+    // 3. Criar anamnese (ignorar erro)
     await supabase.from('anamnesis').insert({
       patient_id: patientId,
       professional_id: professionalId,
       status: 'incomplete'
     }).catch(() => {});
     
-    // Buscar paciente criado
-    const patientResult = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', patientId)
-      .maybeSingle()
-      .catch(() => ({ data: null, error: { message: 'Erro ao buscar' } }));
-    
-    if (!patientResult.data) {
-      console.error('❌ Paciente não encontrado');
-      return { data: null, error: { message: 'Erro ao buscar paciente' } };
-    }
-    
     console.log('✅ Paciente criado');
-    return { data: patientResult.data, error: null };
+    return { data: { id: patientId, ...patientData, role: 'patient' }, error: null };
     
-  } catch (error) {
-    console.error('❌ Erro fatal');
-    return { data: null, error: { message: 'Erro fatal' } };
+  } catch (err) {
+    console.error('❌ Erro:', err?.message || 'Erro desconhecido');
+    return { data: null, error: { message: 'Erro ao criar paciente. Verifique se o email já existe.' } };
   }
 };
 
