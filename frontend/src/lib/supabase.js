@@ -560,7 +560,7 @@ export const markMessageAsRead = async (messageId) => {
 export const getMealPlans = async (userId, userRole) => {
   let query = supabase.from('meal_plans').select(`
     *,
-    patient:profiles!patient_id(id, name, email)
+    patient:patient_id(id, name, email)
   `);
   
   if (userRole === 'professional') {
@@ -576,7 +576,7 @@ export const getMealPlans = async (userId, userRole) => {
 export const getMealPlan = async (planId) => {
   const { data, error } = await supabase
     .from('meal_plans')
-    .select(`*, patient:profiles!patient_id(id, name, email)`)
+    .select(`*, patient:patient_id(id, name, email)`)
     .eq('id', planId)
     .single();
   return { data, error };
@@ -679,7 +679,7 @@ export const getAllProfessionals = async () => {
 export const getProfessionalStats = async (professionalId, isAdmin = false) => {
   let patientQuery = supabase
     .from('patient_profiles')
-    .select('*, patient:profiles!patient_id(*)', { count: 'exact' });
+    .select('*, patient:patient_id(*)', { count: 'exact' });
   
   if (!isAdmin) {
     patientQuery = patientQuery.eq('professional_id', professionalId);
@@ -704,7 +704,7 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
   // Pacientes recentes
   let recentQuery = supabase
     .from('patient_profiles')
-    .select('*, patient:profiles!patient_id(*)')
+    .select('*, patient:patient_id(*)')
     .is('patient.deleted_at', null)
     .order('created_at', { ascending: false })
     .limit(5);
