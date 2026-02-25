@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowLeft, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
 
 /**
  * Barra fixa de Admin que aparece quando admin está visualizando outras áreas
@@ -11,12 +12,22 @@ const AdminBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { profile } = useAuth();
+  const [shouldShow, setShouldShow] = useState(false);
 
   // Só mostrar se for admin E estiver fora do painel admin
   const isAdmin = profile?.role === 'admin';
   const isInAdminArea = location.pathname.startsWith('/admin');
   
-  if (!isAdmin || isInAdminArea) {
+  useEffect(() => {
+    // Delay para evitar flash durante navegação
+    const timer = setTimeout(() => {
+      setShouldShow(isAdmin && !isInAdminArea);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isAdmin, isInAdminArea]);
+
+  if (!shouldShow) {
     return null;
   }
 
@@ -27,6 +38,10 @@ const AdminBar = () => {
   } else if (location.pathname.startsWith('/patient')) {
     currentArea = 'Área de Paciente';
   }
+
+  const handleBackToAdmin = () => {
+    navigate('/admin/dashboard', { replace: true });
+  };
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-700 to-purple-800 text-white shadow-lg">
@@ -43,7 +58,7 @@ const AdminBar = () => {
         </div>
         
         <Button
-          onClick={() => navigate('/admin/dashboard')}
+          onClick={handleBackToAdmin}
           variant="secondary"
           size="sm"
           className="bg-white/20 hover:bg-white/30 text-white border-white/30"
