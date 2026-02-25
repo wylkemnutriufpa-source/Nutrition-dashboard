@@ -4,8 +4,23 @@ CREATE TABLE IF NOT EXISTS checklist_tasks (
   patient_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   completed BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Trigger para atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_checklist_tasks_updated_at
+  BEFORE UPDATE ON checklist_tasks
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 
 -- Índice para buscar tarefas por paciente
 CREATE INDEX IF NOT EXISTS idx_checklist_tasks_patient_id ON checklist_tasks(patient_id);

@@ -835,14 +835,18 @@ export const createChecklistTask = async (patientId, title) => {
   return { data, error };
 };
 
-export const toggleChecklistTask = async (taskId, completed) => {
+export const updateChecklistTask = async (taskId, updates) => {
   const { data, error } = await supabase
     .from('checklist_tasks')
-    .update({ completed })
+    .update(updates)
     .eq('id', taskId)
     .select()
     .single();
   return { data, error };
+};
+
+export const toggleChecklistTask = async (taskId, completed) => {
+  return await updateChecklistTask(taskId, { completed });
 };
 
 export const deleteChecklistTask = async (taskId) => {
