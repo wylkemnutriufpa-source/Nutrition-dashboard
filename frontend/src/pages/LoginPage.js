@@ -80,15 +80,18 @@ const LoginPage = () => {
 
         toast.success('Login realizado com sucesso!');
 
+        // Aguardar um pouco para o toast aparecer e evitar race condition no unmount
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         // Redirecionar baseado no role
         if (profile.role === 'admin') {
-          navigate('/admin/dashboard');
+          navigate('/admin/dashboard', { replace: true });
         } else if (profile.role === 'professional') {
-          navigate('/professional/dashboard');
+          navigate('/professional/dashboard', { replace: true });
         } else if (profile.role === 'patient') {
           localStorage.setItem('fitjourney_patient_id', profile.id);
           localStorage.setItem('fitjourney_patient_name', profile.name);
-          navigate('/patient/dashboard');
+          navigate('/patient/dashboard', { replace: true });
         }
       }
     } catch (error) {
