@@ -116,6 +116,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Backend básico FastAPI funcionando"
+      - working: true
+        agent: "testing"
+        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://health-metrics-198.preview.emergentagent.com with proper MongoDB integration."
 
 frontend:
   - task: "Supabase Auth Integration"
