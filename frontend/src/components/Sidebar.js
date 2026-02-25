@@ -1,11 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database, Palette } from 'lucide-react';
+import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database, Palette, Shield, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
 
 const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
   const { branding } = useBranding();
+
+  const adminLinks = [
+    { to: '/admin/dashboard', icon: Shield, label: 'Painel Admin' },
+    { to: '/professional/patients', icon: Users, label: 'Ver Pacientes' },
+    { to: '/professional/food-database', icon: Database, label: 'Banco de Alimentos' },
+    { to: '/professional/settings', icon: Settings, label: 'Configurações' }
+  ];
 
   const professionalLinks = [
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
@@ -25,6 +32,17 @@ const Sidebar = ({ userType, onLogout }) => {
   const visitorLinks = [
     { to: '/visitor/calculators', icon: Calculator, label: 'Calculadoras' }
   ];
+
+  const links = userType === 'admin' ? adminLinks : userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
+
+  const getUserTypeLabel = () => {
+    switch(userType) {
+      case 'admin': return 'Administrador';
+      case 'professional': return 'Profissional';
+      case 'patient': return 'Paciente';
+      default: return 'Visitante';
+    }
+  };
 
   const links = userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
 
