@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -342,7 +343,13 @@ const HealthCheckQuiz = () => {
     const indexData = getNutritionalIndex(result.score);
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 py-8 px-4">
+      <Layout title="Resultado do Check" userType="visitor">
+        {/* Botão WhatsApp Flutuante */}
+        <WhatsAppFloating 
+          phoneNumber="5511999999999"
+          message="Olá! Fiz o Check Nutricional e quero saber mais"
+        />
+        
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -589,12 +596,12 @@ const HealthCheckQuiz = () => {
             </Card>
           )}
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 py-8 px-4">
+    <Layout title="Check Nutricional" userType="visitor">
       {/* Botão WhatsApp Flutuante */}
       <WhatsAppFloating 
         phoneNumber="5511999999999"
@@ -693,7 +700,7 @@ const HealthCheckQuiz = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
