@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database, Palette, Shield, Stethoscope } from 'lucide-react';
+import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database, Palette, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
 
@@ -32,17 +32,6 @@ const Sidebar = ({ userType, onLogout }) => {
   const visitorLinks = [
     { to: '/visitor/calculators', icon: Calculator, label: 'Calculadoras' }
   ];
-
-  const links = userType === 'admin' ? adminLinks : userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
-
-  const getUserTypeLabel = () => {
-    switch(userType) {
-      case 'admin': return 'Administrador';
-      case 'professional': return 'Profissional';
-      case 'patient': return 'Paciente';
-      default: return 'Visitante';
-    }
-  };
 
   const links = userType === 'admin' ? adminLinks : userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
 
@@ -90,7 +79,7 @@ const Sidebar = ({ userType, onLogout }) => {
                   ? 'text-white shadow-md'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
-              style={isActive ? { backgroundColor: branding.primaryColor } : {}}
+              style={isActive ? { backgroundColor: userType === 'admin' ? '#7C3AED' : branding.primaryColor } : {}}
             >
               <Icon size={20} />
               <span className="font-medium text-sm">{link.label}</span>
