@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { supabase, getCurrentUser, getUserProfile, signOut } from '@/lib/supabase';
 
 const AuthContext = createContext({});
@@ -12,6 +12,79 @@ export const AuthProvider = ({ children }) => {
   const isCheckingUser = useRef(false);
   const isMounted = useRef(true);
   const authListenerRef = useRef(null);
+
+  const handleSignOut = useCallback(() => {
+    if (isMounted.current) {
+      setUser(null);
+      setProfile(null);
+      localStorage.removeItem('fitjourney_user_type');
+      localStorage.removeItem('fitjourney_user_email');
+      localStorage.removeItem('fitjourney_user_id');
+      localStorage.removeItem('fitjourney_patient_id');
+      localStorage.removeItem('fitjourney_patient_name');
+    }
+  }, []);
+
+  // Tratamento para sessão corrompida
+  const handleCorruptedSession = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      handleSignOut();
+    } catch (error) {
+      console.error('Error clearing corrupted session:', error);
+      // Forçar limpeza local mesmo se signOut falhar
+      handleSignOut();
+    }
+  }, [handleSignOut]);
+
+  const handleSignIn = useCallback(async (authUser) => {
+    try {
+      const userProfile = await getUserProfile(authUser.id);
+      if (isMounted.current) {
+        setUser(authUser);
+        setProfile(userProfile);
+      }
+    } catch (error) {
+      console.error('Error loading profile after sign in:', error);
+      // Em caso de erro, fazer logout seguro
+      await handleCorruptedSession();
+    }
+  }, [handleCorruptedSession]);
+
+  const checkUser = useCallback(async () => {
+    // Evitar múltiplas chamadas simultâneas
+    if (isCheckingUser.current) {
+      return;
+    }
+
+    isCheckingUser.current = true;
+
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Session error:', error);
+        await handleCorruptedSession();
+        return;
+      }
+
+      if (session?.user) {
+        const userProfile = await getUserProfile(session.user.id);
+        if (isMounted.current) {
+          setUser(session.user);
+          setProfile(userProfile);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking user:', error);
+      await handleCorruptedSession();
+    } finally {
+      if (isMounted.current) {
+        setLoading(false);
+      }
+      isCheckingUser.current = false;
+    }
+  }, [handleCorruptedSession]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -52,80 +125,7 @@ export const AuthProvider = ({ children }) => {
         authListenerRef.current = null;
       }
     };
-  }, []);
-
-  const handleSignIn = async (authUser) => {
-    try {
-      const userProfile = await getUserProfile(authUser.id);
-      if (isMounted.current) {
-        setUser(authUser);
-        setProfile(userProfile);
-      }
-    } catch (error) {
-      console.error('Error loading profile after sign in:', error);
-      // Em caso de erro, fazer logout seguro
-      await handleCorruptedSession();
-    }
-  };
-
-  const handleSignOut = () => {
-    if (isMounted.current) {
-      setUser(null);
-      setProfile(null);
-      localStorage.removeItem('fitjourney_user_type');
-      localStorage.removeItem('fitjourney_user_email');
-      localStorage.removeItem('fitjourney_user_id');
-      localStorage.removeItem('fitjourney_patient_id');
-      localStorage.removeItem('fitjourney_patient_name');
-    }
-  };
-
-  const checkUser = async () => {
-    // Evitar múltiplas chamadas simultâneas
-    if (isCheckingUser.current) {
-      return;
-    }
-
-    isCheckingUser.current = true;
-
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Session error:', error);
-        await handleCorruptedSession();
-        return;
-      }
-
-      if (session?.user) {
-        const userProfile = await getUserProfile(session.user.id);
-        if (isMounted.current) {
-          setUser(session.user);
-          setProfile(userProfile);
-        }
-      }
-    } catch (error) {
-      console.error('Error checking user:', error);
-      await handleCorruptedSession();
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
-      }
-      isCheckingUser.current = false;
-    }
-  };
-
-  // Tratamento para sessão corrompida
-  const handleCorruptedSession = async () => {
-    try {
-      await supabase.auth.signOut();
-      handleSignOut();
-    } catch (error) {
-      console.error('Error clearing corrupted session:', error);
-      // Forçar limpeza local mesmo se signOut falhar
-      handleSignOut();
-    }
-  };
+  }, [checkUser, handleSignIn, handleSignOut]);
 
   const logout = async () => {
     try {
