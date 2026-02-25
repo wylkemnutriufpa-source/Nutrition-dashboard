@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,99 +9,29 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, FileText, Utensils, AlertTriangle, Edit, Loader2, User, Save, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Calendar, FileText, Utensils, AlertTriangle, Edit, Loader2, User, Save, Plus,
+  ClipboardList, MessageSquare, CheckCircle2, Circle, Trash2, Send, Pin
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, getMealPlans } from '@/lib/supabase';
+import { 
+  getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, updateAnamnesis,
+  getMealPlans, getChecklistTemplates, createChecklistTemplate, updateChecklistTemplate,
+  deleteChecklistTemplate, getChecklistEntriesForDate, toggleChecklistEntry, getChecklistAdherence,
+  getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage
+} from '@/lib/supabase';
 import { toast } from 'sonner';
 
-const PatientProfile = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [patient, setPatient] = useState(null);
-  const [mealPlan, setMealPlan] = useState(null);
-  const [allMealPlans, setAllMealPlans] = useState([]);
-  const [anamnesis, setAnamnesis] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
-
-  useEffect(() => {
-    if (id && user) {
-      loadPatientData();
-    }
-  }, [id, user]);
-
-  const loadPatientData = async () => {
-    setLoading(true);
-    try {
-      // Carregar dados do paciente
-      const { data: patientData, error: patientError } = await getPatientById(id);
-      if (patientError) throw patientError;
-      setPatient(patientData);
-      setEditData(patientData);
-
-      // Carregar plano alimentar ativo
-      const { data: planData } = await getPatientMealPlan(id, user.id);
-      setMealPlan(planData);
-
-      // Carregar todos os planos do paciente
-      const { data: allPlans } = await getMealPlans(user.id, 'professional');
-      const patientPlans = (allPlans || []).filter(p => p.patient_id === id);
-      setAllMealPlans(patientPlans);
-
-      // Carregar anamnese
-      const { data: anamnesisData } = await getAnamnesis(id);
-      setAnamnesis(anamnesisData);
-
-    } catch (error) {
-      console.error('Error loading patient:', error);
-      toast.error('Erro ao carregar dados do paciente');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSavePatient = async () => {
-    setSaving(true);
-    try {
-      const updates = {
-        name: editData.name,
-        phone: editData.phone,
-        birth_date: editData.birth_date,
-        gender: editData.gender,
-        height: editData.height ? parseFloat(editData.height) : null,
-        current_weight: editData.current_weight ? parseFloat(editData.current_weight) : null,
-        goal_weight: editData.goal_weight ? parseFloat(editData.goal_weight) : null,
-        goal: editData.goal,
-        notes: editData.notes,
-        status: editData.status
-      };
-
-      const { error } = await updatePatient(id, updates);
-      if (error) throw error;
-
-      toast.success('Dados atualizados com sucesso!');
-      setIsEditing(false);
-      await loadPatientData();
-    } catch (error) {
-      console.error('Error updating patient:', error);
-      toast.error('Erro ao atualizar dados');
-    } finally {
-      setSaving(false);
-    }
-  };
-
+// Componente de Aba Resumo
+const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
   const calculateAge = (birthDate) => {
     if (!birthDate) return null;
     const today = new Date();
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
     return age;
   };
 
@@ -111,32 +41,787 @@ const PatientProfile = () => {
     return (patient.current_weight / (heightInMeters * heightInMeters)).toFixed(1);
   };
 
-  const getIMCClassification = (imc) => {
-    if (!imc) return '';
-    const value = parseFloat(imc);
-    if (value < 18.5) return 'Abaixo do peso';
-    if (value < 25) return 'Peso normal';
-    if (value < 30) return 'Sobrepeso';
-    if (value < 35) return 'Obesidade I';
-    if (value < 40) return 'Obesidade II';
-    return 'Obesidade III';
-  };
-
   const getGoalLabel = (goal) => {
     const goals = {
-      'weight_loss': 'Emagrecimento',
-      'muscle_gain': 'Ganho de Massa Muscular',
-      'maintenance': 'Manutenção',
-      'health': 'Saúde/Reeducação Alimentar',
-      'sports': 'Performance Esportiva',
-      'other': 'Outro'
+      'weight_loss': 'Emagrecimento', 'muscle_gain': 'Ganho de Massa',
+      'maintenance': 'Manutenção', 'health': 'Saúde', 'sports': 'Performance', 'other': 'Outro'
     };
     return goals[goal] || goal || 'Não definido';
   };
 
+  const age = calculateAge(patient?.birth_date);
+  const imc = calculateIMC();
+
+  return (
+    <div className="space-y-6">
+      {/* Cards de resumo */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Peso Atual</p>
+            <p className="text-2xl font-bold">{patient?.current_weight ? `${patient.current_weight} kg` : '--'}</p>
+            {imc && <p className="text-xs text-gray-500">IMC: {imc}</p>}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Meta</p>
+            <p className="text-2xl font-bold">{patient?.goal_weight ? `${patient.goal_weight} kg` : '--'}</p>
+            <p className="text-xs text-gray-500">{getGoalLabel(patient?.goal)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Anamnese</p>
+            <Badge variant={anamnesis?.status === 'complete' ? 'default' : 'secondary'}>
+              {anamnesis?.status === 'complete' ? 'Completa' : anamnesis?.status === 'draft' ? 'Rascunho' : 'Incompleta'}
+            </Badge>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Aderência (7 dias)</p>
+            <p className="text-2xl font-bold text-teal-700">{adherence?.adherence || 0}%</p>
+            <p className="text-xs text-gray-500">{adherence?.completed || 0}/{adherence?.total || 0} tarefas</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Info detalhada */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader><CardTitle>Informações Pessoais</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between"><span className="text-gray-600">Idade</span><span>{age ? `${age} anos` : '--'}</span></div>
+            <div className="flex justify-between"><span className="text-gray-600">Sexo</span><span>{patient?.gender === 'male' ? 'Masculino' : patient?.gender === 'female' ? 'Feminino' : '--'}</span></div>
+            <div className="flex justify-between"><span className="text-gray-600">Altura</span><span>{patient?.height ? `${patient.height} cm` : '--'}</span></div>
+            <div className="flex justify-between"><span className="text-gray-600">Telefone</span><span>{patient?.phone || '--'}</span></div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Ações Rápidas</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start" variant="outline" onClick={() => onNavigate('anamnese')}>
+              <FileText className="mr-2" size={18} /> Abrir Anamnese
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => onNavigate('plano')}>
+              <Utensils className="mr-2" size={18} /> Abrir Plano Alimentar
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => onNavigate('checklist')}>
+              <ClipboardList className="mr-2" size={18} /> Ver Checklist
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Observações */}
+      {patient?.notes && (
+        <Card>
+          <CardHeader><CardTitle>Observações</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-gray-700 whitespace-pre-wrap">{patient.notes}</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+// Componente de Aba Anamnese
+const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate }) => {
+  const [data, setData] = useState(anamnesis || {});
+  const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    setData(anamnesis || {});
+  }, [anamnesis]);
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+    setHasChanges(true);
+  };
+
+  const handleSave = async (markComplete = false) => {
+    setSaving(true);
+    try {
+      const updates = {
+        ...data,
+        status: markComplete ? 'complete' : 'draft',
+        last_edited_by: 'professional'
+      };
+      
+      const { error } = await updateAnamnesis(anamnesis.id, updates);
+      if (error) throw error;
+      
+      toast.success(markComplete ? 'Anamnese concluída!' : 'Rascunho salvo!');
+      setHasChanges(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error saving anamnesis:', error);
+      toast.error('Erro ao salvar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Auto-save a cada 30 segundos se houver mudanças
+  useEffect(() => {
+    if (!hasChanges) return;
+    const timer = setTimeout(() => {
+      handleSave(false);
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [data, hasChanges]);
+
+  return (
+    <div className="space-y-6">
+      {/* Status */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Badge variant={data.status === 'complete' ? 'default' : 'secondary'}>
+            {data.status === 'complete' ? 'Completa' : data.status === 'draft' ? 'Rascunho' : 'Incompleta'}
+          </Badge>
+          {hasChanges && <span className="text-xs text-amber-600">Alterações não salvas</span>}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => handleSave(false)} disabled={saving || !hasChanges}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Salvar Rascunho'}
+          </Button>
+          <Button className="bg-teal-700 hover:bg-teal-800" onClick={() => handleSave(true)} disabled={saving}>
+            Concluir Anamnese
+          </Button>
+        </div>
+      </div>
+
+      {/* Histórico Médico */}
+      <Card>
+        <CardHeader><CardTitle>Histórico Médico</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label>Condições Médicas</Label>
+            <Textarea
+              value={data.medical_conditions ? JSON.stringify(data.medical_conditions) : ''}
+              onChange={(e) => {
+                try {
+                  handleChange('medical_conditions', JSON.parse(e.target.value));
+                } catch {
+                  // Se não for JSON válido, salvar como texto
+                }
+              }}
+              placeholder='Ex: [{"condition": "Diabetes Tipo 2", "since": "2020", "controlled": true}]'
+              rows={3}
+            />
+            <p className="text-xs text-gray-500 mt-1">JSON array de condições ou texto livre</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Alergias Alimentares</Label>
+              <Input
+                value={data.allergies?.join(', ') || ''}
+                onChange={(e) => handleChange('allergies', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                placeholder="Amendoim, Frutos do mar, Glúten"
+              />
+            </div>
+            <div>
+              <Label>Intolerâncias</Label>
+              <Input
+                value={data.food_intolerances?.join(', ') || ''}
+                onChange={(e) => handleChange('food_intolerances', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                placeholder="Lactose, Frutose"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Hábitos de Vida */}
+      <Card>
+        <CardHeader><CardTitle>Hábitos de Vida</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <Label>Tabagismo</Label>
+              <Select value={data.smoking || ''} onValueChange={(v) => handleChange('smoking', v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="never">Nunca fumou</SelectItem>
+                  <SelectItem value="former">Ex-fumante</SelectItem>
+                  <SelectItem value="current">Fumante</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Álcool</Label>
+              <Select value={data.alcohol || ''} onValueChange={(v) => handleChange('alcohol', v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="never">Não bebe</SelectItem>
+                  <SelectItem value="social">Social</SelectItem>
+                  <SelectItem value="regular">Regular</SelectItem>
+                  <SelectItem value="daily">Diário</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Horas de Sono</Label>
+              <Input
+                type="number"
+                value={data.sleep_hours || ''}
+                onChange={(e) => handleChange('sleep_hours', parseFloat(e.target.value) || null)}
+                placeholder="7"
+              />
+            </div>
+            <div>
+              <Label>Nível de Estresse</Label>
+              <Select value={data.stress_level || ''} onValueChange={(v) => handleChange('stress_level', v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Baixo</SelectItem>
+                  <SelectItem value="moderate">Moderado</SelectItem>
+                  <SelectItem value="high">Alto</SelectItem>
+                  <SelectItem value="very_high">Muito Alto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Nível de Atividade Física</Label>
+              <Select value={data.physical_activity_level || ''} onValueChange={(v) => handleChange('physical_activity_level', v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sedentary">Sedentário</SelectItem>
+                  <SelectItem value="light">Leve</SelectItem>
+                  <SelectItem value="moderate">Moderado</SelectItem>
+                  <SelectItem value="active">Ativo</SelectItem>
+                  <SelectItem value="very_active">Muito Ativo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Água por Dia (litros)</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={data.water_intake || ''}
+                onChange={(e) => handleChange('water_intake', parseFloat(e.target.value) || null)}
+                placeholder="2.0"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Histórico Alimentar */}
+      <Card>
+        <CardHeader><CardTitle>Histórico Alimentar</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Refeições por Dia</Label>
+              <Input
+                type="number"
+                value={data.meals_per_day || ''}
+                onChange={(e) => handleChange('meals_per_day', parseInt(e.target.value) || null)}
+                placeholder="5"
+              />
+            </div>
+            <div>
+              <Label>Restrições Alimentares</Label>
+              <Input
+                value={data.dietary_restrictions || ''}
+                onChange={(e) => handleChange('dietary_restrictions', e.target.value)}
+                placeholder="Vegetariano, Sem glúten..."
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Preferências Alimentares</Label>
+            <Textarea
+              value={data.food_preferences || ''}
+              onChange={(e) => handleChange('food_preferences', e.target.value)}
+              placeholder="Alimentos que gosta, favoritos..."
+              rows={2}
+            />
+          </div>
+          <div>
+            <Label>Aversões Alimentares</Label>
+            <Textarea
+              value={data.food_aversions || ''}
+              onChange={(e) => handleChange('food_aversions', e.target.value)}
+              placeholder="Alimentos que não gosta ou evita..."
+              rows={2}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Observações */}
+      <Card>
+        <CardHeader><CardTitle>Observações do Profissional</CardTitle></CardHeader>
+        <CardContent>
+          <Textarea
+            value={data.professional_notes || ''}
+            onChange={(e) => handleChange('professional_notes', e.target.value)}
+            placeholder="Observações, anotações, pontos de atenção..."
+            rows={4}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Componente de Aba Checklist
+const ChecklistTab = ({ patientId, professionalId, onUpdate }) => {
+  const [templates, setTemplates] = useState([]);
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [newTask, setNewTask] = useState({ title: '', category: 'general', time_of_day: 'anytime' });
+  const today = new Date().toISOString().split('T')[0];
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: templatesData } = await getChecklistTemplates(patientId);
+      setTemplates(templatesData || []);
+      
+      const { data: entriesData } = await getChecklistEntriesForDate(patientId, today);
+      setEntries(entriesData || []);
+    } catch (error) {
+      console.error('Error loading checklist:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [patientId, today]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleAddTask = async () => {
+    if (!newTask.title.trim()) {
+      toast.error('Título é obrigatório');
+      return;
+    }
+
+    try {
+      const { error } = await createChecklistTemplate({
+        patient_id: patientId,
+        professional_id: professionalId,
+        ...newTask,
+        order_index: templates.length
+      });
+      if (error) throw error;
+      
+      toast.success('Tarefa adicionada!');
+      setIsAddingTask(false);
+      setNewTask({ title: '', category: 'general', time_of_day: 'anytime' });
+      loadData();
+    } catch (error) {
+      toast.error('Erro ao adicionar tarefa');
+    }
+  };
+
+  const handleDeleteTask = async (templateId) => {
+    if (!window.confirm('Remover esta tarefa?')) return;
+    
+    try {
+      const { error } = await deleteChecklistTemplate(templateId);
+      if (error) throw error;
+      toast.success('Tarefa removida');
+      loadData();
+    } catch (error) {
+      toast.error('Erro ao remover');
+    }
+  };
+
+  const isTaskCompleted = (templateId) => {
+    return entries.some(e => e.template_id === templateId && e.completed);
+  };
+
+  const getCategoryColor = (category) => {
+    const colors = {
+      'nutrition': 'bg-green-100 text-green-700',
+      'exercise': 'bg-blue-100 text-blue-700',
+      'hydration': 'bg-cyan-100 text-cyan-700',
+      'supplement': 'bg-purple-100 text-purple-700',
+      'general': 'bg-gray-100 text-gray-700'
+    };
+    return colors[category] || colors.general;
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-teal-700" /></div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Tarefas do Paciente</h3>
+        <Dialog open={isAddingTask} onOpenChange={setIsAddingTask}>
+          <DialogTrigger asChild>
+            <Button className="bg-teal-700 hover:bg-teal-800">
+              <Plus size={18} className="mr-2" /> Nova Tarefa
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nova Tarefa</DialogTitle>
+              <DialogDescription>Adicione uma tarefa para o paciente completar diariamente</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Título *</Label>
+                <Input
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  placeholder="Ex: Beber 2L de água"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Categoria</Label>
+                  <Select value={newTask.category} onValueChange={(v) => setNewTask({ ...newTask, category: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="nutrition">Nutrição</SelectItem>
+                      <SelectItem value="exercise">Exercício</SelectItem>
+                      <SelectItem value="hydration">Hidratação</SelectItem>
+                      <SelectItem value="supplement">Suplemento</SelectItem>
+                      <SelectItem value="general">Geral</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Período</Label>
+                  <Select value={newTask.time_of_day} onValueChange={(v) => setNewTask({ ...newTask, time_of_day: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="morning">Manhã</SelectItem>
+                      <SelectItem value="afternoon">Tarde</SelectItem>
+                      <SelectItem value="evening">Noite</SelectItem>
+                      <SelectItem value="anytime">Qualquer hora</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Button onClick={handleAddTask} className="w-full bg-teal-700 hover:bg-teal-800">
+                Adicionar Tarefa
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {templates.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <ClipboardList className="mx-auto text-gray-400 mb-4" size={48} />
+            <p className="text-gray-600">Nenhuma tarefa definida</p>
+            <p className="text-sm text-gray-500">Adicione tarefas para o paciente acompanhar diariamente</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {templates.map((task) => {
+            const completed = isTaskCompleted(task.id);
+            return (
+              <Card key={task.id} className={completed ? 'border-green-200 bg-green-50' : ''}>
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      {completed ? (
+                        <CheckCircle2 className="text-green-600" size={24} />
+                      ) : (
+                        <Circle className="text-gray-400" size={24} />
+                      )}
+                      <div>
+                        <p className={`font-medium ${completed ? 'text-green-700' : 'text-gray-900'}`}>
+                          {task.title}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge className={getCategoryColor(task.category)}>{task.category}</Badge>
+                          <span className="text-xs text-gray-500">{task.time_of_day}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => handleDeleteTask(task.id)}
+                    >
+                      <Trash2 size={18} />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Componente de Aba Recados
+const RecadosTab = ({ patientId, professionalId }) => {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isAddingMessage, setIsAddingMessage] = useState(false);
+  const [newMessage, setNewMessage] = useState({ title: '', content: '', type: 'tip', priority: 'normal' });
+
+  const loadMessages = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await getPatientMessages(patientId, false);
+      setMessages(data || []);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [patientId]);
+
+  useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
+
+  const handleSendMessage = async () => {
+    if (!newMessage.title.trim() || !newMessage.content.trim()) {
+      toast.error('Título e conteúdo são obrigatórios');
+      return;
+    }
+
+    try {
+      const { error } = await createPatientMessage({
+        patient_id: patientId,
+        professional_id: professionalId,
+        ...newMessage
+      });
+      if (error) throw error;
+      
+      toast.success('Recado enviado!');
+      setIsAddingMessage(false);
+      setNewMessage({ title: '', content: '', type: 'tip', priority: 'normal' });
+      loadMessages();
+    } catch (error) {
+      toast.error('Erro ao enviar recado');
+    }
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    if (!window.confirm('Excluir este recado?')) return;
+    
+    try {
+      const { error } = await deletePatientMessage(messageId);
+      if (error) throw error;
+      toast.success('Recado excluído');
+      loadMessages();
+    } catch (error) {
+      toast.error('Erro ao excluir');
+    }
+  };
+
+  const handleTogglePin = async (message) => {
+    try {
+      const { error } = await updatePatientMessage(message.id, { is_pinned: !message.is_pinned });
+      if (error) throw error;
+      loadMessages();
+    } catch (error) {
+      toast.error('Erro ao atualizar');
+    }
+  };
+
+  const getTypeColor = (type) => {
+    const colors = {
+      'tip': 'bg-blue-100 text-blue-700',
+      'reminder': 'bg-amber-100 text-amber-700',
+      'alert': 'bg-red-100 text-red-700',
+      'motivation': 'bg-green-100 text-green-700',
+      'feedback': 'bg-purple-100 text-purple-700'
+    };
+    return colors[type] || colors.tip;
+  };
+
+  const getTypeLabel = (type) => {
+    const labels = { 'tip': 'Dica', 'reminder': 'Lembrete', 'alert': 'Alerta', 'motivation': 'Motivação', 'feedback': 'Feedback' };
+    return labels[type] || type;
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-teal-700" /></div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Recados e Dicas</h3>
+        <Dialog open={isAddingMessage} onOpenChange={setIsAddingMessage}>
+          <DialogTrigger asChild>
+            <Button className="bg-teal-700 hover:bg-teal-800">
+              <Send size={18} className="mr-2" /> Novo Recado
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Novo Recado</DialogTitle>
+              <DialogDescription>Envie uma mensagem, dica ou lembrete para o paciente</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Título *</Label>
+                <Input
+                  value={newMessage.title}
+                  onChange={(e) => setNewMessage({ ...newMessage, title: e.target.value })}
+                  placeholder="Ex: Lembrete importante"
+                />
+              </div>
+              <div>
+                <Label>Conteúdo *</Label>
+                <Textarea
+                  value={newMessage.content}
+                  onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
+                  placeholder="Digite sua mensagem..."
+                  rows={4}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Tipo</Label>
+                  <Select value={newMessage.type} onValueChange={(v) => setNewMessage({ ...newMessage, type: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tip">Dica</SelectItem>
+                      <SelectItem value="reminder">Lembrete</SelectItem>
+                      <SelectItem value="alert">Alerta</SelectItem>
+                      <SelectItem value="motivation">Motivação</SelectItem>
+                      <SelectItem value="feedback">Feedback</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Prioridade</Label>
+                  <Select value={newMessage.priority} onValueChange={(v) => setNewMessage({ ...newMessage, priority: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Baixa</SelectItem>
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="high">Alta</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Button onClick={handleSendMessage} className="w-full bg-teal-700 hover:bg-teal-800">
+                Enviar Recado
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {messages.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <MessageSquare className="mx-auto text-gray-400 mb-4" size={48} />
+            <p className="text-gray-600">Nenhum recado enviado</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {messages.map((msg) => (
+            <Card key={msg.id} className={msg.is_pinned ? 'border-amber-300 bg-amber-50' : ''}>
+              <CardContent className="py-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      {msg.is_pinned && <Pin size={14} className="text-amber-600" />}
+                      <h4 className="font-semibold text-gray-900">{msg.title}</h4>
+                      <Badge className={getTypeColor(msg.type)}>{getTypeLabel(msg.type)}</Badge>
+                      {msg.is_read && <Badge variant="outline" className="text-xs">Lido</Badge>}
+                    </div>
+                    <p className="text-gray-700 text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {new Date(msg.created_at).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => handleTogglePin(msg)}>
+                      <Pin size={16} className={msg.is_pinned ? 'text-amber-600' : 'text-gray-400'} />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleDeleteMessage(msg.id)}>
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Componente Principal
+const PatientProfile = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user, profile } = useAuth();
+  
+  const [patient, setPatient] = useState(null);
+  const [mealPlan, setMealPlan] = useState(null);
+  const [allMealPlans, setAllMealPlans] = useState([]);
+  const [anamnesis, setAnamnesis] = useState(null);
+  const [adherence, setAdherence] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'resumo');
+
+  const loadPatientData = useCallback(async () => {
+    if (!id || !profile) return;
+    
+    setLoading(true);
+    try {
+      const { data: patientData, error: patientError } = await getPatientById(id);
+      if (patientError) throw patientError;
+      setPatient(patientData);
+
+      const { data: planData } = await getPatientMealPlan(id, profile.id);
+      setMealPlan(planData);
+
+      const { data: allPlans } = await getMealPlans(profile.id, 'professional');
+      setAllMealPlans((allPlans || []).filter(p => p.patient_id === id));
+
+      const { data: anamnesisData } = await getAnamnesis(id);
+      setAnamnesis(anamnesisData);
+
+      const adherenceData = await getChecklistAdherence(id, 7);
+      setAdherence(adherenceData);
+
+    } catch (error) {
+      console.error('Error loading patient:', error);
+      toast.error('Erro ao carregar paciente');
+    } finally {
+      setLoading(false);
+    }
+  }, [id, profile]);
+
+  useEffect(() => {
+    loadPatientData();
+  }, [loadPatientData]);
+
+  const handleNavigateTab = (tab) => {
+    setActiveTab(tab);
+  };
+
   if (loading) {
     return (
-      <Layout title="Carregando..." showBack userType="professional">
+      <Layout title="Carregando..." showBack userType={profile?.role || 'professional'}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
         </div>
@@ -146,15 +831,12 @@ const PatientProfile = () => {
 
   if (!patient) {
     return (
-      <Layout title="Paciente não encontrado" showBack userType="professional">
+      <Layout title="Paciente não encontrado" showBack userType={profile?.role || 'professional'}>
         <Card>
           <CardContent className="py-12 text-center">
             <User className="mx-auto text-gray-400 mb-4" size={48} />
-            <p className="text-gray-600">Paciente não encontrado ou sem permissão de acesso</p>
-            <Button 
-              className="mt-4"
-              onClick={() => navigate('/professional/patients')}
-            >
+            <p className="text-gray-600">Paciente não encontrado</p>
+            <Button className="mt-4" onClick={() => navigate('/professional/patients')}>
               Voltar para lista
             </Button>
           </CardContent>
@@ -164,446 +846,127 @@ const PatientProfile = () => {
   }
 
   const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(patient.name)}&background=0F766E&color=fff&size=200`;
-  const age = calculateAge(patient.birth_date);
-  const imc = calculateIMC();
 
   return (
-    <Layout title={patient.name} showBack userType="professional">
+    <Layout title={patient.name} showBack userType={profile?.role || 'professional'}>
       <div data-testid="patient-profile" className="space-y-6">
-        {/* Header com dados do paciente */}
+        {/* Header */}
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center space-x-6">
-              <img src={avatar} alt={patient.name} className="w-24 h-24 rounded-full" />
+              <img src={avatar} alt={patient.name} className="w-20 h-20 rounded-full" />
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">{patient.name}</h2>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <Edit className="mr-2" size={16} />
-                    Editar
-                  </Button>
-                </div>
+                <h2 className="text-2xl font-bold text-gray-900">{patient.name}</h2>
                 <p className="text-gray-600">{patient.email}</p>
-                <p className="text-gray-600">{patient.phone || 'Telefone não informado'}</p>
-                <div className="flex items-center space-x-4 mt-2">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    patient.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                  }`}>
-                    {patient.status === 'active' ? 'Ativo' : 'Inativo'}
-                  </span>
-                  {patient.goal && (
-                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-700">
-                      {getGoalLabel(patient.goal)}
-                    </span>
-                  )}
-                </div>
+                <p className="text-gray-500 text-sm">{patient.phone || 'Sem telefone'}</p>
               </div>
-              <div className="text-right space-y-2">
-                {age && (
-                  <div>
-                    <p className="text-sm text-gray-600">Idade</p>
-                    <p className="text-2xl font-bold text-gray-900">{age} anos</p>
-                  </div>
-                )}
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}`)}>
+                  <Utensils size={18} className="mr-2" /> Plano Alimentar
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Dialog de edição */}
-        <Dialog open={isEditing} onOpenChange={setIsEditing}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Editar Paciente</DialogTitle>
-              <DialogDescription>
-                Atualize os dados do paciente
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <Label htmlFor="edit_name">Nome Completo</Label>
-                  <Input
-                    id="edit_name"
-                    value={editData.name || ''}
-                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit_phone">Telefone</Label>
-                  <Input
-                    id="edit_phone"
-                    value={editData.phone || ''}
-                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit_status">Status</Label>
-                  <Select value={editData.status || 'active'} onValueChange={(v) => setEditData({ ...editData, status: v })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Ativo</SelectItem>
-                      <SelectItem value="inactive">Inativo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="edit_birth_date">Data de Nascimento</Label>
-                  <Input
-                    id="edit_birth_date"
-                    type="date"
-                    value={editData.birth_date || ''}
-                    onChange={(e) => setEditData({ ...editData, birth_date: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit_gender">Sexo</Label>
-                  <Select value={editData.gender || ''} onValueChange={(v) => setEditData({ ...editData, gender: v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Masculino</SelectItem>
-                      <SelectItem value="female">Feminino</SelectItem>
-                      <SelectItem value="other">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="edit_height">Altura (cm)</Label>
-                  <Input
-                    id="edit_height"
-                    type="number"
-                    value={editData.height || ''}
-                    onChange={(e) => setEditData({ ...editData, height: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit_current_weight">Peso Atual (kg)</Label>
-                  <Input
-                    id="edit_current_weight"
-                    type="number"
-                    step="0.1"
-                    value={editData.current_weight || ''}
-                    onChange={(e) => setEditData({ ...editData, current_weight: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit_goal_weight">Peso Meta (kg)</Label>
-                  <Input
-                    id="edit_goal_weight"
-                    type="number"
-                    step="0.1"
-                    value={editData.goal_weight || ''}
-                    onChange={(e) => setEditData({ ...editData, goal_weight: e.target.value })}
-                  />
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="edit_goal">Objetivo</Label>
-                  <Select value={editData.goal || ''} onValueChange={(v) => setEditData({ ...editData, goal: v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o objetivo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="weight_loss">Emagrecimento</SelectItem>
-                      <SelectItem value="muscle_gain">Ganho de Massa Muscular</SelectItem>
-                      <SelectItem value="maintenance">Manutenção</SelectItem>
-                      <SelectItem value="health">Saúde/Reeducação Alimentar</SelectItem>
-                      <SelectItem value="sports">Performance Esportiva</SelectItem>
-                      <SelectItem value="other">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="edit_notes">Observações</Label>
-                  <Textarea
-                    id="edit_notes"
-                    value={editData.notes || ''}
-                    onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditData(patient);
-                  }}
-                  className="flex-1"
-                  disabled={saving}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleSavePatient}
-                  className="flex-1 bg-teal-700 hover:bg-teal-800"
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2" size={18} />
-                      Salvar Alterações
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Tabs com informações */}
-        <Tabs defaultValue="resumo" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100">
             <TabsTrigger value="resumo">Resumo</TabsTrigger>
             <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
-            <TabsTrigger value="plano">Plano Alimentar</TabsTrigger>
-            <TabsTrigger value="historico">Histórico</TabsTrigger>
+            <TabsTrigger value="plano">Plano</TabsTrigger>
+            <TabsTrigger value="checklist">Checklist</TabsTrigger>
+            <TabsTrigger value="recados">Recados</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="resumo" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informações Físicas</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Peso Atual</p>
-                      <p className="text-lg font-semibold">{patient.current_weight ? `${patient.current_weight} kg` : '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Peso Meta</p>
-                      <p className="text-lg font-semibold">{patient.goal_weight ? `${patient.goal_weight} kg` : '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Altura</p>
-                      <p className="text-lg font-semibold">{patient.height ? `${patient.height} cm` : '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">IMC</p>
-                      <p className="text-lg font-semibold">
-                        {imc || '-'}
-                        {imc && <span className="text-sm text-gray-500 ml-1">({getIMCClassification(imc)})</span>}
-                      </p>
-                    </div>
-                  </div>
-                  {patient.current_weight && patient.goal_weight && (
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm text-gray-600 mb-2">Progresso</p>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div 
-                          className="bg-teal-700 h-3 rounded-full transition-all"
-                          style={{ 
-                            width: `${Math.min(100, Math.max(0, ((patient.current_weight - patient.goal_weight) / (patient.current_weight)) * 100))}%` 
-                          }}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Faltam {Math.abs(patient.current_weight - patient.goal_weight).toFixed(1)} kg
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informações Gerais</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-600">Sexo</p>
-                      <p className="text-lg font-semibold">
-                        {patient.gender === 'male' ? 'Masculino' : patient.gender === 'female' ? 'Feminino' : patient.gender || '-'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Data de Nascimento</p>
-                      <p className="text-lg font-semibold">
-                        {patient.birth_date ? new Date(patient.birth_date).toLocaleDateString('pt-BR') : '-'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Objetivo</p>
-                      <p className="text-lg font-semibold">{getGoalLabel(patient.goal)}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {patient.notes && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Observações</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 whitespace-pre-wrap">{patient.notes}</p>
-                </CardContent>
-              </Card>
-            )}
+          <TabsContent value="resumo">
+            <ResumoTab 
+              patient={patient} 
+              mealPlan={mealPlan} 
+              anamnesis={anamnesis} 
+              adherence={adherence}
+              onNavigate={handleNavigateTab}
+            />
           </TabsContent>
 
-          <TabsContent value="anamnese" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <AlertTriangle className="mr-2 text-amber-600" size={20} />
-                  Anamnese
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {anamnesis ? (
-                  <div className="space-y-4">
-                    {anamnesis.conditions && anamnesis.conditions.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Condições/Alertas</h4>
-                        <div className="space-y-2">
-                          {anamnesis.conditions.map((item, index) => (
-                            <div key={index} className="p-3 bg-amber-50 border-l-4 border-amber-500 rounded">
-                              <p className="font-semibold text-amber-900">{item.condition}</p>
-                              <p className="text-sm text-amber-700">{item.alert}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {anamnesis.allergies && anamnesis.allergies.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Alergias</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {anamnesis.allergies.map((allergy, index) => (
-                            <span key={index} className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
-                              {allergy}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {anamnesis.observations && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Observações</h4>
-                        <p className="text-gray-700">{anamnesis.observations}</p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <FileText className="mx-auto mb-4 text-gray-400" size={48} />
-                    <p>Nenhuma anamnese cadastrada</p>
-                    <Button className="mt-4 bg-teal-700 hover:bg-teal-800">
-                      <Plus size={18} className="mr-2" />
-                      Criar Anamnese
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          <TabsContent value="anamnese">
+            <AnamneseTab 
+              anamnesis={anamnesis} 
+              patientId={id} 
+              professionalId={profile?.id}
+              onUpdate={loadPatientData}
+            />
           </TabsContent>
 
-          <TabsContent value="plano" className="space-y-4">
+          <TabsContent value="plano">
             <Card>
-              <CardHeader>
-                <CardTitle>Plano Alimentar</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>Plano Alimentar</CardTitle></CardHeader>
               <CardContent>
                 {mealPlan ? (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div>
-                        <h4 className="font-semibold text-green-900">{mealPlan.name}</h4>
-                        <p className="text-sm text-green-700">
-                          Atualizado em: {new Date(mealPlan.updated_at).toLocaleDateString('pt-BR')}
-                        </p>
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-green-900">{mealPlan.name}</h4>
+                          <p className="text-sm text-green-700">
+                            Atualizado: {new Date(mealPlan.updated_at).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                        <Badge className="bg-green-100 text-green-700">Ativo</Badge>
                       </div>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                        Ativo
-                      </span>
                     </div>
-                    <div className="flex gap-3">
-                      <Button 
-                        className="flex-1 bg-teal-700 hover:bg-teal-800"
-                        onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}`)}
-                      >
-                        <Edit className="mr-2" size={18} />
-                        Editar Plano
-                      </Button>
-                    </div>
+                    <Button 
+                      className="w-full bg-teal-700 hover:bg-teal-800"
+                      onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}`)}
+                    >
+                      <Edit className="mr-2" size={18} /> Editar Plano
+                    </Button>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Utensils className="mx-auto mb-4 text-gray-400" size={48} />
-                    <p>Nenhum plano alimentar ativo</p>
+                  <div className="text-center py-8">
+                    <Utensils className="mx-auto text-gray-400 mb-4" size={48} />
+                    <p className="text-gray-600 mb-4">Nenhum plano alimentar</p>
                     <Button 
-                      className="mt-4 bg-teal-700 hover:bg-teal-800"
+                      className="bg-teal-700 hover:bg-teal-800"
                       onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}`)}
                     >
-                      <Plus size={18} className="mr-2" />
-                      Criar Plano Alimentar
+                      <Plus size={18} className="mr-2" /> Criar Plano
                     </Button>
+                  </div>
+                )}
+
+                {/* Histórico de planos */}
+                {allMealPlans.length > 1 && (
+                  <div className="mt-6">
+                    <h4 className="font-semibold text-gray-900 mb-3">Histórico</h4>
+                    <div className="space-y-2">
+                      {allMealPlans.filter(p => p.id !== mealPlan?.id).map(plan => (
+                        <div 
+                          key={plan.id}
+                          className="p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100"
+                          onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${plan.id}`)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{plan.name}</span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(plan.created_at).toLocaleDateString('pt-BR')}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="historico" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Histórico de Planos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {allMealPlans.length > 0 ? (
-                  <div className="space-y-3">
-                    {allMealPlans.map((plan) => (
-                      <div 
-                        key={plan.id} 
-                        className={`p-4 rounded-lg border cursor-pointer hover:shadow-md transition-shadow ${
-                          plan.is_active ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
-                        }`}
-                        onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${plan.id}`)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{plan.name}</h4>
-                            <p className="text-sm text-gray-600">
-                              Criado em: {new Date(plan.created_at).toLocaleDateString('pt-BR')}
-                            </p>
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            plan.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {plan.is_active ? 'Ativo' : 'Inativo'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Calendar className="mx-auto mb-4 text-gray-400" size={48} />
-                    <p>Nenhum plano no histórico</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          <TabsContent value="checklist">
+            <ChecklistTab patientId={id} professionalId={profile?.id} onUpdate={loadPatientData} />
+          </TabsContent>
+
+          <TabsContent value="recados">
+            <RecadosTab patientId={id} professionalId={profile?.id} />
           </TabsContent>
         </Tabs>
       </div>
