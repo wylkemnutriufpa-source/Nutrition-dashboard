@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase, getCurrentUser, getUserProfile, signOut } from '@/lib/supabase';
-import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext({});
 
@@ -8,47 +7,145 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Flags para evitar race conditions e múltiplas chamadas
+  const isCheckingUser = useRef(false);
+  const isMounted = useRef(true);
+  const authListenerRef = useRef(null);
 
   useEffect(() => {
-    // Verificar sessão inicial
+    isMounted.current = true;
+
+    // Verificar sessão inicial apenas uma vez
     checkUser();
 
-    // Listener para mudanças de auth
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        const userProfile = await getUserProfile(session.user.id);
-        setUser(session.user);
-        setProfile(userProfile);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setProfile(null);
-      }
-    });
+    // Configurar listener APENAS se não existir
+    if (!authListenerRef.current) {
+      const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('🔐 Auth event:', event);
+        
+        // Evitar processar eventos durante check inicial
+        if (isCheckingUser.current) {
+          return;
+        }
+
+        if (event === 'SIGNED_IN' && session?.user) {
+          await handleSignIn(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          handleSignOut();
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Apenas atualizar user, não buscar profile novamente
+          if (isMounted.current) {
+            setUser(session.user);
+          }
+        }
+      });
+
+      authListenerRef.current = authListener;
+    }
 
     return () => {
-      authListener?.subscription?.unsubscribe();
+      isMounted.current = false;
+      // Limpar listener ao desmontar
+      if (authListenerRef.current) {
+        authListenerRef.current?.subscription?.unsubscribe();
+        authListenerRef.current = null;
+      }
     };
   }, []);
 
-  const checkUser = async () => {
+  const handleSignIn = async (authUser) => {
     try {
-      const currentUser = await getCurrentUser();
-      if (currentUser) {
-        const userProfile = await getUserProfile(currentUser.id);
-        setUser(currentUser);
+      const userProfile = await getUserProfile(authUser.id);
+      if (isMounted.current) {
+        setUser(authUser);
         setProfile(userProfile);
       }
     } catch (error) {
+      console.error('Error loading profile after sign in:', error);
+      // Em caso de erro, fazer logout seguro
+      await handleCorruptedSession();
+    }
+  };
+
+  const handleSignOut = () => {
+    if (isMounted.current) {
+      setUser(null);
+      setProfile(null);
+      localStorage.removeItem('fitjourney_user_type');
+      localStorage.removeItem('fitjourney_user_email');
+      localStorage.removeItem('fitjourney_user_id');
+      localStorage.removeItem('fitjourney_patient_id');
+      localStorage.removeItem('fitjourney_patient_name');
+    }
+  };
+
+  const checkUser = async () => {
+    // Evitar múltiplas chamadas simultâneas
+    if (isCheckingUser.current) {
+      return;
+    }
+
+    isCheckingUser.current = true;
+
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Session error:', error);
+        await handleCorruptedSession();
+        return;
+      }
+
+      if (session?.user) {
+        const userProfile = await getUserProfile(session.user.id);
+        if (isMounted.current) {
+          setUser(session.user);
+          setProfile(userProfile);
+        }
+      }
+    } catch (error) {
       console.error('Error checking user:', error);
+      await handleCorruptedSession();
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
+      isCheckingUser.current = false;
+    }
+  };
+
+  // Tratamento para sessão corrompida
+  const handleCorruptedSession = async () => {
+    try {
+      await supabase.auth.signOut();
+      handleSignOut();
+    } catch (error) {
+      console.error('Error clearing corrupted session:', error);
+      // Forçar limpeza local mesmo se signOut falhar
+      handleSignOut();
     }
   };
 
   const logout = async () => {
-    await signOut();
-    setUser(null);
-    setProfile(null);
+    try {
+      await signOut();
+      handleSignOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Garantir limpeza local mesmo se signOut falhar
+      handleSignOut();
+    }
+  };
+
+  // Método para refresh forçado do profile (útil após updates)
+  const refreshProfile = async () => {
+    if (user?.id) {
+      const userProfile = await getUserProfile(user.id);
+      if (isMounted.current) {
+        setProfile(userProfile);
+      }
+    }
   };
 
   const value = {
@@ -56,6 +153,7 @@ export const AuthProvider = ({ children }) => {
     profile,
     loading,
     logout,
+    refreshProfile,
     isAuthenticated: !!user,
     role: profile?.role
   };
