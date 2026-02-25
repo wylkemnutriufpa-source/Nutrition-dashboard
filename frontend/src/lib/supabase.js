@@ -280,8 +280,9 @@ export const createPatientByProfessional = async (professionalId, patientData) =
   const patientId = crypto.randomUUID();
   
   try {
-    // 1. Criar profile direto
-    await supabase.from('profiles').insert({
+    // 1. Criar profile
+    console.log('📝 Inserindo profile...');
+    const profileResult = await supabase.from('profiles').insert({
       id: patientId,
       email: patientData.email,
       name: patientData.name,
@@ -297,12 +298,27 @@ export const createPatientByProfessional = async (professionalId, patientData) =
       status: 'active'
     });
     
+    console.log('📝 Resultado profile:', profileResult);
+    
+    if (profileResult.error) {
+      console.error('❌ Erro no profile:', profileResult.error.message, profileResult.error.code);
+      return { data: null, error: { message: `Erro ao criar perfil: ${profileResult.error.message}` } };
+    }
+    
     // 2. Criar vínculo
-    await supabase.from('patient_profiles').insert({
+    console.log('🔗 Criando vínculo...');
+    const linkResult = await supabase.from('patient_profiles').insert({
       patient_id: patientId,
       professional_id: professionalId,
       status: 'active'
     });
+    
+    console.log('🔗 Resultado link:', linkResult);
+    
+    if (linkResult.error) {
+      console.error('❌ Erro no vínculo:', linkResult.error.message);
+      return { data: null, error: { message: `Erro ao vincular: ${linkResult.error.message}` } };
+    }
     
     // 3. Criar anamnese (ignorar erro)
     await supabase.from('anamnesis').insert({
@@ -311,12 +327,12 @@ export const createPatientByProfessional = async (professionalId, patientData) =
       status: 'incomplete'
     }).catch(() => {});
     
-    console.log('✅ Paciente criado');
+    console.log('✅ Paciente criado com sucesso!');
     return { data: { id: patientId, ...patientData, role: 'patient' }, error: null };
     
   } catch (err) {
-    console.error('❌ Erro:', err?.message || 'Erro desconhecido');
-    return { data: null, error: { message: 'Erro ao criar paciente. Verifique se o email já existe.' } };
+    console.error('❌ ERRO FATAL:', err);
+    return { data: null, error: { message: `Erro: ${err.message}` } };
   }
 };
 
