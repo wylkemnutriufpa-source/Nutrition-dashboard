@@ -814,3 +814,42 @@ export const saveBranding = async (userId, brandingData) => {
     .single();
   return { data, error };
 };
+
+// ==================== CHECKLIST SIMPLES (MVP) ====================
+
+export const getChecklistTasks = async (patientId) => {
+  const { data, error } = await supabase
+    .from('checklist_tasks')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('created_at', { ascending: true });
+  return { data, error };
+};
+
+export const createChecklistTask = async (patientId, title) => {
+  const { data, error } = await supabase
+    .from('checklist_tasks')
+    .insert({ patient_id: patientId, title })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const toggleChecklistTask = async (taskId, completed) => {
+  const { data, error } = await supabase
+    .from('checklist_tasks')
+    .update({ completed })
+    .eq('id', taskId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteChecklistTask = async (taskId) => {
+  const { error } = await supabase
+    .from('checklist_tasks')
+    .delete()
+    .eq('id', taskId);
+  return { error };
+};
+
