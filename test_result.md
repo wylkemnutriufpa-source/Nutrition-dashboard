@@ -281,4 +281,18 @@ agent_communication:
     - /app/frontend/src/App.js - integração do AdminBar
     - /app/frontend/src/components/Layout.js - compensação de espaço
     
-    STATUS: Pronto para testes de login (admin, professional, patient)"
+    3️⃣ Erro removeChild Durante Login - CORRIGIDO
+    - Adicionado delay de 300ms entre toast e navegação (LoginPage)
+    - Delay de 200ms no getUserProfile após signIn
+    - AdminBar com renderização suave (delay de 100ms)
+    - Criado ErrorBoundary para capturar e auto-recuperar de erros transitórios
+    - Toaster com position='top-right' para maior estabilidade
+    - Navegação com replace:true para evitar voltar ao login
+    
+    Arquivos criados/alterados:
+    - /app/frontend/src/components/ErrorBoundary.js - NOVO
+    - /app/frontend/src/pages/LoginPage.js - delays ajustados
+    - /app/frontend/src/components/AdminBar.js - renderização suave
+    - /app/frontend/src/App.js - ErrorBoundary integrado
+    
+    STATUS: Pronto para testes. Limpar cache do navegador antes de testar!"
