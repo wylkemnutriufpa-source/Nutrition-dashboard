@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Configuração do Supabase
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Supabase credentials not found. Using mock mode.');
+  console.warn('⚠️ Supabase credentials not found.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -20,135 +19,100 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export const getCurrentUser = async () => {
   const { data: { user }, error } = await supabase.auth.getUser();
-  if (error) {
-    console.error('Error getting user:', error);
-    return null;
-  }
+  if (error) return null;
   return user;
 };
 
 export const getUserProfile = async (userId) => {
-  // Tentar buscar por id primeiro (compatibilidade com id = auth.uid)
+  // Tentar por id
   let { data, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', userId)
     .single();
   
-  // Se não encontrou, tentar por auth_user_id
+  // Tentar por auth_user_id
   if (error || !data) {
-    const result = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('auth_user_id', userId)
-      .single();
-    
+    const result = await supabase.from('profiles').select('*').eq('auth_user_id', userId).single();
     data = result.data;
     error = result.error;
   }
   
-  // Se ainda não encontrou, tentar buscar pelo email do auth user
+  // Tentar por email
   if (error || !data) {
     const { data: { user } } = await supabase.auth.getUser();
     if (user?.email) {
-      const result = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('email', user.email)
-        .single();
-      
+      const result = await supabase.from('profiles').select('*').eq('email', user.email).single();
       data = result.data;
-      error = result.error;
     }
   }
   
-  if (error) {
-    console.error('Error getting profile:', error);
-    return null;
-  }
-  return data;
-};
-
-export const signUp = async (email, password, metadata = {}) => {
-  try {
-    console.log('Attempting signup with:', { email, metadata });
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata,
-        emailRedirectTo: window.location.origin
-      }
-    });
-    
-    console.log('Signup response:', { data, error });
-    return { data, error };
-  } catch (err) {
-    console.error('Signup exception:', err);
-    return { data: null, error: err };
-  }
+  return data || null;
 };
 
 export const signIn = async (email, password) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-  
-  return { data, error };
+  return await supabase.auth.signInWithPassword({ email, password });
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
+  return await supabase.auth.signOut();
 };
 
-// ==================== PROFILES ====================
+// ==================== PROFILE HELPERS ====================
 
-export const updateProfile = async (userId, updates) => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(updates)
-    .eq('id', userId)
-    .select()
-    .single();
-  
-  return { data, error };
-};
-
-export const getAllProfessionals = async () => {
+export const getProfileById = async (profileId) => {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .eq('role', 'professional')
-    .order('name');
-  
+    .eq('id', profileId)
+    .is('deleted_at', null)
+    .single();
   return { data, error };
 };
 
-// ==================== PATIENT MANAGEMENT ====================
-
-export const linkPatientToProfessional = async (patientId, professionalId) => {
+export const updateProfile = async (profileId, updates) => {
   const { data, error } = await supabase
-    .from('patient_profiles')
-    .insert({ patient_id: patientId, professional_id: professionalId })
+    .from('profiles')
+    .update(updates)
+    .eq('id', profileId)
     .select()
     .single();
-  
   return { data, error };
 };
 
-export const getProfessionalPatients = async (professionalId) => {
-  const { data, error } = await supabase
+// ==================== PATIENTS MANAGEMENT ====================
+
+// Buscar pacientes do profissional (ou todos se admin)
+export const getProfessionalPatients = async (professionalId, isAdmin = false, filters = {}) => {
+  let query = supabase
     .from('patient_profiles')
     .select(`
       *,
       patient:profiles!patient_id(*)
     `)
-    .eq('professional_id', professionalId)
-    .order('created_at', { ascending: false });
+    .is('patient.deleted_at', null);
   
+  // Se não for admin, filtra apenas pelos pacientes do profissional
+  if (!isAdmin) {
+    query = query.eq('professional_id', professionalId);
+  } else if (filters.professionalId) {
+    // Admin pode filtrar por profissional específico
+    query = query.eq('professional_id', filters.professionalId);
+  }
+  
+  // Filtro de status
+  if (filters.status) {
+    query = query.eq('status', filters.status);
+  }
+  
+  // Ordenação
+  if (filters.orderBy === 'name') {
+    query = query.order('patient(name)', { ascending: true });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
+  
+  const { data, error } = await query;
   return { data, error };
 };
 
@@ -158,28 +122,26 @@ export const getPatientById = async (patientId) => {
     .select('*')
     .eq('id', patientId)
     .eq('role', 'patient')
+    .is('deleted_at', null)
     .single();
-  
   return { data, error };
 };
 
-// Criar paciente pelo profissional (sem auth - apenas profile)
 export const createPatientByProfessional = async (professionalId, patientData) => {
-  // Primeiro, verificar se email já existe
-  const { data: existingUser } = await supabase
+  // Verificar email existente
+  const { data: existing } = await supabase
     .from('profiles')
     .select('id')
     .eq('email', patientData.email)
     .single();
   
-  if (existingUser) {
+  if (existing) {
     return { data: null, error: { message: 'Email já cadastrado no sistema' } };
   }
 
-  // Gerar UUID para o paciente
   const patientId = crypto.randomUUID();
   
-  // Criar profile do paciente
+  // Criar profile
   const { error: profileError } = await supabase
     .from('profiles')
     .insert({
@@ -199,11 +161,10 @@ export const createPatientByProfessional = async (professionalId, patientData) =
     });
   
   if (profileError) {
-    console.error('Error creating patient profile:', profileError);
     return { data: null, error: profileError };
   }
   
-  // Criar vínculo com profissional
+  // Criar vínculo
   const { error: linkError } = await supabase
     .from('patient_profiles')
     .insert({
@@ -213,13 +174,17 @@ export const createPatientByProfessional = async (professionalId, patientData) =
     });
   
   if (linkError) {
-    // Rollback: deletar profile criado
     await supabase.from('profiles').delete().eq('id', patientId);
-    console.error('Error linking patient:', linkError);
     return { data: null, error: linkError };
   }
   
-  // Retornar dados do paciente criado
+  // Criar anamnese vazia
+  await supabase.from('anamnesis').insert({
+    patient_id: patientId,
+    professional_id: professionalId,
+    status: 'incomplete'
+  });
+  
   const { data: patient } = await supabase
     .from('profiles')
     .select('*')
@@ -236,75 +201,239 @@ export const updatePatient = async (patientId, updates) => {
     .eq('id', patientId)
     .select()
     .single();
-  
   return { data, error };
 };
 
-export const deletePatient = async (patientId, professionalId) => {
-  // Primeiro remove o vínculo
-  const { error: linkError } = await supabase
-    .from('patient_profiles')
-    .delete()
-    .eq('patient_id', patientId)
-    .eq('professional_id', professionalId);
-  
-  if (linkError) {
-    return { error: linkError };
-  }
-  
-  // Depois pode opcionalmente deletar o profile (ou apenas inativar)
-  const { error } = await supabase
+// Soft delete
+export const archivePatient = async (patientId) => {
+  const { data, error } = await supabase
     .from('profiles')
-    .update({ status: 'inactive' })
-    .eq('id', patientId);
+    .update({ deleted_at: new Date().toISOString(), status: 'inactive' })
+    .eq('id', patientId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Restaurar paciente
+export const restorePatient = async (patientId) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ deleted_at: null, status: 'active' })
+    .eq('id', patientId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// ==================== ANAMNESIS ====================
+
+export const getAnamnesis = async (patientId) => {
+  const { data, error } = await supabase
+    .from('anamnesis')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  return { data, error };
+};
+
+export const createAnamnesis = async (data) => {
+  const { data: result, error } = await supabase
+    .from('anamnesis')
+    .insert(data)
+    .select()
+    .single();
+  return { data: result, error };
+};
+
+export const updateAnamnesis = async (anamnesisId, updates) => {
+  const { data, error } = await supabase
+    .from('anamnesis')
+    .update(updates)
+    .eq('id', anamnesisId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const saveAnamnesisDraft = async (patientId, professionalId, updates) => {
+  // Verificar se existe
+  const { data: existing } = await supabase
+    .from('anamnesis')
+    .select('id')
+    .eq('patient_id', patientId)
+    .single();
   
+  if (existing) {
+    return await updateAnamnesis(existing.id, { ...updates, status: 'draft' });
+  } else {
+    return await createAnamnesis({ ...updates, patient_id: patientId, professional_id: professionalId, status: 'draft' });
+  }
+};
+
+// ==================== CHECKLIST / TASKS ====================
+
+export const getChecklistTemplates = async (patientId) => {
+  const { data, error } = await supabase
+    .from('checklist_templates')
+    .select('*')
+    .eq('patient_id', patientId)
+    .eq('is_active', true)
+    .order('order_index');
+  return { data, error };
+};
+
+export const createChecklistTemplate = async (templateData) => {
+  const { data, error } = await supabase
+    .from('checklist_templates')
+    .insert(templateData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateChecklistTemplate = async (templateId, updates) => {
+  const { data, error } = await supabase
+    .from('checklist_templates')
+    .update(updates)
+    .eq('id', templateId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteChecklistTemplate = async (templateId) => {
+  const { error } = await supabase
+    .from('checklist_templates')
+    .update({ is_active: false })
+    .eq('id', templateId);
   return { error };
 };
 
-// ==================== CUSTOM FOODS ====================
-
-export const getCustomFoods = async (professionalId) => {
+export const getChecklistEntries = async (patientId, startDate, endDate) => {
   const { data, error } = await supabase
-    .from('custom_foods')
-    .select('*')
-    .eq('professional_id', professionalId)
-    .order('created_at', { ascending: false });
-  
+    .from('checklist_entries')
+    .select(`
+      *,
+      template:checklist_templates(*)
+    `)
+    .eq('patient_id', patientId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: false });
   return { data, error };
 };
 
-export const createCustomFood = async (professionalId, foodData) => {
+export const getChecklistEntriesForDate = async (patientId, date) => {
   const { data, error } = await supabase
-    .from('custom_foods')
-    .insert({
-      professional_id: professionalId,
-      source: 'CUSTOM',
-      ...foodData
+    .from('checklist_entries')
+    .select(`
+      *,
+      template:checklist_templates(*)
+    `)
+    .eq('patient_id', patientId)
+    .eq('date', date);
+  return { data, error };
+};
+
+export const toggleChecklistEntry = async (templateId, patientId, date, completed) => {
+  // Upsert: criar se não existe, atualizar se existe
+  const { data, error } = await supabase
+    .from('checklist_entries')
+    .upsert({
+      template_id: templateId,
+      patient_id: patientId,
+      date: date,
+      completed: completed,
+      completed_at: completed ? new Date().toISOString() : null
+    }, {
+      onConflict: 'template_id,patient_id,date'
     })
     .select()
     .single();
-  
   return { data, error };
 };
 
-export const updateCustomFood = async (foodId, updates) => {
+// Calcular aderência dos últimos N dias
+export const getChecklistAdherence = async (patientId, days = 7) => {
+  const endDate = new Date().toISOString().split('T')[0];
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  
+  // Buscar templates ativos
+  const { data: templates } = await getChecklistTemplates(patientId);
+  if (!templates || templates.length === 0) return { adherence: 0, completed: 0, total: 0 };
+  
+  // Buscar entries no período
+  const { data: entries } = await getChecklistEntries(patientId, startDate, endDate);
+  
+  const totalPossible = templates.length * days;
+  const completedCount = entries?.filter(e => e.completed).length || 0;
+  
+  return {
+    adherence: totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0,
+    completed: completedCount,
+    total: totalPossible
+  };
+};
+
+// ==================== PATIENT MESSAGES / TIPS ====================
+
+export const getPatientMessages = async (patientId, onlyActive = true) => {
+  let query = supabase
+    .from('patient_messages')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('is_pinned', { ascending: false })
+    .order('created_at', { ascending: false });
+  
+  if (onlyActive) {
+    const today = new Date().toISOString().split('T')[0];
+    query = query
+      .lte('valid_from', today)
+      .or(`valid_until.is.null,valid_until.gte.${today}`);
+  }
+  
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const createPatientMessage = async (messageData) => {
   const { data, error } = await supabase
-    .from('custom_foods')
-    .update(updates)
-    .eq('id', foodId)
+    .from('patient_messages')
+    .insert(messageData)
     .select()
     .single();
-  
   return { data, error };
 };
 
-export const deleteCustomFood = async (foodId) => {
+export const updatePatientMessage = async (messageId, updates) => {
+  const { data, error } = await supabase
+    .from('patient_messages')
+    .update(updates)
+    .eq('id', messageId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deletePatientMessage = async (messageId) => {
   const { error } = await supabase
-    .from('custom_foods')
+    .from('patient_messages')
     .delete()
-    .eq('id', foodId);
-  
+    .eq('id', messageId);
   return { error };
+};
+
+export const markMessageAsRead = async (messageId) => {
+  const { data, error } = await supabase
+    .from('patient_messages')
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq('id', messageId)
+    .select()
+    .single();
+  return { data, error };
 };
 
 // ==================== MEAL PLANS ====================
@@ -328,13 +457,9 @@ export const getMealPlans = async (userId, userRole) => {
 export const getMealPlan = async (planId) => {
   const { data, error } = await supabase
     .from('meal_plans')
-    .select(`
-      *,
-      patient:profiles!patient_id(id, name, email)
-    `)
+    .select(`*, patient:profiles!patient_id(id, name, email)`)
     .eq('id', planId)
     .single();
-  
   return { data, error };
 };
 
@@ -365,7 +490,6 @@ export const createMealPlan = async (planData) => {
     })
     .select()
     .single();
-  
   return { data, error };
 };
 
@@ -376,43 +500,125 @@ export const updateMealPlan = async (planId, updates) => {
     .eq('id', planId)
     .select()
     .single();
-  
   return { data, error };
 };
 
 export const deleteMealPlan = async (planId) => {
-  const { error } = await supabase
-    .from('meal_plans')
-    .delete()
-    .eq('id', planId);
-  
+  const { error } = await supabase.from('meal_plans').delete().eq('id', planId);
   return { error };
 };
 
-// Desativar outros planos quando ativar um novo
-export const setActiveMealPlan = async (planId, patientId, professionalId) => {
-  // Desativar todos os planos do paciente
-  await supabase
-    .from('meal_plans')
-    .update({ is_active: false })
-    .eq('patient_id', patientId)
-    .eq('professional_id', professionalId);
-  
-  // Ativar o plano selecionado
+// ==================== CUSTOM FOODS ====================
+
+export const getCustomFoods = async (professionalId) => {
   const { data, error } = await supabase
-    .from('meal_plans')
-    .update({ is_active: true })
-    .eq('id', planId)
-    .select()
-    .single();
-  
+    .from('custom_foods')
+    .select('*')
+    .eq('professional_id', professionalId)
+    .order('created_at', { ascending: false });
   return { data, error };
 };
 
-// ==================== ANAMNESIS ====================
-
-export const getAnamnesis = async (patientId) => {
+export const createCustomFood = async (professionalId, foodData) => {
   const { data, error } = await supabase
+    .from('custom_foods')
+    .insert({ professional_id: professionalId, source: 'CUSTOM', ...foodData })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateCustomFood = async (foodId, updates) => {
+  const { data, error } = await supabase
+    .from('custom_foods')
+    .update(updates)
+    .eq('id', foodId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteCustomFood = async (foodId) => {
+  const { error } = await supabase.from('custom_foods').delete().eq('id', foodId);
+  return { error };
+};
+
+// ==================== PROFESSIONALS (Admin) ====================
+
+export const getAllProfessionals = async () => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'professional')
+    .is('deleted_at', null)
+    .order('name');
+  return { data, error };
+};
+
+// ==================== STATISTICS ====================
+
+export const getProfessionalStats = async (professionalId, isAdmin = false) => {
+  let patientQuery = supabase
+    .from('patient_profiles')
+    .select('*, patient:profiles!patient_id(*)', { count: 'exact' });
+  
+  if (!isAdmin) {
+    patientQuery = patientQuery.eq('professional_id', professionalId);
+  }
+  
+  const { data: patients, count: totalPatients } = await patientQuery
+    .eq('status', 'active')
+    .is('patient.deleted_at', null);
+  
+  // Planos ativos
+  let plansQuery = supabase
+    .from('meal_plans')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_active', true);
+  
+  if (!isAdmin) {
+    plansQuery = plansQuery.eq('professional_id', professionalId);
+  }
+  
+  const { count: activePlans } = await plansQuery;
+  
+  // Pacientes recentes
+  let recentQuery = supabase
+    .from('patient_profiles')
+    .select('*, patient:profiles!patient_id(*)')
+    .is('patient.deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(5);
+  
+  if (!isAdmin) {
+    recentQuery = recentQuery.eq('professional_id', professionalId);
+  }
+  
+  const { data: recentPatients } = await recentQuery;
+  
+  return {
+    activePatients: totalPatients || 0,
+    totalPatients: totalPatients || 0,
+    activePlans: activePlans || 0,
+    recentPatients: recentPatients || []
+  };
+};
+
+export const getPatientStats = async (patientId) => {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', patientId)
+    .single();
+  
+  const { data: activePlan } = await supabase
+    .from('meal_plans')
+    .select('*')
+    .eq('patient_id', patientId)
+    .eq('is_active', true)
+    .single();
+  
+  const { data: anamnesis } = await supabase
     .from('anamnesis')
     .select('*')
     .eq('patient_id', patientId)
@@ -420,28 +626,9 @@ export const getAnamnesis = async (patientId) => {
     .limit(1)
     .single();
   
-  return { data, error };
-};
-
-export const createAnamnesis = async (anamnesisData) => {
-  const { data, error } = await supabase
-    .from('anamnesis')
-    .insert(anamnesisData)
-    .select()
-    .single();
+  const adherence = await getChecklistAdherence(patientId, 7);
   
-  return { data, error };
-};
-
-export const updateAnamnesis = async (anamnesisId, updates) => {
-  const { data, error } = await supabase
-    .from('anamnesis')
-    .update(updates)
-    .eq('id', anamnesisId)
-    .select()
-    .single();
-  
-  return { data, error };
+  return { profile, activePlan, anamnesis, adherence };
 };
 
 // ==================== BRANDING ====================
@@ -452,110 +639,14 @@ export const getBranding = async (userId) => {
     .select('*')
     .eq('user_id', userId)
     .single();
-  
   return { data, error };
 };
 
 export const saveBranding = async (userId, brandingData) => {
   const { data, error } = await supabase
     .from('branding_configs')
-    .upsert({
-      user_id: userId,
-      ...brandingData
-    })
+    .upsert({ user_id: userId, ...brandingData })
     .select()
     .single();
-  
   return { data, error };
-};
-
-// ==================== ADMIN FUNCTIONS ====================
-
-export const createProfessionalByAdmin = async (professionalData) => {
-  // Admin cria um novo profissional via signup
-  const { data, error } = await supabase.auth.admin.createUser({
-    email: professionalData.email,
-    password: professionalData.password || 'TempPass123!',
-    email_confirm: true,
-    user_metadata: {
-      name: professionalData.name,
-      role: 'professional'
-    }
-  });
-  
-  return { data, error };
-};
-
-// ==================== STATISTICS ====================
-
-export const getProfessionalStats = async (professionalId) => {
-  // Contar pacientes ativos
-  const { count: activePatients } = await supabase
-    .from('patient_profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('professional_id', professionalId)
-    .eq('status', 'active');
-  
-  // Contar total de pacientes
-  const { count: totalPatients } = await supabase
-    .from('patient_profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('professional_id', professionalId);
-  
-  // Contar planos ativos
-  const { count: activePlans } = await supabase
-    .from('meal_plans')
-    .select('*', { count: 'exact', head: true })
-    .eq('professional_id', professionalId)
-    .eq('is_active', true);
-  
-  // Buscar últimas consultas (pacientes recém criados/atualizados)
-  const { data: recentPatients } = await supabase
-    .from('patient_profiles')
-    .select(`
-      *,
-      patient:profiles!patient_id(*)
-    `)
-    .eq('professional_id', professionalId)
-    .order('created_at', { ascending: false })
-    .limit(5);
-  
-  return {
-    activePatients: activePatients || 0,
-    totalPatients: totalPatients || 0,
-    activePlans: activePlans || 0,
-    recentPatients: recentPatients || []
-  };
-};
-
-export const getPatientStats = async (patientId) => {
-  // Buscar profile do paciente
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', patientId)
-    .single();
-  
-  // Buscar plano ativo
-  const { data: activePlan } = await supabase
-    .from('meal_plans')
-    .select('*')
-    .eq('patient_id', patientId)
-    .eq('is_active', true)
-    .single();
-  
-  // Buscar anamnese
-  const { data: anamnesis } = await supabase
-    .from('anamnesis')
-    .select('*')
-    .eq('patient_id', patientId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-  
-  return {
-    profile,
-    activePlan,
-    anamnesis
-  };
 };
