@@ -222,16 +222,17 @@ export const getProfessionalPatients = async (professionalId, isAdmin = false, f
     const { data, error } = await query;
     
     if (error) {
-      console.error('❌ Erro ao buscar pacientes:', error);
-      return { data: [], error };
+      // Não tentar processar o erro, apenas retornar
+      console.error('❌ Erro ao buscar pacientes');
+      return { data: [], error: { message: 'Erro ao buscar pacientes' } };
     }
     
     console.log(`✅ ${data?.length || 0} pacientes encontrados`);
     return { data: data || [], error: null };
     
   } catch (error) {
-    console.error('❌ Erro fatal ao buscar pacientes:', error);
-    return { data: [], error };
+    console.error('❌ Erro fatal ao buscar pacientes');
+    return { data: [], error: { message: 'Erro fatal ao buscar pacientes' } };
   }
 };
 
