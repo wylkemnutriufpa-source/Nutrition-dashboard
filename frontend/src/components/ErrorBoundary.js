@@ -13,20 +13,20 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // Erros de removeChild são transitórios durante navegação
-    // Não logar no console para não alarmar
-    if (error.message?.includes('removeChild')) {
+    // Silenciar erros transitórios do React (insertBefore/removeChild)
+    if (error.message?.includes('insertBefore') || 
+        error.message?.includes('removeChild')) {
       // Auto-recuperar silenciosamente
       setTimeout(() => {
         if (this._isMounted) {
           this.setState({ hasError: false, error: null });
         }
       }, 50);
-      return; // Não logar no console
+      return; // NÃO logar
     }
     
-    // Outros erros, logar normalmente
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Outros erros, logar
+    console.error('ErrorBoundary:', error);
   }
 
   componentDidMount() {
