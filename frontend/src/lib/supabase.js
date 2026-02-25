@@ -218,66 +218,48 @@ export const updateProfile = async (profileId, updates) => {
 
 // Buscar pacientes do profissional (ou todos se admin)
 export const getProfessionalPatients = async (professionalId, isAdmin = false, filters = {}) => {
-  console.log('📋 Buscando pacientes...', { professionalId, isAdmin, filters });
+  console.log('📋 Buscando pacientes...');
   
   try {
-    // Primeiro buscar os vínculos patient_profiles
-    let query = supabase
-      .from('patient_profiles')
-      .select('*');
+    // Buscar vínculos
+    let query = supabase.from('patient_profiles').select('*');
     
-    // Se não for admin, filtra apenas pelos pacientes do profissional
     if (!isAdmin) {
       query = query.eq('professional_id', professionalId);
-    } else if (filters.professionalId) {
-      // Admin pode filtrar por profissional específico
-      query = query.eq('professional_id', filters.professionalId);
     }
     
-    // Filtro de status
     if (filters.status) {
       query = query.eq('status', filters.status);
     }
     
-    // Ordenação
     query = query.order('created_at', { ascending: false });
     
-    const { data: links, error: linksError } = await query;
-    
-    if (linksError) {
-      console.error('❌ Erro ao buscar vínculos');
-      return { data: [], error: { message: 'Erro ao buscar pacientes' } };
-    }
+    const { data: links } = await query;
     
     if (!links || links.length === 0) {
-      console.log('✅ 0 pacientes encontrados');
+      console.log('✅ 0 pacientes');
       return { data: [], error: null };
     }
     
-    // Buscar os perfis dos pacientes
+    // Buscar perfis
     const patientIds = links.map(link => link.patient_id);
-    const { data: patients, error: patientsError } = await supabase
+    const { data: patients } = await supabase
       .from('profiles')
       .select('*')
       .in('id', patientIds);
     
-    if (patientsError) {
-      console.error('❌ Erro ao buscar perfis dos pacientes');
-      return { data: [], error: { message: 'Erro ao buscar dados dos pacientes' } };
-    }
-    
-    // Combinar dados
+    // Combinar
     const combined = links.map(link => ({
       ...link,
-      patient: patients.find(p => p.id === link.patient_id) || null
-    })).filter(item => item.patient !== null);
+      patient: patients?.find(p => p.id === link.patient_id) || null
+    })).filter(item => item.patient);
     
-    console.log(`✅ ${combined.length} pacientes encontrados`);
+    console.log(`✅ ${combined.length} pacientes`);
     return { data: combined, error: null };
     
-  } catch (error) {
-    console.error('❌ Erro fatal ao buscar pacientes');
-    return { data: [], error: { message: 'Erro fatal ao buscar pacientes' } };
+  } catch (err) {
+    console.error('❌ Erro:', err?.message || 'Desconhecido');
+    return { data: [], error: { message: 'Erro ao buscar pacientes' } };
   }
 };
 
