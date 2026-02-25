@@ -179,32 +179,8 @@ const PatientDashboard = () => {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Tarefas do Dia */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tarefas de Hoje</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {tasks.map((task) => {
-                  const Icon = task.icon;
-                  return (
-                    <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                      {task.completed ? (
-                        <CheckCircle2 className="text-green-600" size={24} />
-                      ) : (
-                        <Circle className="text-gray-400" size={24} />
-                      )}
-                      <Icon className="text-teal-700" size={20} />
-                      <span className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-900 font-medium'}`}>
-                        {task.title}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Checklist Diário */}
+          <ChecklistSimple patientId={user?.id} isPatientView={true} />
 
           {/* Dicas */}
           <Card>
