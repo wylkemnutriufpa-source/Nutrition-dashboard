@@ -40,7 +40,7 @@ const LoginPage = () => {
       if (data?.user) {
         // Aguardar um pouco para o AuthContext processar o login
         // Isso evita race condition com múltiplas chamadas getUserProfile
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // Buscar profile uma única vez após login
         const profile = await getUserProfile(data.user.id);
