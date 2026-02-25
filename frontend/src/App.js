@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import AdminBar from '@/components/AdminBar';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 import LoginPage from '@/pages/LoginPage';
 import AdminDashboard from '@/pages/AdminDashboard';
