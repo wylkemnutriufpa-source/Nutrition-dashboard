@@ -37,7 +37,12 @@ const LoginPage = () => {
         return;
       }
 
-      if (data.user) {
+      if (data?.user) {
+        // Aguardar um pouco para o AuthContext processar o login
+        // Isso evita race condition com múltiplas chamadas getUserProfile
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Buscar profile uma única vez após login
         const profile = await getUserProfile(data.user.id);
         
         if (!profile) {
@@ -49,18 +54,21 @@ const LoginPage = () => {
         // Verificar se o tipo de login corresponde ao role do usuário
         if (loginType === 'professional' && profile.role !== 'professional' && profile.role !== 'admin') {
           toast.error('Esta conta não é de profissional');
+          await signOut(); // Fazer logout se role incorreto
           setLoading(false);
           return;
         }
 
         if (loginType === 'patient' && profile.role !== 'patient') {
           toast.error('Esta conta não é de paciente');
+          await signOut();
           setLoading(false);
           return;
         }
 
         if (loginType === 'admin' && profile.role !== 'admin') {
           toast.error('Esta conta não tem permissão de administrador');
+          await signOut();
           setLoading(false);
           return;
         }
