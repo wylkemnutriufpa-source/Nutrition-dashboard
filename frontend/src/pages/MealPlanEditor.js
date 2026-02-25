@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,11 +7,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, GripVertical, Trash2, Copy, Search } from 'lucide-react';
+import { Plus, GripVertical, Trash2, Copy, Search, Save, Loader2, User, Check } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { mockMeals, householdMeasures, getAllFoods } from '@/data/mockData';
+import { mockMeals, householdMeasures, mockFoods } from '@/data/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  getProfessionalPatients, 
+  getPatientById, 
+  getMealPlan, 
+  createMealPlan, 
+  updateMealPlan,
+  getCustomFoods 
+} from '@/lib/supabase';
+import { toast } from 'sonner';
 
 const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: food.id });
@@ -21,7 +32,7 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const foodData = allFoods.find(f => f.id === food.foodId);
+  const foodData = allFoods.find(f => f.id === food.foodId || f.id === food.food_id);
   
   const calculateNutrients = () => {
     if (!foodData) return { calorias: 0, proteina: 0, carboidrato: 0, gordura: 0 };
@@ -45,8 +56,8 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
         
         <div className="flex-1 grid grid-cols-12 gap-4 items-center">
           <div className="col-span-4">
-            <p className="font-medium text-gray-900">{foodData?.name}</p>
-            <p className="text-xs text-gray-500">{foodData?.source}</p>
+            <p className="font-medium text-gray-900">{foodData?.name || 'Alimento não encontrado'}</p>
+            <p className="text-xs text-gray-500">{foodData?.source || ''}</p>
           </div>
           
           <div className="col-span-3 flex gap-2">
@@ -91,15 +102,13 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   );
 };
 
-const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal }) => {
+const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, allFoods }) => {
   const [isAddingFood, setIsAddingFood] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFoodId, setSelectedFoodId] = useState(null);
   const [quantity, setQuantity] = useState(100);
   const [unit, setUnit] = useState('g');
   const [sourceFilter, setSourceFilter] = useState('ALL');
-
-  const allFoods = getAllFoods();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -118,7 +127,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
 
   const calculateMealTotals = () => {
     return meal.foods.reduce((totals, food) => {
-      const foodData = allFoods.find(f => f.id === food.foodId);
+      const foodData = allFoods.find(f => f.id === food.foodId || f.id === food.food_id);
       if (!foodData) return totals;
       const multiplier = food.quantity / foodData.porcao;
       return {
@@ -143,7 +152,8 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
     if (selectedFoodId) {
       onAddFood(meal.id, {
         id: `f${Date.now()}`,
-        foodId: parseInt(selectedFoodId),
+        foodId: selectedFoodId,
+        food_id: selectedFoodId,
         quantity,
         unit,
         measure: ''
@@ -179,7 +189,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
         </div>
         <div className="mt-4 flex gap-6 text-sm bg-white p-3 rounded-lg border border-gray-200">
           <span className="font-semibold text-teal-700">{totals.calorias.toFixed(0)} kcal</span>
-          <span className="text-gray-700">Prote\u00edna: {totals.proteina.toFixed(1)}g</span>
+          <span className="text-gray-700">Proteína: {totals.proteina.toFixed(1)}g</span>
           <span className="text-gray-700">Carboidrato: {totals.carboidrato.toFixed(1)}g</span>
           <span className="text-gray-700">Gordura: {totals.gordura.toFixed(1)}g</span>
         </div>
@@ -323,13 +333,92 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
 };
 
 const MealPlanEditor = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const patientIdParam = searchParams.get('patient');
+  const planIdParam = searchParams.get('plan');
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [currentPlan, setCurrentPlan] = useState(null);
+  const [planName, setPlanName] = useState('Plano Alimentar');
+  const [allFoods, setAllFoods] = useState([...mockFoods]);
+  const [isSelectingPatient, setIsSelectingPatient] = useState(false);
+
   const [meals, setMeals] = useState([
     { ...mockMeals[0], foods: [] },
     { ...mockMeals[2], foods: [] },
     { ...mockMeals[4], foods: [] }
   ]);
 
-  const allFoods = getAllFoods();
+  useEffect(() => {
+    if (user) {
+      loadInitialData();
+    }
+  }, [user, patientIdParam, planIdParam]);
+
+  const loadInitialData = async () => {
+    setLoading(true);
+    try {
+      // Carregar pacientes do profissional
+      const { data: patientsData } = await getProfessionalPatients(user.id);
+      const mappedPatients = (patientsData || []).map(item => ({
+        id: item.patient.id,
+        name: item.patient.name,
+        email: item.patient.email
+      }));
+      setPatients(mappedPatients);
+
+      // Carregar alimentos customizados
+      const { data: customFoods } = await getCustomFoods(user.id);
+      if (customFoods) {
+        setAllFoods([...mockFoods, ...customFoods]);
+      }
+
+      // Se tiver paciente na URL, carregar dados
+      if (patientIdParam) {
+        const { data: patientData } = await getPatientById(patientIdParam);
+        if (patientData) {
+          setSelectedPatient(patientData);
+        }
+
+        // Se tiver plano na URL, carregar plano
+        if (planIdParam) {
+          const { data: planData } = await getMealPlan(planIdParam);
+          if (planData) {
+            setCurrentPlan(planData);
+            setPlanName(planData.name);
+            if (planData.plan_data && planData.plan_data.meals) {
+              setMeals(planData.plan_data.meals);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Erro ao carregar dados');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectPatient = (patientId) => {
+    const patient = patients.find(p => p.id === patientId);
+    setSelectedPatient(patient);
+    setIsSelectingPatient(false);
+    // Resetar plano ao trocar paciente
+    setCurrentPlan(null);
+    setPlanName('Plano Alimentar');
+    setMeals([
+      { ...mockMeals[0], foods: [] },
+      { ...mockMeals[2], foods: [] },
+      { ...mockMeals[4], foods: [] }
+    ]);
+  };
 
   const addFoodToMeal = (mealId, food) => {
     setMeals(meals.map(m => 
@@ -359,7 +448,7 @@ const MealPlanEditor = () => {
       const newMeal = {
         ...mealToDuplicate,
         id: `m${Date.now()}`,
-        name: `${mealToDuplicate.name} (C\u00f3pia)`,
+        name: `${mealToDuplicate.name} (Cópia)`,
         foods: mealToDuplicate.foods.map(f => ({ ...f, id: `f${Date.now()}_${f.id}` }))
       };
       setMeals([...meals, newMeal]);
@@ -369,7 +458,7 @@ const MealPlanEditor = () => {
   const calculateDayTotals = () => {
     return meals.reduce((totals, meal) => {
       meal.foods.forEach(food => {
-        const foodData = allFoods.find(f => f.id === food.foodId);
+        const foodData = allFoods.find(f => f.id === food.foodId || f.id === food.food_id);
         if (foodData) {
           const multiplier = food.quantity / foodData.porcao;
           totals.calorias += foodData.calorias * multiplier;
@@ -382,61 +471,218 @@ const MealPlanEditor = () => {
     }, { calorias: 0, proteina: 0, carboidrato: 0, gordura: 0 });
   };
 
+  const handleSavePlan = async () => {
+    if (!selectedPatient) {
+      toast.error('Selecione um paciente primeiro');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const planData = {
+        patient_id: selectedPatient.id,
+        professional_id: user.id,
+        name: planName,
+        plan_data: { meals },
+        daily_targets: calculateDayTotals(),
+        is_active: true
+      };
+
+      if (currentPlan) {
+        // Atualizar plano existente
+        const { error } = await updateMealPlan(currentPlan.id, {
+          name: planName,
+          plan_data: { meals },
+          daily_targets: calculateDayTotals()
+        });
+        if (error) throw error;
+        toast.success('Plano atualizado com sucesso!');
+      } else {
+        // Criar novo plano
+        const { data, error } = await createMealPlan(planData);
+        if (error) throw error;
+        setCurrentPlan(data);
+        toast.success('Plano criado com sucesso!');
+      }
+    } catch (error) {
+      console.error('Error saving plan:', error);
+      toast.error('Erro ao salvar plano');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const dayTotals = calculateDayTotals();
+
+  if (loading) {
+    return (
+      <Layout title="Editor de Plano Alimentar" showBack userType="professional">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Editor de Plano Alimentar" showBack userType="professional">
-      <div data-testid="meal-plan-editor" className="grid grid-cols-12 gap-6">
-        <div className="col-span-8 space-y-6">
-          {meals.map((meal) => (
-            <MealSection
-              key={meal.id}
-              meal={meal}
-              onAddFood={addFoodToMeal}
-              onRemoveFood={removeFoodFromMeal}
-              onUpdateFood={updateFood}
-              onDuplicateMeal={duplicateMeal}
-            />
-          ))}
-        </div>
-
-        <div className="col-span-4">
-          <Card className="sticky top-6">
-            <CardHeader className="bg-gradient-to-br from-teal-700 to-teal-600 text-white">
-              <CardTitle>Resumo Nutricional</CardTitle>
-              <p className="text-sm text-teal-100">Total do dia</p>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <div className="p-4 bg-teal-50 rounded-lg border border-teal-200">
-                  <p className="text-sm text-gray-600">Calorias Totais</p>
-                  <p className="text-3xl font-bold text-teal-700">{dayTotals.calorias.toFixed(0)}</p>
-                  <p className="text-xs text-gray-500">kcal</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Prote\u00edna</span>
-                    <span className="text-lg font-bold text-gray-900">{dayTotals.proteina.toFixed(1)}g</span>
+      <div data-testid="meal-plan-editor" className="space-y-6">
+        {/* Seleção de Paciente */}
+        <Card>
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <User className="text-teal-700" size={24} />
+                {selectedPatient ? (
+                  <div>
+                    <p className="font-semibold text-gray-900">{selectedPatient.name}</p>
+                    <p className="text-sm text-gray-600">{selectedPatient.email}</p>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Carboidrato</span>
-                    <span className="text-lg font-bold text-gray-900">{dayTotals.carboidrato.toFixed(1)}g</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Gordura</span>
-                    <span className="text-lg font-bold text-gray-900">{dayTotals.gordura.toFixed(1)}g</span>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <Button className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
-                    Salvar Plano
-                  </Button>
-                </div>
+                ) : (
+                  <p className="text-gray-600">Nenhum paciente selecionado</p>
+                )}
               </div>
-            </CardContent>
-          </Card>
+              
+              <Dialog open={isSelectingPatient} onOpenChange={setIsSelectingPatient}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    {selectedPatient ? 'Trocar Paciente' : 'Selecionar Paciente'}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Selecionar Paciente</DialogTitle>
+                    <DialogDescription>Escolha o paciente para este plano alimentar</DialogDescription>
+                  </DialogHeader>
+                  <div className="max-h-96 overflow-y-auto space-y-2">
+                    {patients.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>Nenhum paciente cadastrado</p>
+                        <Button 
+                          className="mt-4"
+                          onClick={() => navigate('/professional/patients')}
+                        >
+                          Cadastrar Paciente
+                        </Button>
+                      </div>
+                    ) : (
+                      patients.map((patient) => (
+                        <div
+                          key={patient.id}
+                          onClick={() => handleSelectPatient(patient.id)}
+                          className={`p-4 rounded-lg border cursor-pointer hover:bg-gray-50 ${
+                            selectedPatient?.id === patient.id ? 'border-teal-700 bg-teal-50' : 'border-gray-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-900">{patient.name}</p>
+                              <p className="text-sm text-gray-600">{patient.email}</p>
+                            </div>
+                            {selectedPatient?.id === patient.id && (
+                              <Check className="text-teal-700" size={20} />
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Nome do Plano */}
+        <Card>
+          <CardContent className="py-4">
+            <div className="flex items-center space-x-4">
+              <Label htmlFor="planName" className="whitespace-nowrap">Nome do Plano:</Label>
+              <Input
+                id="planName"
+                value={planName}
+                onChange={(e) => setPlanName(e.target.value)}
+                className="max-w-md"
+                placeholder="Ex: Plano de Emagrecimento"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Editor de Refeições */}
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-8 space-y-6">
+            {meals.map((meal) => (
+              <MealSection
+                key={meal.id}
+                meal={meal}
+                allFoods={allFoods}
+                onAddFood={addFoodToMeal}
+                onRemoveFood={removeFoodFromMeal}
+                onUpdateFood={updateFood}
+                onDuplicateMeal={duplicateMeal}
+              />
+            ))}
+          </div>
+
+          <div className="col-span-4">
+            <Card className="sticky top-6">
+              <CardHeader className="bg-gradient-to-br from-teal-700 to-teal-600 text-white">
+                <CardTitle>Resumo Nutricional</CardTitle>
+                <p className="text-sm text-teal-100">Total do dia</p>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="p-4 bg-teal-50 rounded-lg border border-teal-200">
+                    <p className="text-sm text-gray-600">Calorias Totais</p>
+                    <p className="text-3xl font-bold text-teal-700">{dayTotals.calorias.toFixed(0)}</p>
+                    <p className="text-xs text-gray-500">kcal</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="text-sm font-medium text-gray-700">Proteína</span>
+                      <span className="text-lg font-bold text-gray-900">{dayTotals.proteina.toFixed(1)}g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="text-sm font-medium text-gray-700">Carboidrato</span>
+                      <span className="text-lg font-bold text-gray-900">{dayTotals.carboidrato.toFixed(1)}g</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="text-sm font-medium text-gray-700">Gordura</span>
+                      <span className="text-lg font-bold text-gray-900">{dayTotals.gordura.toFixed(1)}g</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t space-y-3">
+                    <Button 
+                      className="w-full bg-teal-700 hover:bg-teal-800" 
+                      size="lg"
+                      onClick={handleSavePlan}
+                      disabled={saving || !selectedPatient}
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2" size={18} />
+                          {currentPlan ? 'Atualizar Plano' : 'Salvar Plano'}
+                        </>
+                      )}
+                    </Button>
+                    {!selectedPatient && (
+                      <p className="text-xs text-center text-gray-500">
+                        Selecione um paciente para salvar
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </Layout>
