@@ -292,14 +292,20 @@ export const createPatientByProfessional = async (professionalId, patientData) =
         status: 'active'
       });
     
+    // Status 409 = Conflict (email duplicado)
+    if (profileStatus === 409) {
+      console.error('❌ Email já existe');
+      return { data: null, error: { message: 'Este email já está cadastrado no sistema' } };
+    }
+    
     if (profileError || profileStatus !== 201) {
       console.error('❌ Erro profile');
-      return { data: null, error: { message: 'Erro ao criar perfil no banco' } };
+      return { data: null, error: { message: 'Erro ao criar perfil. Verifique os dados.' } };
     }
     
     console.log('✅ Profile criado');
     
-    // 2. Criar vínculo (capturar erro antes de processar)
+    // 2. Criar vínculo
     const linkPromise = supabase
       .from('patient_profiles')
       .insert({
@@ -308,16 +314,14 @@ export const createPatientByProfessional = async (professionalId, patientData) =
         status: 'active'
       });
     
-    const linkResult = await linkPromise.catch(err => {
-      console.error('❌ Erro capturado:', err);
+    const linkResult = await linkPromise.catch(() => {
       return { error: { message: 'Erro ao criar vínculo' }, status: 0 };
     });
     
     if (linkResult.error) {
-      console.error('❌ Erro vínculo');
-      // Deletar profile criado
+      console.error('❌ Erro vínculo - deletando profile...');
       await supabase.from('profiles').delete().eq('id', patientId).catch(() => {});
-      return { data: null, error: { message: 'Erro ao vincular paciente. Tabela patient_profiles pode não existir.' } };
+      return { data: null, error: { message: 'Erro ao vincular paciente. Verifique se as tabelas do Supabase estão criadas.' } };
     }
     
     console.log('✅ Vínculo criado');
@@ -329,7 +333,7 @@ export const createPatientByProfessional = async (professionalId, patientData) =
       status: 'incomplete'
     }).catch(() => {});
     
-    console.log('✅ PACIENTE CRIADO COM SUCESSO');
+    console.log('✅ PACIENTE CRIADO');
     return { 
       data: { 
         id: patientId, 
@@ -342,8 +346,8 @@ export const createPatientByProfessional = async (professionalId, patientData) =
     };
     
   } catch (err) {
-    console.error('❌ ERRO FATAL:', err);
-    return { data: null, error: { message: 'Erro fatal' } };
+    console.error('❌ ERRO:', err);
+    return { data: null, error: { message: 'Erro inesperado' } };
   }
 };
 
