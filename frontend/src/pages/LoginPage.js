@@ -80,8 +80,8 @@ const LoginPage = () => {
 
         toast.success('Login realizado com sucesso!');
 
-        // Aguardar um pouco para o toast aparecer e evitar race condition no unmount
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Aguardar para o toast e componentes estabilizarem antes de navegar
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // Redirecionar baseado no role
         if (profile.role === 'admin') {
@@ -93,13 +93,14 @@ const LoginPage = () => {
           localStorage.setItem('fitjourney_patient_name', profile.name);
           navigate('/patient/dashboard', { replace: true });
         }
+      } catch (error) {
+        toast.error('Erro ao fazer login');
+        console.error(error);
+      } finally {
+        // Pequeno delay antes de liberar o botão para evitar double click
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setLoading(false);
       }
-    } catch (error) {
-      toast.error('Erro ao fazer login');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleVisitorLogin = () => {
