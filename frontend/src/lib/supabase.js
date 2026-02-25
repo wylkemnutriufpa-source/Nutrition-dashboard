@@ -248,70 +248,91 @@ export const getPatientById = async (patientId) => {
 };
 
 export const createPatientByProfessional = async (professionalId, patientData) => {
-  // Verificar email existente
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('email', patientData.email)
-    .single();
+  console.log('🆕 Criando paciente...', { professionalId, email: patientData.email });
   
-  if (existing) {
-    return { data: null, error: { message: 'Email já cadastrado no sistema' } };
-  }
+  try {
+    // Verificar email existente
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', patientData.email)
+      .maybeSingle();
+    
+    if (existing) {
+      console.warn('⚠️ Email já existe');
+      return { data: null, error: { message: 'Email já cadastrado no sistema' } };
+    }
 
-  const patientId = crypto.randomUUID();
-  
-  // Criar profile
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert({
-      id: patientId,
-      email: patientData.email,
-      name: patientData.name,
-      phone: patientData.phone || null,
-      role: 'patient',
-      birth_date: patientData.birth_date || null,
-      gender: patientData.gender || null,
-      height: patientData.height || null,
-      current_weight: patientData.current_weight || null,
-      goal_weight: patientData.goal_weight || null,
-      goal: patientData.goal || null,
-      notes: patientData.notes || null,
-      status: 'active'
-    });
-  
-  if (profileError) {
-    return { data: null, error: profileError };
-  }
-  
-  // Criar vínculo
-  const { error: linkError } = await supabase
-    .from('patient_profiles')
-    .insert({
+    const patientId = crypto.randomUUID();
+    
+    // Criar profile
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: patientId,
+        email: patientData.email,
+        name: patientData.name,
+        phone: patientData.phone || null,
+        role: 'patient',
+        birth_date: patientData.birth_date || null,
+        gender: patientData.gender || null,
+        height: patientData.height || null,
+        current_weight: patientData.current_weight || null,
+        goal_weight: patientData.goal_weight || null,
+        goal: patientData.goal || null,
+        notes: patientData.notes || null,
+        status: 'active'
+      });
+    
+    if (profileError) {
+      console.error('❌ Erro ao criar profile');
+      return { data: null, error: { message: 'Erro ao criar paciente' } };
+    }
+    
+    // Criar vínculo
+    const { error: linkError } = await supabase
+      .from('patient_profiles')
+      .insert({
+        patient_id: patientId,
+        professional_id: professionalId,
+        status: 'active'
+      });
+    
+    if (linkError) {
+      console.error('❌ Erro ao criar vínculo');
+      // Tentar limpar profile criado
+      await supabase.from('profiles').delete().eq('id', patientId);
+      return { data: null, error: { message: 'Erro ao vincular paciente' } };
+    }
+    
+    // Criar anamnese vazia (não bloquear se falhar)
+    await supabase.from('anamnesis').insert({
       patient_id: patientId,
       professional_id: professionalId,
-      status: 'active'
+      status: 'incomplete'
+    }).catch(err => {
+      console.warn('⚠️ Erro ao criar anamnese (não crítico)', err);
     });
-  
-  if (linkError) {
-    await supabase.from('profiles').delete().eq('id', patientId);
-    return { data: null, error: linkError };
+    
+    // Buscar paciente criado
+    const { data: patient } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', patientId)
+      .maybeSingle();
+    
+    if (!patient) {
+      console.error('❌ Paciente criado mas não encontrado');
+      return { data: null, error: { message: 'Erro ao buscar paciente criado' } };
+    }
+    
+    console.log('✅ Paciente criado com sucesso');
+    return { data: patient, error: null };
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao criar paciente');
+    return { data: null, error: { message: 'Erro fatal ao criar paciente' } };
   }
-  
-  // Criar anamnese vazia
-  await supabase.from('anamnesis').insert({
-    patient_id: patientId,
-    professional_id: professionalId,
-    status: 'incomplete'
-  });
-  
-  const { data: patient } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', patientId)
-    .single();
-  
-  return { data: patient, error: null };
 };
 
 export const updatePatient = async (patientId, updates) => {
