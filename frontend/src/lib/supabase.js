@@ -64,30 +64,99 @@ export const getCurrentUser = async () => {
 };
 
 export const getUserProfile = async (userId) => {
-  // Tentar por id
-  let { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  console.log('🔍 Buscando profile para userId:', userId);
   
-  // Tentar por auth_user_id
-  if (error || !data) {
-    const result = await supabase.from('profiles').select('*').eq('auth_user_id', userId).single();
-    data = result.data;
-    error = result.error;
-  }
-  
-  // Tentar por email
-  if (error || !data) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user?.email) {
-      const result = await supabase.from('profiles').select('*').eq('email', user.email).single();
-      data = result.data;
+  try {
+    // Tentar buscar por id
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle(); // maybeSingle() não lança erro se não encontrar
+    
+    if (error) {
+      console.error('❌ Erro ao buscar profile:', error);
+      
+      // Se erro 406, pode ser problema de RLS ou perfil não existe
+      if (error.code === 'PGRST116' || error.message.includes('406')) {
+        console.warn('⚠️ Profile não encontrado ou bloqueado por RLS');
+        
+        // Tentar criar perfil automaticamente
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) {
+          console.log('🔧 Tentando criar profile automaticamente...');
+          return await createMissingProfile(user);
+        }
+      }
+      
+      return null;
     }
+    
+    if (!data) {
+      console.warn('⚠️ Profile não encontrado no banco');
+      // Tentar criar perfil automaticamente
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        console.log('🔧 Tentando criar profile automaticamente...');
+        return await createMissingProfile(user);
+      }
+      return null;
+    }
+    
+    console.log('✅ Profile encontrado:', data.email, 'Role:', data.role);
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar profile:', error);
+    return null;
   }
-  
-  return data || null;
+};
+
+// Criar perfil faltante automaticamente
+const createMissingProfile = async (authUser) => {
+  try {
+    console.log('🆕 Criando profile para:', authUser.email);
+    
+    // Verificar se já existe por email
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', authUser.email)
+      .maybeSingle();
+    
+    if (existing) {
+      console.log('✅ Profile já existe (encontrado por email)');
+      return existing;
+    }
+    
+    // Criar novo profile com role visitor por padrão
+    // Admin precisa promover para professional ou admin depois
+    const newProfile = {
+      id: authUser.id,
+      email: authUser.email,
+      name: authUser.user_metadata?.name || authUser.email.split('@')[0],
+      role: 'visitor', // Papel padrão, admin pode alterar depois
+      created_at: new Date().toISOString()
+    };
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert(newProfile)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Erro ao criar profile:', error);
+      return null;
+    }
+    
+    console.log('✅ Profile criado com sucesso');
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao criar profile:', error);
+    return null;
+  }
 };
 
 export const signIn = async (email, password) => {
