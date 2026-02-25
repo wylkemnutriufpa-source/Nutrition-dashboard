@@ -45,8 +45,16 @@ function App() {
             <Routes>
           <Route path="/" element={<LoginPage />} />
           
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute allowedTypes={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          
+          {/* Professional Routes */}
           <Route path="/professional/dashboard" element={
-            <ProtectedRoute allowedTypes={['professional']}>
+            <ProtectedRoute allowedTypes={['professional', 'admin']}>
               <ProfessionalDashboard />
             </ProtectedRoute>
           } />
