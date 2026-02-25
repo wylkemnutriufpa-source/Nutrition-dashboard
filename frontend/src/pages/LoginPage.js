@@ -194,11 +194,11 @@ const LoginPage = () => {
                   <Eye className="text-blue-700" size={32} />
                 </div>
                 <CardTitle className="text-xl">Visitante</CardTitle>
-                <CardDescription>Check nutricional gratuito</CardDescription>
+                <CardDescription>Check nutricional + calculadoras</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button data-testid="visitor-login-button" className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
-                  Fazer Check Gratuito
+                  Acessar Ferramentas
                 </Button>
               </CardContent>
             </Card>
