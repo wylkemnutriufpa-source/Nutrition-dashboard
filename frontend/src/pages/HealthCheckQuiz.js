@@ -73,7 +73,7 @@ const QUESTIONS = [
   }
 ];
 
-// Lógica de análise
+// Lógica de análise com Índice Nutricional (0-100)
 const analyzeResults = (answers) => {
   const alerts = [];
   let score = 100;
@@ -88,17 +88,17 @@ const analyzeResults = (answers) => {
   if (symptoms.includes('fatigue') && sleep !== 'good') {
     alerts.push({
       type: 'warning',
-      title: 'Desequilíbrio energético',
-      message: 'Seu corpo pode estar sinalizando necessidade de ajustes na rotina alimentar e no sono'
+      title: 'Desequilíbrio energético identificado',
+      message: 'Padrão de cansaço associado à baixa qualidade do sono sugere necessidade de revisão da rotina alimentar e recuperação'
     });
-    score -= 15;
+    score -= 10;
   }
 
   if (symptoms.includes('bloating') && symptoms.includes('anxiety')) {
     alerts.push({
       type: 'warning',
       title: 'Padrão alimentar desregulado',
-      message: 'Pode haver indícios de alimentação irregular ou escolhas alimentares que não estão favorecendo seu bem-estar'
+      message: 'A combinação de sintomas digestivos e ansiedade alimentar pode indicar escolhas nutricionais que não favorecem seu equilíbrio'
     });
     score -= 15;
   }
@@ -106,8 +106,8 @@ const analyzeResults = (answers) => {
   if (symptoms.includes('weight_difficulty') && (routine === 'moderate_3_4' || routine === 'intense_5_6')) {
     alerts.push({
       type: 'warning',
-      title: 'Possível ajuste metabólico',
-      message: 'Treino frequente sem resultados pode indicar necessidade de revisão nutricional estratégica'
+      title: 'Possível sobrecarga metabólica',
+      message: 'Atividade física frequente sem resultados esperados sugere necessidade de ajuste estratégico nutricional'
     });
     score -= 15;
   }
@@ -115,18 +115,18 @@ const analyzeResults = (answers) => {
   if (symptoms.includes('hair_loss') || symptoms.includes('muscle_pain')) {
     alerts.push({
       type: 'warning',
-      title: 'Sinais de possível deficiência',
-      message: 'Seu corpo pode estar sinalizando falta de nutrientes essenciais. Vale investigar'
+      title: 'Sinais de possível deficiência nutricional',
+      message: 'Manifestações como queda capilar ou dores musculares podem estar associadas a carências de micronutrientes'
     });
     score -= 15;
   }
 
-  // Análise de duração
+  // Análise de duração dos sintomas
   if (duration === 'more_3_months') {
     alerts.push({
       type: 'info',
       title: 'Sintomas prolongados',
-      message: 'Sintomas há mais de 3 meses merecem atenção profissional especializada'
+      message: 'Manifestações persistentes por mais de 3 meses justificam investigação profissional detalhada'
     });
     score -= 10;
   }
@@ -136,19 +136,24 @@ const analyzeResults = (answers) => {
     alerts.push({
       type: 'info',
       title: 'Qualidade do sono comprometida',
-      message: 'O sono impacta diretamente sua recuperação e metabolismo'
+      message: 'O sono inadequado impacta diretamente processos metabólicos e recuperação celular'
     });
     score -= 10;
   }
 
-  // Análise de rotina
+  // Análise de sedentarismo
   if (routine === 'sedentary') {
     alerts.push({
-      type: 'info',
-      title: 'Sedentarismo',
-      message: 'Atividade física regular potencializa resultados nutricionais'
+      type: 'warning',
+      title: 'Padrão sedentário',
+      message: 'A ausência de atividade física regular é reconhecida como fator de risco para doenças crônicas'
     });
-    score -= 10;
+    score -= 15;
+  }
+
+  // Bônus por atividade regular
+  if (routine === 'moderate_3_4' || routine === 'intense_5_6') {
+    score += 5; // Pequeno bônus
   }
 
   // Exames
@@ -156,21 +161,62 @@ const analyzeResults = (answers) => {
     alerts.push({
       type: 'warning',
       title: 'Avaliação clínica recomendada',
-      message: 'Com múltiplos sintomas, exames laboratoriais podem ajudar a direcionar o plano nutricional'
+      message: 'Múltiplos sintomas sem avaliação laboratorial recente justificam investigação complementar'
     });
     score -= 10;
   }
 
-  // Mensagem positiva se poucos sintomas
-  if (symptoms.length <= 1 && sleep === 'good') {
+  // Mensagem positiva se score alto
+  if (score >= 80) {
     alerts.push({
       type: 'success',
-      title: 'Bom equilíbrio geral',
-      message: 'Seu corpo mostra sinais positivos! Manter a rotina e otimizar detalhes pode elevar seus resultados'
+      title: 'Equilíbrio adequado identificado',
+      message: 'Seus padrões indicam bom gerenciamento nutricional. Otimizações pontuais podem potencializar ainda mais seus resultados'
     });
   }
 
   return { alerts, score: Math.max(score, 0) };
+};
+
+// Função para determinar categoria e cor do índice
+const getNutritionalIndex = (score) => {
+  if (score >= 80) {
+    return {
+      category: 'Equilíbrio adequado',
+      color: 'bg-green-500',
+      textColor: 'text-green-700',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-500',
+      message: 'Seu Índice Nutricional indica padrões saudáveis. Continue mantendo boas práticas.'
+    };
+  } else if (score >= 60) {
+    return {
+      category: 'Atenção leve',
+      color: 'bg-yellow-500',
+      textColor: 'text-yellow-700',
+      bgColor: 'bg-yellow-50',
+      borderColor: 'border-yellow-500',
+      message: 'Seu Índice Nutricional sugere oportunidades de melhoria em alguns aspectos da rotina.'
+    };
+  } else if (score >= 40) {
+    return {
+      category: 'Atenção moderada',
+      color: 'bg-orange-500',
+      textColor: 'text-orange-700',
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-500',
+      message: 'Seu Índice Nutricional indica necessidade de ajustes estratégicos na rotina.'
+    };
+  } else {
+    return {
+      category: 'Necessita ajuste prioritário',
+      color: 'bg-red-500',
+      textColor: 'text-red-700',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-500',
+      message: 'Seu Índice Nutricional sugere que ajustes nutricionais devem ser priorizados.'
+    };
+  }
 };
 
 const HealthCheckQuiz = () => {
