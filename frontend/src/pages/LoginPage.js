@@ -202,10 +202,6 @@ const LoginPage = () => {
                 </Button>
               </CardContent>
             </Card>
-                  Continuar como Visitante
-                </Button>
-              </CardContent>
-            </Card>
           </div>
 
           <div className="mt-8 text-center text-sm text-gray-600">
