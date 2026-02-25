@@ -7,20 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Lock, User, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { updatePassword } from '@/lib/supabase';
 
 const SettingsPage = () => {
   const userEmail = localStorage.getItem('fitjourney_user_email');
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleChangePassword = (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
-
-    if (currentPassword !== '123456') {
-      toast.error('Senha atual incorreta');
-      return;
-    }
 
     if (newPassword.length < 6) {
       toast.error('A nova senha deve ter no mínimo 6 caracteres');
@@ -32,10 +28,24 @@ const SettingsPage = () => {
       return;
     }
 
-    toast.success('Senha alterada com sucesso! (Mock - não salvo)');
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    setLoading(true);
+    
+    try {
+      const { success, error } = await updatePassword(newPassword);
+      
+      if (error) {
+        toast.error(error.message || 'Erro ao alterar senha');
+        return;
+      }
+      
+      toast.success('Senha alterada com sucesso!');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      toast.error('Erro inesperado ao alterar senha');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
