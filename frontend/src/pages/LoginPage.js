@@ -106,7 +106,7 @@ const LoginPage = () => {
 
   const handleVisitorLogin = () => {
     localStorage.setItem('fitjourney_user_type', 'visitor');
-    navigate('/visitor/health-check');
+    navigate('/visitor/calculators');
   };
 
   // Tela inicial de seleção de tipo
