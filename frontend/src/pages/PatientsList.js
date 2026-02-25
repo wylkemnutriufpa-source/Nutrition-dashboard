@@ -150,7 +150,13 @@ const PatientsList = () => {
       };
 
       const { data, error } = await createPatientByProfessional(profile.id, patientData);
-      if (error) throw error;
+      
+      if (error) {
+        console.error('❌ Erro ao criar paciente:', error);
+        toast.error(error.message || 'Erro ao criar paciente');
+        setSaving(false);
+        return;
+      }
       
       toast.success('Paciente criado com sucesso!');
       setIsCreateDialogOpen(false);
@@ -158,7 +164,7 @@ const PatientsList = () => {
       await loadData();
     } catch (error) {
       console.error('Error creating patient:', error);
-      toast.error(error.message || 'Erro ao criar paciente');
+      toast.error('Erro inesperado ao criar paciente');
     } finally {
       setSaving(false);
     }
