@@ -336,13 +336,27 @@ export const createPatientByProfessional = async (professionalId, patientData) =
 };
 
 export const updatePatient = async (patientId, updates) => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(updates)
-    .eq('id', patientId)
-    .select()
-    .single();
-  return { data, error };
+  console.log('✏️ Atualizando paciente...', { patientId });
+  
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', patientId)
+      .select()
+      .maybeSingle();
+    
+    if (error) {
+      console.error('❌ Erro ao atualizar paciente');
+      return { data: null, error: { message: 'Erro ao atualizar paciente' } };
+    }
+    
+    console.log('✅ Paciente atualizado');
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao atualizar paciente');
+    return { data: null, error: { message: 'Erro fatal ao atualizar paciente' } };
+  }
 };
 
 // Soft delete
