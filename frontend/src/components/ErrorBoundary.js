@@ -13,16 +13,28 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log para debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
-    // Erros de removeChild são geralmente transitórios durante navegação
-    // Podemos tentar recuperar automaticamente
+    // Erros de removeChild são transitórios durante navegação
+    // Não logar no console para não alarmar
     if (error.message?.includes('removeChild')) {
+      // Auto-recuperar silenciosamente
       setTimeout(() => {
-        this.setState({ hasError: false, error: null });
-      }, 100);
+        if (this._isMounted) {
+          this.setState({ hasError: false, error: null });
+        }
+      }, 50);
+      return; // Não logar no console
     }
+    
+    // Outros erros, logar normalmente
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   handleReload = () => {
