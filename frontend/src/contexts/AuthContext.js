@@ -97,8 +97,14 @@ export const AuthProvider = ({ children }) => {
       const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('🔐 Auth event:', event);
         
+        // Ignorar INITIAL_SESSION pois já chamamos checkUser()
+        if (event === 'INITIAL_SESSION') {
+          return;
+        }
+        
         // Evitar processar eventos durante check inicial
         if (isCheckingUser.current) {
+          console.log('⏭️ Ignorando evento (checkUser em progresso)');
           return;
         }
 
