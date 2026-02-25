@@ -167,6 +167,28 @@ export const signOut = async () => {
   return await supabase.auth.signOut();
 };
 
+export const updatePassword = async (newPassword) => {
+  console.log('🔐 Atualizando senha...');
+  
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+    
+    if (error) {
+      console.error('❌ Erro ao atualizar senha');
+      return { success: false, error: { message: 'Erro ao atualizar senha' } };
+    }
+    
+    console.log('✅ Senha atualizada com sucesso');
+    return { success: true, error: null };
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao atualizar senha');
+    return { success: false, error: { message: 'Erro fatal ao atualizar senha' } };
+  }
+};
+
 // ==================== PROFILE HELPERS ====================
 
 export const getProfileById = async (profileId) => {
