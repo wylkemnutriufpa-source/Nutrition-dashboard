@@ -334,6 +334,8 @@ const HealthCheckQuiz = () => {
   };
 
   if (showResult) {
+    const indexData = getNutritionalIndex(result.score);
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 py-8 px-4">
         <div className="max-w-3xl mx-auto">
@@ -345,29 +347,54 @@ const HealthCheckQuiz = () => {
             <p className="text-gray-600">Análise baseada nas suas respostas</p>
           </div>
 
-          {/* Score */}
+          {/* Índice Nutricional */}
           <Card className="mb-6 bg-white shadow-lg">
             <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-teal-600 to-blue-600 text-white mb-4">
-                  <span className="text-4xl font-bold">{result.score}</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Score de Bem-Estar
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Índice Nutricional
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  {result.score >= 80 ? 'Ótimo!' : result.score >= 60 ? 'Bom' : 'Precisa de atenção'}
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-teal-600 to-blue-600 text-white mb-4">
+                  <span className="text-5xl font-bold">{result.score}</span>
+                </div>
+                <p className="text-lg font-semibold text-gray-700 mb-4">
+                  {indexData.category}
+                </p>
+              </div>
+
+              {/* Barra de progresso colorida */}
+              <div className="mb-4">
+                <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
+                  <div 
+                    className={`${indexData.color} h-6 rounded-full transition-all duration-1000 flex items-center justify-end pr-2`}
+                    style={{ width: `${result.score}%` }}
+                  >
+                    <span className="text-white text-xs font-bold">{result.score}/100</span>
+                  </div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0</span>
+                  <span>40</span>
+                  <span>60</span>
+                  <span>80</span>
+                  <span>100</span>
+                </div>
+              </div>
+
+              <div className={`p-4 rounded-lg border-l-4 ${indexData.borderColor} ${indexData.bgColor}`}>
+                <p className={`text-sm font-medium ${indexData.textColor}`}>
+                  {indexData.message}
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Alertas */}
+          {/* Alertas Personalizados */}
           <Card className="mb-6 bg-white shadow-lg">
             <CardContent className="pt-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <AlertCircle className="mr-2 text-teal-600" size={20} />
-                Com base nas suas respostas:
+                Pontos identificados na sua avaliação:
               </h3>
               
               <div className="space-y-4">
@@ -392,7 +419,36 @@ const HealthCheckQuiz = () => {
                 ))}
               </div>
 
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              {/* Alerta personalizado por faixa */}
+              {result.score < 60 && (
+                <div className="mt-6 p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                  <p className="text-sm font-medium text-orange-900">
+                    ⚠️ {result.score < 40 
+                      ? 'Recomendamos fortemente considerar uma avaliação profissional detalhada para investigar possíveis desequilíbrios.'
+                      : 'Os padrões identificados sugerem que seu corpo pode estar enfrentando um nível de sobrecarga metabólica que merece atenção preventiva.'}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Contexto Institucional */}
+          <Card className="mb-6 bg-gray-50 shadow-lg border border-gray-200">
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                📚 Contexto de Saúde Pública
+              </h3>
+              
+              <div className="space-y-4 text-sm text-gray-700">
+                <p>
+                  Segundo a <strong>Organização Mundial da Saúde (OMS)</strong>, o excesso de peso e o sedentarismo estão entre os principais fatores de risco modificáveis para doenças crônicas.
+                </p>
+                <p>
+                  De acordo com a <strong>Sociedade Brasileira de Cardiologia</strong>, hábitos alimentares inadequados e baixa atividade física aumentam significativamente o risco cardiovascular ao longo do tempo.
+                </p>
+              </div>
+
+              <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
                 <p className="text-sm text-gray-600 flex items-center">
                   <AlertCircle size={16} className="mr-2 flex-shrink-0" />
                   <strong>Importante:</strong> Este resultado não substitui avaliação médica ou nutricional profissional.
@@ -401,22 +457,47 @@ const HealthCheckQuiz = () => {
             </CardContent>
           </Card>
 
-          {/* CTAs */}
+          {/* CTA Emocional */}
           {!showLeadCapture ? (
             <Card className="bg-gradient-to-br from-teal-600 to-blue-600 text-white shadow-xl">
               <CardContent className="pt-6">
-                <h3 className="text-2xl font-bold mb-4 text-center">
-                  Próximos Passos
+                <h3 className="text-2xl font-bold mb-2 text-center">
+                  Transforme informação em ação
                 </h3>
+                <p className="text-center mb-6 text-white/90">
+                  Pequenos ajustes hoje podem reduzir riscos futuros e melhorar sua qualidade de vida. 
+                  Receba uma análise ampliada com orientações práticas e prioridades personalizadas.
+                </p>
+
+                <div className="bg-white/10 rounded-lg p-4 mb-6">
+                  <p className="text-sm font-semibold mb-3">O que você vai receber:</p>
+                  <div className="space-y-2 text-sm">
+                    <p className="flex items-center">
+                      <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+                      Interpretação detalhada do seu índice
+                    </p>
+                    <p className="flex items-center">
+                      <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+                      Pontos críticos da sua rotina
+                    </p>
+                    <p className="flex items-center">
+                      <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+                      Sugestões iniciais de melhoria
+                    </p>
+                    <p className="flex items-center">
+                      <CheckCircle size={16} className="mr-2 flex-shrink-0" />
+                      Direcionamento profissional
+                    </p>
+                  </div>
+                </div>
                 
                 <div className="space-y-3">
                   <Button 
-                    onClick={() => handleCTA('consult')}
-                    className="w-full bg-white text-teal-700 hover:bg-gray-100 text-lg py-6"
+                    onClick={() => setShowLeadCapture(true)}
+                    className="w-full bg-white text-teal-700 hover:bg-gray-100 text-lg py-6 font-bold"
                     size="lg"
                   >
-                    <CheckCircle className="mr-2" size={20} />
-                    Quero uma avaliação personalizada
+                    Quero Minha Análise Estratégica
                   </Button>
                   
                   <Button 
@@ -425,17 +506,7 @@ const HealthCheckQuiz = () => {
                     size="lg"
                   >
                     <MessageCircle className="mr-2" size={20} />
-                    Falar com um nutricionista
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => handleCTA('email')}
-                    variant="outline"
-                    className="w-full bg-white/10 border-white text-white hover:bg-white/20 text-lg py-6"
-                    size="lg"
-                  >
-                    <Mail className="mr-2" size={20} />
-                    Receber resultado por e-mail
+                    Falar com nutricionista agora
                   </Button>
                 </div>
               </CardContent>
@@ -443,9 +514,12 @@ const HealthCheckQuiz = () => {
           ) : (
             <Card className="bg-white shadow-xl">
               <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Receba seu resultado completo
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">
+                  Receba sua análise completa
                 </h3>
+                <p className="text-sm text-gray-600 text-center mb-6">
+                  Seus dados são confidenciais e utilizados apenas para envio da análise.
+                </p>
                 
                 <div className="space-y-4">
                   <div>
@@ -483,9 +557,10 @@ const HealthCheckQuiz = () => {
                   <Button 
                     onClick={handleLeadSubmit}
                     disabled={saving}
-                    className="w-full bg-teal-600 hover:bg-teal-700"
+                    className="w-full bg-teal-600 hover:bg-teal-700 py-6"
+                    size="lg"
                   >
-                    {saving ? 'Enviando...' : 'Receber resultado'}
+                    {saving ? 'Enviando...' : 'Receber Análise Completa'}
                   </Button>
                   
                   <Button 
