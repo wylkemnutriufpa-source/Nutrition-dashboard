@@ -19,6 +19,7 @@ import WaterCalculator from '@/pages/WaterCalculator';
 import SettingsPage from '@/pages/SettingsPage';
 import FoodDatabase from '@/pages/FoodDatabase';
 import BrandingSettings from '@/pages/BrandingSettings';
+import HealthCheckQuiz from '@/pages/HealthCheckQuiz';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
@@ -149,6 +150,11 @@ function App() {
               } />
               
               {/* Visitor Routes */}
+              <Route path="/visitor/health-check" element={
+                <ProtectedRoute allowedTypes={['visitor']}>
+                  <HealthCheckQuiz />
+                </ProtectedRoute>
+              } />
               <Route path="/visitor/calculators" element={
                 <ProtectedRoute allowedTypes={['visitor']}>
                   <CalculatorsList userType="visitor" />
