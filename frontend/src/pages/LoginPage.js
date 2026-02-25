@@ -93,14 +93,15 @@ const LoginPage = () => {
           localStorage.setItem('fitjourney_patient_name', profile.name);
           navigate('/patient/dashboard', { replace: true });
         }
-      } catch (error) {
-        toast.error('Erro ao fazer login');
-        console.error(error);
-      } finally {
-        // Pequeno delay antes de liberar o botão para evitar double click
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setLoading(false);
       }
+    } catch (error) {
+      toast.error('Erro ao fazer login');
+      console.error(error);
+    } finally {
+      // Pequeno delay antes de liberar o botão para evitar double click
+      await new Promise(resolve => setTimeout(resolve, 200));
+      setLoading(false);
+    }
   };
 
   const handleVisitorLogin = () => {
