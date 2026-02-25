@@ -8,10 +8,11 @@ import { Progress } from '@/components/ui/progress';
 import { 
   Zap, Moon, Dumbbell, Scale, Brain, Droplet, Activity,
   AlertCircle, CheckCircle, Mail, Phone, User, Download,
-  ArrowRight, ArrowLeft, MessageCircle
+  ArrowRight, ArrowLeft, MessageCircle, Instagram
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import WhatsAppFloating from '@/components/WhatsAppFloating';
 
 // Configuração das perguntas
 const QUESTIONS = [
@@ -313,7 +314,11 @@ const HealthCheckQuiz = () => {
     } else if (action === 'whatsapp') {
       await saveToSupabase(false);
       // Abrir WhatsApp (ajuste o número)
-      window.open('https://wa.me/5511999999999?text=Olá! Fiz o Check Nutricional e quero uma consultoria', '_blank');
+      window.open('https://wa.me/5511999999999?text=Olá! Fiz o Check Nutricional e quero uma consultoria personalizada', '_blank');
+    } else if (action === 'instagram') {
+      await saveToSupabase(false);
+      // Abrir Instagram (ajuste o @)
+      window.open('https://instagram.com/seu_instagram', '_blank');
     } else if (action === 'consult') {
       await saveToSupabase(false);
       toast.success('Em breve entraremos em contato!');
@@ -500,14 +505,23 @@ const HealthCheckQuiz = () => {
                     Quero Minha Análise Estratégica
                   </Button>
                   
-                  <Button 
-                    onClick={() => handleCTA('whatsapp')}
-                    className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
-                    size="lg"
-                  >
-                    <MessageCircle className="mr-2" size={20} />
-                    Falar com nutricionista agora
-                  </Button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      onClick={() => handleCTA('whatsapp')}
+                      className="w-full bg-green-600 hover:bg-green-700 py-4"
+                    >
+                      <MessageCircle className="mr-2" size={18} />
+                      WhatsApp
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => handleCTA('instagram')}
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 py-4"
+                    >
+                      <Instagram className="mr-2" size={18} />
+                      Instagram
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -581,6 +595,12 @@ const HealthCheckQuiz = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 py-8 px-4">
+      {/* Botão WhatsApp Flutuante */}
+      <WhatsAppFloating 
+        phoneNumber="5511999999999"
+        message="Olá! Fiz o Check Nutricional e quero saber mais"
+      />
+      
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
