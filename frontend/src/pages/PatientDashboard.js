@@ -5,6 +5,7 @@ import { CheckCircle2, Circle, Droplet, Footprints, Dumbbell, AlertTriangle, Loa
 import { useAuth } from '@/contexts/AuthContext';
 import { getPatientStats } from '@/lib/supabase';
 import { toast } from 'sonner';
+import ChecklistSimple from '@/components/ChecklistSimple';
 
 const PatientDashboard = () => {
   const { user, profile } = useAuth();
