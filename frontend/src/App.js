@@ -168,9 +168,10 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
-          <Toaster position="top-right" />
         </BrandingProvider>
       </AuthProvider>
+      {/* Toaster fora do Router para evitar unmount durante navegação */}
+      <Toaster position="top-right" duration={3000} />
     </div>
     </ErrorBoundary>
   );
