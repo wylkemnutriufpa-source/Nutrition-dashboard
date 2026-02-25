@@ -520,26 +520,23 @@ export const toggleChecklistEntry = async (templateId, patientId, date, complete
   return { data, error };
 };
 
-// Calcular aderência dos últimos N dias
+// Calcular aderência simples (para o resumo do paciente)
 export const getChecklistAdherence = async (patientId, days = 7) => {
-  const endDate = new Date().toISOString().split('T')[0];
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  // Para MVP simples, apenas contar tarefas completas vs totais
+  const { data: tasks } = await supabase
+    .from('checklist_tasks')
+    .select('*')
+    .eq('patient_id', patientId);
   
-  // Buscar templates ativos
-  const { data: templates } = await getChecklistTemplates(patientId);
-  if (!templates || templates.length === 0) return { adherence: 0, completed: 0, total: 0 };
+  if (!tasks || tasks.length === 0) {
+    return { adherence: 0, completed: 0, total: 0 };
+  }
   
-  // Buscar entries no período
-  const { data: entries } = await getChecklistEntries(patientId, startDate, endDate);
+  const completed = tasks.filter(t => t.completed).length;
+  const total = tasks.length;
+  const adherence = total > 0 ? Math.round((completed / total) * 100) : 0;
   
-  const totalPossible = templates.length * days;
-  const completedCount = entries?.filter(e => e.completed).length || 0;
-  
-  return {
-    adherence: totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0,
-    completed: completedCount,
-    total: totalPossible
-  };
+  return { adherence, completed, total };
 };
 
 // ==================== PATIENT MESSAGES / TIPS ====================
@@ -855,24 +852,5 @@ export const deleteChecklistTask = async (taskId) => {
     .delete()
     .eq('id', taskId);
   return { error };
-};
-
-// Calcular aderência simples (para o resumo do paciente)
-export const getChecklistAdherence = async (patientId, days = 7) => {
-  // Para MVP simples, apenas contar tarefas completas vs totais
-  const { data: tasks } = await supabase
-    .from('checklist_tasks')
-    .select('*')
-    .eq('patient_id', patientId);
-  
-  if (!tasks || tasks.length === 0) {
-    return { adherence: 0, completed: 0, total: 0 };
-  }
-  
-  const completed = tasks.filter(t => t.completed).length;
-  const total = tasks.length;
-  const adherence = total > 0 ? Math.round((completed / total) * 100) : 0;
-  
-  return { adherence, completed, total };
 };
 
