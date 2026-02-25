@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { User, Stethoscope, Eye, ArrowLeft, Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBranding } from '@/contexts/BrandingContext';
-import { signIn, getUserProfile } from '@/lib/supabase';
+import { signIn, getUserProfile, signOut } from '@/lib/supabase';
 
 const LoginPage = () => {
   const navigate = useNavigate();
