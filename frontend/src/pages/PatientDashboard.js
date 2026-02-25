@@ -57,14 +57,6 @@ const PatientDashboard = () => {
     return goals[goal] || goal || 'Não definido';
   };
 
-  // Tasks mockadas (podem ser integradas com um sistema de tarefas real futuramente)
-  const tasks = [
-    { id: 1, title: 'Beber 2.5L de água', completed: true, icon: Droplet },
-    { id: 2, title: 'Caminhar 10.000 passos', completed: false, icon: Footprints },
-    { id: 3, title: 'Treinar 30 minutos', completed: true, icon: Dumbbell },
-    { id: 4, title: 'Seguir plano alimentar', completed: false, icon: CheckCircle2 }
-  ];
-
   const tips = [
     'Lembre-se de beber água ao longo do dia',
     'Evite pular refeições',
