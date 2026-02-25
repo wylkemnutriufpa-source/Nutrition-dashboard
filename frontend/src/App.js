@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import AdminBar from '@/components/AdminBar';
 
 import LoginPage from '@/pages/LoginPage';
 import AdminDashboard from '@/pages/AdminDashboard';
@@ -26,7 +27,7 @@ const ProtectedRoute = ({ children, allowedTypes }) => {
     return <Navigate to="/" replace />;
   }
   
-  // Admin tem acesso a TUDO (override)
+  // Admin tem acesso a TUDO (override) - mantém sua role
   if (userType === 'admin') {
     return children;
   }
@@ -48,6 +49,9 @@ function App() {
       <AuthProvider>
         <BrandingProvider>
           <BrowserRouter>
+            {/* AdminBar: aparece automaticamente quando admin está em outras áreas */}
+            <AdminBar />
+            
             <Routes>
               <Route path="/" element={<LoginPage />} />
               
