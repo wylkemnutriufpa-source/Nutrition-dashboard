@@ -106,7 +106,7 @@ const LoginPage = () => {
 
   const handleVisitorLogin = () => {
     localStorage.setItem('fitjourney_user_type', 'visitor');
-    navigate('/visitor/calculators');
+    navigate('/visitor/health-check');
   };
 
   // Tela inicial de seleção de tipo
@@ -186,18 +186,22 @@ const LoginPage = () => {
             {/* Visitante */}
             <Card 
               data-testid="visitor-login-card" 
-              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-gray-600 cursor-pointer" 
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-600 cursor-pointer" 
               onClick={handleVisitorLogin}
             >
               <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                  <Eye className="text-gray-700" size={32} />
+                <div className="mx-auto w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                  <Eye className="text-blue-700" size={32} />
                 </div>
                 <CardTitle className="text-xl">Visitante</CardTitle>
-                <CardDescription>Experimente as calculadoras</CardDescription>
+                <CardDescription>Check nutricional gratuito</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button data-testid="visitor-login-button" className="w-full bg-gray-700 hover:bg-gray-800" size="lg" variant="outline">
+                <Button data-testid="visitor-login-button" className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
+                  Fazer Check Gratuito
+                </Button>
+              </CardContent>
+            </Card>
                   Continuar como Visitante
                 </Button>
               </CardContent>
