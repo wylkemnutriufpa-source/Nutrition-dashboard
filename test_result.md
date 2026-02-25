@@ -237,9 +237,10 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Supabase Auth Lock Fix"
+    - "Admin Navigation Architecture"
     - "PatientsList com CRUD real"
     - "MealPlanEditor com persistência Supabase"
-    - "ProfessionalDashboard com dados reais"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
