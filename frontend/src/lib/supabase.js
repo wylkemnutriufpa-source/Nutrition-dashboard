@@ -857,3 +857,22 @@ export const deleteChecklistTask = async (taskId) => {
   return { error };
 };
 
+// Calcular aderência simples (para o resumo do paciente)
+export const getChecklistAdherence = async (patientId, days = 7) => {
+  // Para MVP simples, apenas contar tarefas completas vs totais
+  const { data: tasks } = await supabase
+    .from('checklist_tasks')
+    .select('*')
+    .eq('patient_id', patientId);
+  
+  if (!tasks || tasks.length === 0) {
+    return { adherence: 0, completed: 0, total: 0 };
+  }
+  
+  const completed = tasks.filter(t => t.completed).length;
+  const total = tasks.length;
+  const adherence = total > 0 ? Math.round((completed / total) * 100) : 0;
+  
+  return { adherence, completed, total };
+};
+
