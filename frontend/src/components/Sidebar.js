@@ -1,5 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Calendar, Calculator, FileText, Settings, LogOut, Database, Palette, Shield } from 'lucide-react';
+import { 
+  Home, Users, Calendar, Calculator, FileText, Settings, LogOut, 
+  Database, Palette, Shield, ClipboardList, MessageSquare, Stethoscope,
+  UserCog
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
 
@@ -7,33 +11,54 @@ const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
   const { branding } = useBranding();
 
-  const adminLinks = [
-    { to: '/admin/dashboard', icon: Shield, label: 'Painel Admin' },
-    { to: '/professional/patients', icon: Users, label: 'Ver Pacientes' },
-    { to: '/professional/food-database', icon: Database, label: 'Banco de Alimentos' },
-    { to: '/professional/settings', icon: Settings, label: 'Configurações' }
-  ];
-
+  // Links do Professional (admin também tem acesso)
   const professionalLinks = [
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/professional/patients', icon: Users, label: 'Pacientes' },
-    { to: '/professional/food-database', icon: Database, label: 'Banco de Alimentos' },
+    { to: '/professional/food-database', icon: Database, label: 'Alimentos' },
     { to: '/professional/branding', icon: Palette, label: 'Personalização' },
     { to: '/professional/settings', icon: Settings, label: 'Configurações' }
   ];
 
+  // Links exclusivos do Admin
+  const adminExtraLinks = [
+    { to: '/admin/dashboard', icon: Shield, label: 'Painel Admin' },
+    { to: '/admin/professionals', icon: UserCog, label: 'Profissionais' }
+  ];
+
+  // Links do Paciente
   const patientLinks = [
     { to: '/patient/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/patient/meal-plan', icon: Calendar, label: 'Meu Plano' },
-    { to: '/patient/calculators', icon: Calculator, label: 'Calculadoras' },
-    { to: '/patient/feedback', icon: FileText, label: 'Feedbacks' }
+    { to: '/patient/checklist', icon: ClipboardList, label: 'Tarefas' },
+    { to: '/patient/messages', icon: MessageSquare, label: 'Recados' },
+    { to: '/patient/calculators', icon: Calculator, label: 'Calculadoras' }
   ];
 
+  // Links do Visitante
   const visitorLinks = [
     { to: '/visitor/calculators', icon: Calculator, label: 'Calculadoras' }
   ];
 
-  const links = userType === 'admin' ? adminLinks : userType === 'professional' ? professionalLinks : userType === 'patient' ? patientLinks : visitorLinks;
+  // Montar menu baseado no tipo de usuário
+  const getLinks = () => {
+    switch (userType) {
+      case 'admin':
+        // Admin tem TUDO do professional + links admin extras
+        return [...adminExtraLinks, ...professionalLinks.map(l => ({
+          ...l,
+          // Manter as mesmas rotas do professional
+        }))];
+      case 'professional':
+        return professionalLinks;
+      case 'patient':
+        return patientLinks;
+      default:
+        return visitorLinks;
+    }
+  };
+
+  const links = getLinks();
 
   const getUserTypeLabel = () => {
     switch(userType) {
@@ -42,6 +67,11 @@ const Sidebar = ({ userType, onLogout }) => {
       case 'patient': return 'Paciente';
       default: return 'Visitante';
     }
+  };
+
+  const getPrimaryColor = () => {
+    if (userType === 'admin') return '#7C3AED';
+    return branding.primaryColor || '#0F766E';
   };
 
   return (
@@ -53,33 +83,61 @@ const Sidebar = ({ userType, onLogout }) => {
           ) : (
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ background: userType === 'admin' ? 'linear-gradient(to br, #7C3AED, #6D28D9)' : `linear-gradient(to br, ${branding.primaryColor}, ${branding.accentColor})` }}
+              style={{ background: `linear-gradient(to br, ${getPrimaryColor()}, ${branding.accentColor || '#059669'})` }}
             >
-              <span className="text-white font-bold text-xl">{branding.brandName?.substring(0, 2).toUpperCase()}</span>
+              <span className="text-white font-bold text-xl">
+                {userType === 'admin' ? 'AD' : branding.brandName?.substring(0, 2).toUpperCase()}
+              </span>
             </div>
           )}
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{branding.brandName}</h1>
+            <h1 className="text-xl font-bold text-gray-900">{branding.brandName || 'FitJourney'}</h1>
             <p className="text-xs text-gray-500">{getUserTypeLabel()}</p>
           </div>
         </Link>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
-        {links.map((link) => {
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {/* Separador para admin */}
+        {userType === 'admin' && (
+          <>
+            <p className="text-xs font-semibold text-gray-400 uppercase px-4 pt-2 pb-1">Admin</p>
+            {adminExtraLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  data-testid={`sidebar-link-${link.label.toLowerCase().replace(/ /g, '-')}`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive ? 'text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                  style={isActive ? { backgroundColor: '#7C3AED' } : {}}
+                >
+                  <Icon size={20} />
+                  <span className="font-medium text-sm">{link.label}</span>
+                </Link>
+              );
+            })}
+            <p className="text-xs font-semibold text-gray-400 uppercase px-4 pt-4 pb-1">Nutrição</p>
+          </>
+        )}
+        
+        {/* Links principais */}
+        {(userType === 'admin' ? professionalLinks : links).map((link) => {
           const Icon = link.icon;
-          const isActive = location.pathname === link.to;
+          const isActive = location.pathname === link.to || 
+            (link.to === '/professional/patients' && location.pathname.startsWith('/professional/patient'));
           return (
             <Link
               key={link.to}
               to={link.to}
-              data-testid={`sidebar-link-${link.label.toLowerCase().replace(' ', '-')}`}
+              data-testid={`sidebar-link-${link.label.toLowerCase().replace(/ /g, '-')}`}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
-                isActive
-                  ? 'text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
+                isActive ? 'text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'
               }`}
-              style={isActive ? { backgroundColor: userType === 'admin' ? '#7C3AED' : branding.primaryColor } : {}}
+              style={isActive ? { backgroundColor: getPrimaryColor() } : {}}
             >
               <Icon size={20} />
               <span className="font-medium text-sm">{link.label}</span>
