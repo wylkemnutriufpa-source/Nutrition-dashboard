@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowLeft, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
 
 /**
  * Barra fixa de Admin que aparece quando admin está visualizando outras áreas
@@ -16,6 +17,10 @@ const AdminBar = () => {
   const isAdmin = profile?.role === 'admin';
   const isInAdminArea = location.pathname.startsWith('/admin');
   const shouldShow = isAdmin && !isInAdminArea;
+
+  useEffect(() => {
+    console.log('🔴 AdminBar:', { isAdmin, isInAdminArea, shouldShow, path: location.pathname });
+  }, [isAdmin, isInAdminArea, shouldShow, location.pathname]);
 
   if (!shouldShow) {
     return null;
@@ -34,7 +39,10 @@ const AdminBar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-700 to-purple-800 text-white shadow-lg">
+    <div 
+      className="fixed top-0 left-0 right-0 bg-gradient-to-r from-purple-700 to-purple-800 text-white shadow-lg"
+      style={{ zIndex: 9999 }}
+    >
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5" />
