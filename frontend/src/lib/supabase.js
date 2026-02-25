@@ -171,11 +171,14 @@ export const updatePassword = async (newPassword) => {
   console.log('🔐 Atualizando senha...');
   
   try {
-    const { data, error } = await supabase.auth.updateUser({
+    const result = await supabase.auth.updateUser({
       password: newPassword
+    }).catch(err => {
+      // Capturar erro do Supabase sem processar
+      return { data: null, error: { message: 'Erro ao atualizar senha' } };
     });
     
-    if (error) {
+    if (result.error) {
       console.error('❌ Erro ao atualizar senha');
       return { success: false, error: { message: 'Erro ao atualizar senha' } };
     }
@@ -184,7 +187,7 @@ export const updatePassword = async (newPassword) => {
     return { success: true, error: null };
     
   } catch (error) {
-    console.error('❌ Erro fatal ao atualizar senha');
+    console.error('❌ Erro fatal');
     return { success: false, error: { message: 'Erro fatal ao atualizar senha' } };
   }
 };
