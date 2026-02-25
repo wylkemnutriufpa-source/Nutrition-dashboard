@@ -225,3 +225,35 @@ agent_communication:
     message: "Implementada migração completa de mock para Supabase. Arquivos alterados: supabase.js, PatientsList.js, ProfessionalDashboard.js, PatientProfile.js, MealPlanEditor.js, PatientDashboard.js. Schema SQL completo criado em supabase_schema_complete.sql"
   - agent: "testing"
     message: "✅ Backend API testing completed successfully. All 3 endpoints (GET /api/, POST /api/status, GET /api/status) working perfectly. Created comprehensive backend_test.py file for API testing. Backend service stable and properly integrated with MongoDB. No issues found - backend is ready for production use."
+  - agent: "main"
+    message: "🔧 CORREÇÕES CRÍTICAS IMPLEMENTADAS:
+    
+    1️⃣ Problema de Login (NavigatorLockAcquireTimeoutError) - CORRIGIDO
+    - Implementado Supabase client como singleton garantido
+    - Refatorado AuthContext para evitar múltiplas chamadas simultâneas (race conditions)
+    - Adicionadas flags (isCheckingUser, isMounted) para prevenir chamadas duplicadas
+    - Apenas 1 listener onAuthStateChange ativo (controlado por ref)
+    - Implementado tratamento de sessão corrompida com fallback seguro
+    - Ajustado LoginPage para aguardar antes de processar (evitar conflito com AuthContext)
+    - Mudado flowType de 'implicit' para 'pkce' (mais seguro)
+    - Desabilitado detectSessionInUrl para evitar múltiplas detecções
+    - Adicionado signOut em caso de role incorreto no login
+    
+    Arquivos alterados:
+    - /app/frontend/src/lib/supabase.js - singleton pattern
+    - /app/frontend/src/contexts/AuthContext.js - controle de race conditions
+    - /app/frontend/src/pages/LoginPage.js - delay + signOut em erro
+    
+    2️⃣ Problema de Rotas Admin - CORRIGIDO
+    - Criado componente AdminBar que aparece quando admin está fora da área admin
+    - AdminBar mostra: role atual, área sendo visualizada, botão 'Voltar ao Painel Admin'
+    - Admin mantém role='admin' ao navegar para outras áreas (não perde contexto)
+    - Layout ajustado para compensar espaço do AdminBar (padding-top dinâmico)
+    - Limpeza completa de localStorage no logout
+    
+    Arquivos criados/alterados:
+    - /app/frontend/src/components/AdminBar.js - NOVO componente
+    - /app/frontend/src/App.js - integração do AdminBar
+    - /app/frontend/src/components/Layout.js - compensação de espaço
+    
+    STATUS: Pronto para testes de login (admin, professional, patient)"
