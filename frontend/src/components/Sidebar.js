@@ -1,15 +1,20 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, Users, Calendar, Calculator, FileText, Settings, LogOut, 
   Database, Palette, Shield, ClipboardList, MessageSquare, Stethoscope,
-  UserCog
+  UserCog, Activity
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
 
 const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { branding } = useBranding();
+
+  // Detectar se está em calculadoras ou health check
+  const isInHealthCheck = location.pathname.includes('/health-check');
+  const isInCalculators = location.pathname.includes('/calculator');
 
   // Links do Professional (admin também tem acesso)
   const professionalLinks = [
@@ -37,7 +42,7 @@ const Sidebar = ({ userType, onLogout }) => {
 
   // Links do Visitante
   const visitorLinks = [
-    { to: '/visitor/calculators', icon: Calculator, label: 'Calculadoras' }
+    { to: '/visitor/calculators', icon: Calculator, label: 'Ferramentas' }
   ];
 
   // Montar menu baseado no tipo de usuário
@@ -121,6 +126,31 @@ const Sidebar = ({ userType, onLogout }) => {
               );
             })}
             <p className="text-xs font-semibold text-gray-400 uppercase px-4 pt-4 pb-1">Nutrição</p>
+          </>
+        )}
+        
+        {/* Navegação condicional para visitante */}
+        {userType === 'visitor' && (isInHealthCheck || isInCalculators) && (
+          <>
+            {isInHealthCheck && (
+              <button
+                onClick={() => navigate('/visitor/calculators')}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all"
+              >
+                <Calculator size={20} />
+                <span className="font-medium text-sm">Ver Calculadoras</span>
+              </button>
+            )}
+            {isInCalculators && (
+              <button
+                onClick={() => navigate('/visitor/health-check')}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-purple-600 hover:bg-purple-50 transition-all"
+              >
+                <Activity size={20} />
+                <span className="font-medium text-sm">Check Nutricional</span>
+              </button>
+            )}
+            <div className="border-t border-gray-200 my-2"></div>
           </>
         )}
         
