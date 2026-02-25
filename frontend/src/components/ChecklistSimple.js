@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Circle, Loader2, Plus, X } from 'lucide-react';
-import { getChecklistTasks, toggleChecklistTask, createChecklistTask, deleteChecklistTask } from '@/lib/supabase';
+import { CheckCircle2, Circle, Loader2, Plus, X, Edit2, Check } from 'lucide-react';
+import { getChecklistTasks, toggleChecklistTask, createChecklistTask, deleteChecklistTask, updateChecklistTask } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 const ChecklistSimple = ({ patientId, isPatientView = true }) => {
@@ -9,6 +9,8 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
   const [loading, setLoading] = useState(true);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
 
   useEffect(() => {
     loadTasks();
@@ -75,6 +77,36 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
     } catch (error) {
       console.error('Erro ao excluir tarefa:', error);
       toast.error('Erro ao excluir tarefa');
+    }
+  };
+
+  const handleStartEdit = (task) => {
+    setEditingId(task.id);
+    setEditTitle(task.title);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditTitle('');
+  };
+
+  const handleSaveEdit = async (taskId) => {
+    if (!editTitle.trim()) {
+      toast.error('Título não pode ser vazio');
+      return;
+    }
+
+    try {
+      const { data, error } = await updateChecklistTask(taskId, { title: editTitle.trim() });
+      if (error) throw error;
+      
+      setTasks(tasks.map(t => t.id === taskId ? data : t));
+      setEditingId(null);
+      setEditTitle('');
+      toast.success('Tarefa atualizada');
+    } catch (error) {
+      console.error('Erro ao atualizar tarefa:', error);
+      toast.error('Erro ao atualizar tarefa');
     }
   };
 
@@ -146,20 +178,58 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
                   )}
                 </button>
                 
-                <span 
-                  className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-900 font-medium'}`}
-                >
-                  {task.title}
-                </span>
+                {editingId === task.id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="flex-1 px-2 py-1 border border-teal-700 rounded focus:outline-none focus:ring-2 focus:ring-teal-700"
+                      data-testid={`task-edit-input-${task.id}`}
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => handleSaveEdit(task.id)}
+                      className="text-green-600 hover:text-green-700"
+                      data-testid={`task-save-${task.id}`}
+                    >
+                      <Check size={20} />
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="text-gray-500 hover:text-gray-700"
+                      data-testid={`task-cancel-${task.id}`}
+                    >
+                      <X size={20} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span 
+                      className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-900 font-medium'}`}
+                    >
+                      {task.title}
+                    </span>
 
-                {!isPatientView && (
-                  <button
-                    onClick={() => handleDelete(task.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
-                    data-testid={`task-delete-${task.id}`}
-                  >
-                    <X size={20} />
-                  </button>
+                    {!isPatientView && (
+                      <>
+                        <button
+                          onClick={() => handleStartEdit(task)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-teal-600 hover:text-teal-700"
+                          data-testid={`task-edit-${task.id}`}
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(task.id)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
+                          data-testid={`task-delete-${task.id}`}
+                        >
+                          <X size={20} />
+                        </button>
+                      </>
+                    )}
+                  </>
                 )}
               </div>
             ))}
