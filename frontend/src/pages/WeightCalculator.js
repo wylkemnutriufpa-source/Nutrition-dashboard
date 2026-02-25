@@ -68,9 +68,12 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
 
   const handleCalculate = () => {
     const height = parseFloat(formData.height);
+    const weight = parseFloat(formData.weight);
+    const age = parseFloat(formData.age);
     const heightInMeters = height / 100;
-    const imc = parseFloat(formData.weight) / (heightInMeters * heightInMeters);
+    const imc = weight / (heightInMeters * heightInMeters);
     
+    // Cálculo do peso ideal
     let idealWeight;
     if (formData.gender === 'masculino') {
       idealWeight = (height - 100) * 0.9;
@@ -78,6 +81,52 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
       idealWeight = (height - 100) * 0.85;
     }
 
+    // Cálculo TMB (Taxa Metabólica Basal) - Fórmula de Harris-Benedict
+    let tmb;
+    if (formData.gender === 'masculino') {
+      tmb = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+    } else {
+      tmb = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+    }
+
+    // Fator de atividade física para GET (Gasto Energético Total)
+    const activityFactors = {
+      'sedentario': 1.2,
+      'leve': 1.375,
+      'moderado': 1.55,
+      'intenso': 1.725,
+      'muito_intenso': 1.9
+    };
+
+    const activityFactor = activityFactors[formData.activityLevel] || 1.2;
+    const get = tmb * activityFactor;
+
+    // Recomendações calóricas baseadas no objetivo
+    let caloriesRecommendation = {};
+    if (formData.goal === 'perder') {
+      caloriesRecommendation = {
+        type: 'Emagrecimento',
+        calories: Math.round(get - 500), // Déficit de 500 kcal
+        message: 'Para perder peso de forma saudável (0,5-1kg/semana)',
+        tip: 'Déficit calórico moderado + treino = resultados sustentáveis'
+      };
+    } else if (formData.goal === 'manter') {
+      caloriesRecommendation = {
+        type: 'Manutenção',
+        calories: Math.round(get),
+        message: 'Para manter seu peso atual',
+        tip: 'Equilíbrio entre calorias consumidas e gastas'
+      };
+    } else if (formData.goal === 'ganhar') {
+      caloriesRecommendation = {
+        type: 'Ganho de Massa Muscular',
+        calories: Math.round(get + 300), // Superávit de 300 kcal
+        message: 'Para ganhar massa muscular de qualidade',
+        tip: 'Superávit calórico + treino de força + proteínas adequadas'
+      };
+    }
+
+    // Diagnóstico baseado no IMC
     let diagnosis = '';
     if (imc < 18.5) {
       diagnosis = 'Você está abaixo do peso ideal. Recomendamos uma dieta balanceada para ganho de massa muscular.';
@@ -91,10 +140,13 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
 
     setResult({
       idealWeight: idealWeight.toFixed(1),
-      currentWeight: formData.weight,
+      currentWeight: weight,
       imc: imc.toFixed(1),
-      difference: (parseFloat(formData.weight) - idealWeight).toFixed(1),
-      diagnosis
+      difference: (weight - idealWeight).toFixed(1),
+      diagnosis,
+      tmb: Math.round(tmb),
+      get: Math.round(get),
+      caloriesRecommendation
     });
   };
 
