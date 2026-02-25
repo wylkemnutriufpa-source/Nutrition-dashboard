@@ -17,11 +17,10 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, updateAnamnesis,
-  getMealPlans, getChecklistTemplates, createChecklistTemplate, updateChecklistTemplate,
-  deleteChecklistTemplate, getChecklistEntriesForDate, toggleChecklistEntry, getChecklistAdherence,
-  getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage
+  getMealPlans, getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage
 } from '@/lib/supabase';
 import { toast } from 'sonner';
+import ChecklistSimple from '@/components/ChecklistSimple';
 
 // Componente de Aba Resumo
 const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
