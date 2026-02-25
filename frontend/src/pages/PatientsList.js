@@ -71,7 +71,14 @@ const PatientsList = () => {
       };
       
       const { data, error } = await getProfessionalPatients(profile.id, isAdmin, filters);
-      if (error) throw error;
+      
+      if (error) {
+        console.error('❌ Erro ao buscar pacientes:', error);
+        toast.error('Erro ao carregar pacientes');
+        setPatients([]);
+        setLoading(false);
+        return;
+      }
       
       const mappedPatients = (data || []).map(item => ({
         id: item.patient.id,
