@@ -776,7 +776,7 @@ const PatientProfile = () => {
           </TabsContent>
 
           <TabsContent value="checklist">
-            <ChecklistTab patientId={id} professionalId={profile?.id} onUpdate={loadPatientData} />
+            <ChecklistTab patientId={id} />
           </TabsContent>
 
           <TabsContent value="recados">
