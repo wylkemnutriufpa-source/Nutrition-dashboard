@@ -200,7 +200,7 @@ export const getProfessionalPatients = async (professionalId, isAdmin = false, f
       .from('patient_profiles')
       .select(`
         *,
-        patient:patient_id(*)
+        patient:profiles!patient_id(*)
       `);
     
     // Se não for admin, filtra apenas pelos pacientes do profissional
