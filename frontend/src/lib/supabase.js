@@ -281,58 +281,69 @@ export const createPatientByProfessional = async (professionalId, patientData) =
   
   try {
     // 1. Criar profile
-    console.log('📝 Inserindo profile...');
-    const profileResult = await supabase.from('profiles').insert({
-      id: patientId,
-      email: patientData.email,
-      name: patientData.name,
-      phone: patientData.phone || null,
-      role: 'patient',
-      birth_date: patientData.birth_date || null,
-      gender: patientData.gender || null,
-      height: patientData.height || null,
-      current_weight: patientData.current_weight || null,
-      goal_weight: patientData.goal_weight || null,
-      goal: patientData.goal || null,
-      notes: patientData.notes || null,
-      status: 'active'
-    });
+    const { error: profileError, status: profileStatus } = await supabase
+      .from('profiles')
+      .insert({
+        id: patientId,
+        email: patientData.email,
+        name: patientData.name,
+        phone: patientData.phone || null,
+        role: 'patient',
+        status: 'active'
+      });
     
-    console.log('📝 Resultado profile:', profileResult);
-    
-    if (profileResult.error) {
-      console.error('❌ Erro no profile:', profileResult.error.message, profileResult.error.code);
-      return { data: null, error: { message: `Erro ao criar perfil: ${profileResult.error.message}` } };
+    if (profileError || profileStatus !== 201) {
+      console.error('❌ Erro profile');
+      return { data: null, error: { message: 'Erro ao criar perfil no banco' } };
     }
     
-    // 2. Criar vínculo
-    console.log('🔗 Criando vínculo...');
-    const linkResult = await supabase.from('patient_profiles').insert({
-      patient_id: patientId,
-      professional_id: professionalId,
-      status: 'active'
-    });
+    console.log('✅ Profile criado');
     
-    console.log('🔗 Resultado link:', linkResult);
+    // 2. Criar vínculo (capturar erro antes de processar)
+    const linkPromise = supabase
+      .from('patient_profiles')
+      .insert({
+        patient_id: patientId,
+        professional_id: professionalId,
+        status: 'active'
+      });
+    
+    const linkResult = await linkPromise.catch(err => {
+      console.error('❌ Erro capturado:', err);
+      return { error: { message: 'Erro ao criar vínculo' }, status: 0 };
+    });
     
     if (linkResult.error) {
-      console.error('❌ Erro no vínculo:', linkResult.error.message);
-      return { data: null, error: { message: `Erro ao vincular: ${linkResult.error.message}` } };
+      console.error('❌ Erro vínculo');
+      // Deletar profile criado
+      await supabase.from('profiles').delete().eq('id', patientId).catch(() => {});
+      return { data: null, error: { message: 'Erro ao vincular paciente. Tabela patient_profiles pode não existir.' } };
     }
     
-    // 3. Criar anamnese (ignorar erro)
+    console.log('✅ Vínculo criado');
+    
+    // 3. Anamnese (opcional)
     await supabase.from('anamnesis').insert({
       patient_id: patientId,
       professional_id: professionalId,
       status: 'incomplete'
     }).catch(() => {});
     
-    console.log('✅ Paciente criado com sucesso!');
-    return { data: { id: patientId, ...patientData, role: 'patient' }, error: null };
+    console.log('✅ PACIENTE CRIADO COM SUCESSO');
+    return { 
+      data: { 
+        id: patientId, 
+        email: patientData.email,
+        name: patientData.name,
+        role: 'patient',
+        status: 'active'
+      }, 
+      error: null 
+    };
     
   } catch (err) {
     console.error('❌ ERRO FATAL:', err);
-    return { data: null, error: { message: `Erro: ${err.message}` } };
+    return { data: null, error: { message: 'Erro fatal' } };
   }
 };
 
