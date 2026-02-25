@@ -5,6 +5,7 @@ import { BrandingProvider } from '@/contexts/BrandingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 import LoginPage from '@/pages/LoginPage';
+import AdminDashboard from '@/pages/AdminDashboard';
 import ProfessionalDashboard from '@/pages/ProfessionalDashboard';
 import PatientsList from '@/pages/PatientsList';
 import PatientProfile from '@/pages/PatientProfile';
