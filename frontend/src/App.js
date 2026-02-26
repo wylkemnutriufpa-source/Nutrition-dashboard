@@ -123,6 +123,16 @@ function App() {
                   <AdminProjetoEditor />
                 </ProtectedRoute>
               } />
+              <Route path="/professional/agenda" element={
+                <ProtectedRoute allowedTypes={['professional', 'admin']}>
+                  <AgendaPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/professional/financeiro" element={
+                <ProtectedRoute allowedTypes={['professional', 'admin']}>
+                  <FinanceiroPage />
+                </ProtectedRoute>
+              } />
               
               {/* Patient Routes */}
               <Route path="/patient/dashboard" element={
