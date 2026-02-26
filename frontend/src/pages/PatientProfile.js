@@ -785,6 +785,10 @@ const PatientProfile = () => {
           <TabsContent value="recados">
             <RecadosTab patientId={id} professionalId={profile?.id} />
           </TabsContent>
+
+          <TabsContent value="projeto">
+            <ProjetoTab patientId={id} professionalId={profile?.id} patient={patient} />
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
