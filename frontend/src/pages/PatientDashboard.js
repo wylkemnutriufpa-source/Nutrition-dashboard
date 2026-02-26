@@ -36,6 +36,26 @@ const PatientDashboard = () => {
     }
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !user?.id) return;
+    setUploadingPhoto(true);
+    try {
+      const { error } = await uploadProfilePhoto(user.id, file);
+      if (error) {
+        toast.error('Erro ao atualizar foto');
+      } else {
+        toast.success('Foto de perfil atualizada!');
+        loadPatientData();
+      }
+    } catch (err) {
+      toast.error('Erro ao atualizar foto');
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = '';
+    }
+  };
+
   const calculateProgress = () => {
     if (!patientData?.current_weight || !patientData?.goal_weight) return 0;
     const startWeight = patientData.current_weight + 5; // Assumindo que começou 5kg acima
