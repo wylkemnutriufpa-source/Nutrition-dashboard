@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implementar Checklist Diário MVP editável com Supabase. Profissional cria/edita/apaga tarefas no perfil do paciente. Paciente marca/desmarca no dashboard."
+user_problem_statement: "Testar a calculadora de peso para visitantes e verificar se o CTA do Projeto Biquíni Branco aparece ao final do resultado."
 
 backend:
   - task: "API Status endpoint"
