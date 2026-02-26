@@ -879,3 +879,216 @@ export const deleteChecklistTask = async (taskId) => {
   return { error };
 };
 
+
+
+// ==================== PATIENT MENU CONFIG ====================
+
+// Menu padrão para pacientes
+export const DEFAULT_PATIENT_MENU = [
+  { id: 'meal-plan', name: 'Meu Plano', icon: 'Calendar', route: '/patient/meal-plan', visible: true, order: 1 },
+  { id: 'tarefas', name: 'Minhas Tarefas', icon: 'ClipboardList', route: '/patient/tarefas', visible: true, order: 2 },
+  { id: 'feedbacks', name: 'Meus Feedbacks', icon: 'MessageSquare', route: '/patient/feedbacks', visible: true, order: 3 },
+  { id: 'receitas', name: 'Minhas Receitas', icon: 'ChefHat', route: '/patient/receitas', visible: true, order: 4 },
+  { id: 'lista-compras', name: 'Minha Lista de Compras', icon: 'ShoppingCart', route: '/patient/lista-compras', visible: true, order: 5 },
+  { id: 'suplementos', name: 'Suplementos', icon: 'Pill', route: '/patient/suplementos', visible: true, order: 6 },
+  { id: 'dicas', name: 'Dicas', icon: 'Lightbulb', route: '/patient/dicas', visible: true, order: 7 },
+  { id: 'jornada', name: 'Minha Jornada', icon: 'TrendingUp', route: '/patient/jornada', visible: true, order: 8 }
+];
+
+// Buscar configuração do menu do paciente
+export const getPatientMenuConfig = async (patientId) => {
+  try {
+    const { data, error } = await supabase
+      .from('patient_menu_config')
+      .select('*')
+      .eq('patient_id', patientId)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('❌ Erro ao buscar menu config:', error);
+      return { data: { menu_items: DEFAULT_PATIENT_MENU }, error: null };
+    }
+    
+    if (!data) {
+      // Retornar menu padrão se não existir configuração
+      return { data: { menu_items: DEFAULT_PATIENT_MENU }, error: null };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar menu config:', error);
+    return { data: { menu_items: DEFAULT_PATIENT_MENU }, error };
+  }
+};
+
+// Criar ou atualizar configuração do menu
+export const upsertPatientMenuConfig = async (patientId, menuItems, professionalId = null) => {
+  try {
+    const { data, error } = await supabase
+      .from('patient_menu_config')
+      .upsert({
+        patient_id: patientId,
+        professional_id: professionalId,
+        menu_items: menuItems,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'patient_id' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Erro ao salvar menu config:', error);
+      return { data: null, error };
+    }
+    
+    console.log('✅ Menu config salvo:', data);
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao salvar menu config:', error);
+    return { data: null, error };
+  }
+};
+
+// ==================== PATIENT JOURNEY ====================
+
+// Buscar jornada do paciente
+export const getPatientJourney = async (patientId) => {
+  try {
+    const { data, error } = await supabase
+      .from('patient_journey')
+      .select('*')
+      .eq('patient_id', patientId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('❌ Erro ao buscar jornada:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar jornada:', error);
+    return { data: null, error };
+  }
+};
+
+// Criar/atualizar jornada do paciente
+export const upsertPatientJourney = async (patientId, journeyData) => {
+  try {
+    const { data, error } = await supabase
+      .from('patient_journey')
+      .upsert({
+        patient_id: patientId,
+        ...journeyData,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Erro ao salvar jornada:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao salvar jornada:', error);
+    return { data: null, error };
+  }
+};
+
+// Buscar histórico de peso
+export const getWeightHistory = async (patientId) => {
+  try {
+    const { data, error } = await supabase
+      .from('weight_history')
+      .select('*')
+      .eq('patient_id', patientId)
+      .order('recorded_at', { ascending: true });
+    
+    if (error) {
+      console.error('❌ Erro ao buscar histórico de peso:', error);
+      return { data: [], error };
+    }
+    
+    return { data: data || [], error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar histórico de peso:', error);
+    return { data: [], error };
+  }
+};
+
+// Adicionar registro de peso
+export const addWeightRecord = async (patientId, weight, notes = '') => {
+  try {
+    const { data, error } = await supabase
+      .from('weight_history')
+      .insert({
+        patient_id: patientId,
+        weight,
+        notes,
+        recorded_at: new Date().toISOString().split('T')[0]
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Erro ao adicionar peso:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao adicionar peso:', error);
+    return { data: null, error };
+  }
+};
+
+// Buscar fotos de progresso
+export const getProgressPhotos = async (patientId) => {
+  try {
+    const { data, error } = await supabase
+      .from('progress_photos')
+      .select('*')
+      .eq('patient_id', patientId)
+      .order('taken_at', { ascending: true });
+    
+    if (error) {
+      console.error('❌ Erro ao buscar fotos:', error);
+      return { data: [], error };
+    }
+    
+    return { data: data || [], error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar fotos:', error);
+    return { data: [], error };
+  }
+};
+
+// Adicionar foto de progresso
+export const addProgressPhoto = async (patientId, photoUrl, photoType = 'progress', notes = '') => {
+  try {
+    const { data, error } = await supabase
+      .from('progress_photos')
+      .insert({
+        patient_id: patientId,
+        photo_url: photoUrl,
+        photo_type: photoType,
+        notes,
+        taken_at: new Date().toISOString().split('T')[0]
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Erro ao adicionar foto:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao adicionar foto:', error);
+    return { data: null, error };
+  }
+};
