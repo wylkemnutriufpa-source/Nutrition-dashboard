@@ -231,6 +231,11 @@ export const restorePatient = async (patientId) => {
 // ==================== ANAMNESIS ====================
 
 export const getAnamnesis = async (patientId) => {
+  if (!patientId) {
+    console.log('[getAnamnesis] No patientId provided');
+    return { data: null, error: null };
+  }
+  
   const { data, error } = await supabase
     .from('anamnesis')
     .select('*')
