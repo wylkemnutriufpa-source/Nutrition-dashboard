@@ -6,6 +6,17 @@ import { Scale, Droplet, Activity, Sparkles } from 'lucide-react';
 const CalculatorsList = ({ userType = 'visitor' }) => {
   const navigate = useNavigate();
 
+  const projectShowcase = {
+    id: 'projeto',
+    title: 'Projeto Biquíni Branco',
+    description: 'Conheça nosso programa completo de transformação corporal',
+    icon: Sparkles,
+    color: 'from-pink-600 to-purple-600',
+    path: `/${userType}/projeto`,
+    badge: 'TRANSFORMAÇÃO',
+    featured: true
+  };
+
   const healthCheck = {
     id: 'health-check',
     title: 'Check Nutricional Inteligente',
@@ -40,6 +51,51 @@ const CalculatorsList = ({ userType = 'visitor' }) => {
     <Layout title="Ferramentas" userType={userType}>
       <div data-testid="calculators-list" className="max-w-5xl mx-auto">
         <p className="text-gray-600 mb-8">Ferramentas para ajudá-lo em sua jornada de saúde</p>
+        
+        {/* Projeto Biquíni Branco Destacado */}
+        <Card
+          className="mb-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-pink-200 bg-gradient-to-br from-pink-50 via-purple-50 to-white relative overflow-hidden"
+          onClick={() => navigate(projectShowcase.path)}
+        >
+          <div className="absolute top-4 right-4">
+            <span className="px-3 py-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white text-xs font-bold rounded-full flex items-center gap-1">
+              <Sparkles size={12} />
+              {projectShowcase.badge}
+            </span>
+          </div>
+
+          <CardHeader className="pb-4">
+            <div className="flex items-start gap-4">
+              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${projectShowcase.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                <projectShowcase.icon className="text-white" size={40} />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-2xl mb-2">{projectShowcase.title}</CardTitle>
+                <CardDescription className="text-base">{projectShowcase.description}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <button
+              data-testid="projeto-button"
+              className="w-full px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all shadow-md hover:shadow-xl flex items-center justify-center gap-2"
+            >
+              <Sparkles size={20} />
+              Conhecer o Projeto
+            </button>
+            <div className="mt-3 flex items-center gap-4 text-sm text-gray-600">
+              <span className="flex items-center gap-1">
+                👙 Programa completo
+              </span>
+              <span className="flex items-center gap-1">
+                📊 Planos personalizados
+              </span>
+              <span className="flex items-center gap-1">
+                💪 Resultados em 90 dias
+              </span>
+            </div>
+          </CardContent>
+        </Card>
         
         {/* Health Check Destacado */}
         <Card
