@@ -152,7 +152,7 @@ const AgendaPage = () => {
     }
     setSaving(true);
     try {
-      const payload = { ...form, professional_id: professionalId, patient_id: form.patient_id || null };
+      const payload = { ...form, professional_id: professionalId, patient_id: form.patient_id === 'none' ? null : (form.patient_id || null) };
       if (editingAppointment) {
         const { error } = await updateAppointment(editingAppointment.id, payload);
         if (error) throw error;
