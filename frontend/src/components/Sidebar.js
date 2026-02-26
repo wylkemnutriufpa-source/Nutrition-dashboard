@@ -63,6 +63,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/professional/patients', icon: Users, label: 'Pacientes' },
     { to: '/professional/food-database', icon: Database, label: 'Alimentos' },
+    { to: '/professional/projeto-editor', icon: Sparkles, label: 'Projeto Biquíni' },
     { to: '/professional/branding', icon: Palette, label: 'Personalização' },
     { to: '/professional/settings', icon: Settings, label: 'Configurações' }
   ];
