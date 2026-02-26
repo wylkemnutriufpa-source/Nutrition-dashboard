@@ -225,3 +225,226 @@ export const generateWeightReport = (patient, journeyData) => {
 
   doc.save(`peso_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
 };
+
+/**
+ * Gera PDF da Anamnese
+ */
+export const generateAnamnesePDF = (patient, anamnesis, professionalInfo) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.width;
+  let yPosition = 20;
+
+  // Cabeçalho
+  doc.setFontSize(20);
+  doc.setTextColor(15, 118, 110);
+  doc.text('Anamnese Nutricional', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 10;
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 15;
+
+  // Info Profissional
+  if (professionalInfo) {
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Profissional: ${professionalInfo.name}`, 14, yPosition);
+    yPosition += 10;
+  }
+
+  // Info Paciente
+  doc.setFontSize(12);
+  doc.text(`Paciente: ${patient.name}`, 14, yPosition);
+  yPosition += 10;
+
+  if (!anamnesis) {
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Nenhuma anamnese registrada.', 14, yPosition);
+    doc.save(`anamnese_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
+    return;
+  }
+
+  // Objetivo
+  if (anamnesis.objective) {
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Objetivo', 14, yPosition);
+    yPosition += 7;
+    doc.setFontSize(11);
+    const objective = doc.splitTextToSize(anamnesis.objective, pageWidth - 28);
+    doc.text(objective, 14, yPosition);
+    yPosition += objective.length * 5 + 8;
+  }
+
+  // Histórico Clínico
+  if (anamnesis.medical_history) {
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Histórico Clínico', 14, yPosition);
+    yPosition += 7;
+    doc.setFontSize(11);
+    const history = doc.splitTextToSize(anamnesis.medical_history, pageWidth - 28);
+    doc.text(history, 14, yPosition);
+    yPosition += history.length * 5 + 8;
+  }
+
+  // Medicamentos
+  if (anamnesis.medications) {
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    doc.setFontSize(14);
+    doc.text('Medicamentos', 14, yPosition);
+    yPosition += 7;
+    doc.setFontSize(11);
+    const meds = doc.splitTextToSize(anamnesis.medications, pageWidth - 28);
+    doc.text(meds, 14, yPosition);
+    yPosition += meds.length * 5 + 8;
+  }
+
+  // Hábitos Alimentares
+  if (anamnesis.eating_habits) {
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    doc.setFontSize(14);
+    doc.text('Hábitos Alimentares', 14, yPosition);
+    yPosition += 7;
+    doc.setFontSize(11);
+    const habits = doc.splitTextToSize(anamnesis.eating_habits, pageWidth - 28);
+    doc.text(habits, 14, yPosition);
+    yPosition += habits.length * 5 + 8;
+  }
+
+  // Observações
+  if (anamnesis.notes) {
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    doc.setFontSize(14);
+    doc.text('Observações', 14, yPosition);
+    yPosition += 7;
+    doc.setFontSize(11);
+    const notes = doc.splitTextToSize(anamnesis.notes, pageWidth - 28);
+    doc.text(notes, 14, yPosition);
+  }
+
+  // Rodapé
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+  }
+
+  doc.save(`anamnese_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
+};
+
+/**
+ * Gera PDF do Plano Alimentar
+ */
+export const generateMealPlanPDF = (patient, mealPlan, professionalInfo) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.width;
+  let yPosition = 20;
+
+  doc.setFontSize(20);
+  doc.setTextColor(15, 118, 110);
+  doc.text('Plano Alimentar', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 10;
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 15;
+
+  if (professionalInfo) {
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Profissional: ${professionalInfo.name}`, 14, yPosition);
+    yPosition += 10;
+  }
+
+  doc.setFontSize(12);
+  doc.text(`Paciente: ${patient.name}`, 14, yPosition);
+  yPosition += 10;
+
+  if (!mealPlan) {
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Nenhum plano alimentar cadastrado.', 14, yPosition);
+    doc.save(`plano_alimentar_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
+    return;
+  }
+
+  doc.setFontSize(14);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Plano: ${mealPlan.name}`, 14, yPosition);
+  yPosition += 10;
+
+  if (mealPlan.description) {
+    doc.setFontSize(11);
+    const desc = doc.splitTextToSize(mealPlan.description, pageWidth - 28);
+    doc.text(desc, 14, yPosition);
+    yPosition += desc.length * 5 + 10;
+  }
+
+  // Refeições
+  if (mealPlan.meals && Array.isArray(mealPlan.meals)) {
+    mealPlan.meals.forEach((meal, index) => {
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFontSize(13);
+      doc.setTextColor(15, 118, 110);
+      doc.text(meal.name || `Refeição ${index + 1}`, 14, yPosition);
+      yPosition += 7;
+
+      if (meal.time) {
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Horário: ${meal.time}`, 14, yPosition);
+        yPosition += 6;
+      }
+
+      if (meal.foods && Array.isArray(meal.foods)) {
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        meal.foods.forEach(food => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          doc.text(`• ${food.name} - ${food.quantity}`, 18, yPosition);
+          yPosition += 5;
+        });
+      }
+
+      yPosition += 8;
+    });
+  }
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+  }
+
+  doc.save(`plano_alimentar_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
+};
