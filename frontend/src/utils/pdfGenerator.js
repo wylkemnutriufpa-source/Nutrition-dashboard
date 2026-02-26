@@ -180,7 +180,9 @@ export const generatePatientProgressReport = async (patient, journeyData, profes
 
   // ===== SALVAR PDF =====
   const fileName = `relatorio_${patient.name?.replace(/\s+/g, '_') || 'paciente'}_${format(new Date(), 'yyyyMMdd')}.pdf`;
-  doc.save(fileName);
+  
+  // Abrir em nova aba ao invés de download (solução para iframe sandbox)
+  window.open(doc.output('bloburl'), '_blank');
 };
 
 /**
