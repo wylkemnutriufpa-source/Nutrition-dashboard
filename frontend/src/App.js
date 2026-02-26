@@ -17,6 +17,14 @@ import WaterCalculator from '@/pages/WaterCalculator';
 import SettingsPage from '@/pages/SettingsPage';
 import FoodDatabase from '@/pages/FoodDatabase';
 import BrandingSettings from '@/pages/BrandingSettings';
+import MenuConfigPage from '@/pages/MenuConfigPage';
+import PatientRecipes from '@/pages/PatientRecipes';
+import PatientShoppingList from '@/pages/PatientShoppingList';
+import PatientSupplements from '@/pages/PatientSupplements';
+import PatientTips from '@/pages/PatientTips';
+import PatientJourney from '@/pages/PatientJourney';
+import PatientFeedbacks from '@/pages/PatientFeedbacks';
+import VisitorProjectPage from '@/pages/VisitorProjectPage';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
