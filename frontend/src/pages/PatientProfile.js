@@ -613,7 +613,36 @@ const ProjetoTab = ({ patientId, professionalId, patient }) => {
 
   useEffect(() => {
     loadJourney();
+    loadPatientPlan();
   }, [patientId]);
+
+  const loadPatientPlan = async () => {
+    const { data } = await getPatientPlan(patientId);
+    if (data) {
+      setPatientPlan(data);
+      setPlanForm({
+        plan_name: data.plan_name || '',
+        plan_price: data.plan_price ? String(data.plan_price) : '',
+        start_date: data.start_date || '',
+        end_date: data.end_date || '',
+        status: data.status || 'active',
+        payment_status: data.payment_status || 'paid',
+        notes: data.notes || ''
+      });
+    }
+  };
+
+  const handleSavePlan = async () => {
+    setSavingPlan(true);
+    const { error } = await upsertPatientPlan(patientId, {
+      ...planForm,
+      plan_price: planForm.plan_price ? parseFloat(planForm.plan_price) : null,
+      professional_id: professionalId
+    });
+    if (error) { toast.error('Erro ao salvar plano'); }
+    else { toast.success('Plano financeiro salvo!'); loadPatientPlan(); }
+    setSavingPlan(false);
+  };
 
   const loadJourney = async () => {
     try {
