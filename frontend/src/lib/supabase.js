@@ -867,6 +867,11 @@ export const deleteJourneyEntry = async (entryId) => {
 // ==================== PATIENT FEEDBACKS ====================
 
 export const getPatientFeedbacks = async (patientId) => {
+  if (!patientId) {
+    console.log('[getPatientFeedbacks] No patientId provided');
+    return { data: [], error: null };
+  }
+  
   const { data, error } = await supabase
     .from('patient_feedbacks')
     .select('*')
