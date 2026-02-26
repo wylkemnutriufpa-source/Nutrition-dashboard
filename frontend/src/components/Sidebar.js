@@ -157,7 +157,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {/* Separador para admin */}
-        {userType === 'admin' && (
+        {validUserType === 'admin' && (
           <>
             <p className="text-xs font-semibold text-gray-400 uppercase px-4 pt-2 pb-1">Admin</p>
             {adminExtraLinks.map((link) => {
