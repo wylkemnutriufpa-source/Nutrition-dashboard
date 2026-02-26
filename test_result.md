@@ -273,15 +273,18 @@ frontend:
 
   - task: "P0: Fix 406/400 errors in PatientProfile"
     implemented: true
-    working: "NA"
+    working: "BLOCKED"
     file: "frontend/src/lib/supabase.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ P0 FIXED: Changed .single() to .maybeSingle() in 5 critical functions (getAnamnesis, getPatientMealPlan, saveAnamnesisDraft, getPatientStats, getBranding). This prevents 406/400 errors when data doesn't exist. Ready for testing."
+      - working: "BLOCKED"
+        agent: "testing"
+        comment: "❌ CRITICAL P0 BLOCKER - TESTING BLOCKED: Cannot verify P0 fix due to login failures. Professional login (admin@teste.com / 123456) fails with 400 error: 'AuthUnknownError: Failed to execute json on Response: body stream already read'. This is the SAME error mentioned in test_result.md line 366 that was supposedly fixed. Patient login (maria@gmail.com / 123456) also fails - dashboard not loading. LOGIN IS COMPLETELY BROKEN. Cannot access PatientProfile to verify 406/400 fix. Root cause: Supabase Auth returning 400 errors, possibly invalid credentials or auth configuration issue. RECOMMENDATION: Main agent must use WEBSEARCH to find solution for Supabase auth errors."
 
 metadata:
   created_by: "main_agent"
