@@ -9,9 +9,13 @@ const Layout = ({ children, title, showBack = false, userType: propUserType }) =
   const location = useLocation();
   const { profile, user } = useAuth();
 
-  // IMPORTANTE: Usar profile.role como fonte PRIMÁRIA de verdade
-  // O propUserType é apenas um fallback ou para override específico (ex: visitor)
+  // IMPORTANTE: Para visitor, usar propUserType diretamente
+  // Para usuários logados, usar profile.role
   const effectiveUserType = (() => {
+    // Se foi explicitamente passado como 'visitor', usar visitor
+    if (propUserType === 'visitor') {
+      return 'visitor';
+    }
     // Se tem profile logado, usar o role real
     if (profile?.role) {
       return profile.role;
