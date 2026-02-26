@@ -63,6 +63,8 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
   const professionalLinks = [
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/professional/patients', icon: Users, label: 'Pacientes' },
+    { to: '/professional/agenda', icon: CalendarDays, label: 'Agenda' },
+    { to: '/professional/financeiro', icon: DollarSign, label: 'Financeiro' },
     { to: '/professional/food-database', icon: Database, label: 'Alimentos' },
     { to: '/professional/projeto-editor', icon: Sparkles, label: 'Projeto Biquíni' },
     { to: '/professional/branding', icon: Palette, label: 'Personalização' },
