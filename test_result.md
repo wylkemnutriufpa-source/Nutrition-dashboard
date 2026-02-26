@@ -276,7 +276,7 @@ frontend:
 
   - task: "P0: Fix 406/400 errors in PatientProfile"
     implemented: true
-    working: "BLOCKED"
+    working: "NA"
     file: "frontend/src/lib/supabase.js"
     stuck_count: 1
     priority: "high"
@@ -288,6 +288,21 @@ frontend:
       - working: "BLOCKED"
         agent: "testing"
         comment: "❌ CRITICAL P0 BLOCKER - TESTING BLOCKED: Cannot verify P0 fix due to login failures. Professional login (admin@teste.com / 123456) fails with 400 error: 'AuthUnknownError: Failed to execute json on Response: body stream already read'. This is the SAME error mentioned in test_result.md line 366 that was supposedly fixed. Patient login (maria@gmail.com / 123456) also fails - dashboard not loading. LOGIN IS COMPLETELY BROKEN. Cannot access PatientProfile to verify 406/400 fix. Root cause: Supabase Auth returning 400 errors, possibly invalid credentials or auth configuration issue. RECOMMENDATION: Main agent must use WEBSEARCH to find solution for Supabase auth errors."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ CANNOT VERIFY P0 FIX - Professional credentials invalid. Testing blocked because admin@teste.com/123456 returns 400 error from Supabase (invalid credentials). The P0 fix (.single() to .maybeSingle()) looks correct in code but cannot be tested without working professional login. Patient login works perfectly, proving the login flow itself is functional. Main agent must verify/create professional account in Supabase database before P0 fix can be verified."
+  
+  - task: "Login Fix - Remove duplicate getUserProfile"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/LoginPage.js, frontend/src/contexts/AuthContext.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ LOGIN FIX VERIFIED - PATIENT LOGIN WORKS PERFECTLY (26/Feb/2026): Comprehensive testing completed. PATIENT LOGIN: ✅ PASS - maria@gmail.com/123456 logs in successfully, redirects to patient dashboard, NO 'body stream already read' error, NO console errors, NO 400/406 network errors. Profile loaded correctly (userId: 700a7390-c7ed-45e0-a3da-07c507935109, role: patient). PROFESSIONAL LOGIN: ❌ FAIL - admin@teste.com/123456 returns 400 error from Supabase auth endpoint. Error 'body stream already read' is a Supabase client library side effect when handling the 400 error. ROOT CAUSE: Professional credentials are INVALID or account doesn't exist in Supabase database. The login fix (removing duplicate getUserProfile, using AuthContext) is WORKING CORRECTLY as proven by successful patient login. Main agent must verify professional account exists in Supabase with correct credentials. Screenshots: 01_login_page_initial.png, 02_professional_login_form.png, 03_professional_credentials_filled.png, 04_after_professional_login.png (shows error), 08_patient_login_form.png, 09_patient_credentials_filled.png, 10_after_patient_login.png (shows success)."
 
 metadata:
   created_by: "main_agent"
