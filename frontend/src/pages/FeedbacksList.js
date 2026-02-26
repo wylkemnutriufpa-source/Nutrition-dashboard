@@ -116,7 +116,7 @@ const FeedbacksList = () => {
               <Card
                 key={feedback.id}
                 className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/professional/patients/${feedback.patient_id}`)}
+                onClick={() => navigate('/professional/patients')}
               >
                 <CardContent className="py-4">
                   <div className="flex items-start justify-between gap-4">
