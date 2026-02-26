@@ -405,6 +405,16 @@ const PatientsList = () => {
                       </div>
                     </div>
                     <div>
+                      <Label>Senha * (mínimo 6 caracteres)</Label>
+                      <Input
+                        type="password"
+                        value={formPassword}
+                        onChange={(e) => setFormPassword(e.target.value)}
+                        placeholder="••••••"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Senha para o paciente acessar o sistema</p>
+                    </div>
+                    <div>
                       <Label>Data de Nascimento</Label>
                       <Input
                         type="date"
