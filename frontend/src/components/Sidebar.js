@@ -16,14 +16,41 @@ const iconMap = {
   Users, Database, Palette, Shield, UserCog, Activity
 };
 
-const Sidebar = ({ userType, onLogout }) => {
+const Sidebar = ({ userType, onLogout, patientId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { branding } = useBranding();
+  
+  // Estado para menu dinâmico do paciente
+  const [patientMenuItems, setPatientMenuItems] = useState(DEFAULT_PATIENT_MENU);
+  const [menuLoading, setMenuLoading] = useState(userType === 'patient');
 
   // Detectar se está em calculadoras ou health check
   const isInHealthCheck = location.pathname.includes('/health-check');
   const isInCalculators = location.pathname.includes('/calculator');
+
+  // Carregar menu do paciente
+  useEffect(() => {
+    const loadPatientMenu = async () => {
+      if (userType !== 'patient' || !patientId) {
+        setMenuLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await getPatientMenuConfig(patientId);
+        if (data?.menu_items && Array.isArray(data.menu_items)) {
+          setPatientMenuItems(data.menu_items);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar menu do paciente:', error);
+      } finally {
+        setMenuLoading(false);
+      }
+    };
+
+    loadPatientMenu();
+  }, [userType, patientId]);
 
   // Links do Professional (admin também tem acesso)
   const professionalLinks = [
@@ -40,14 +67,22 @@ const Sidebar = ({ userType, onLogout }) => {
     { to: '/admin/professionals', icon: UserCog, label: 'Profissionais' }
   ];
 
-  // Links do Paciente
-  const patientLinks = [
-    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' },
-    { to: '/patient/meal-plan', icon: Calendar, label: 'Meu Plano' },
-    { to: '/patient/checklist', icon: ClipboardList, label: 'Tarefas' },
-    { to: '/patient/messages', icon: MessageSquare, label: 'Recados' },
-    { to: '/patient/calculators', icon: Calculator, label: 'Calculadoras' }
+  // Links fixos do Paciente (Dashboard sempre visível)
+  const patientFixedLinks = [
+    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' }
   ];
+
+  // Links dinâmicos do Paciente (configurados pelo profissional)
+  const getPatientDynamicLinks = () => {
+    return patientMenuItems
+      .filter(item => item.visible)
+      .sort((a, b) => a.order - b.order)
+      .map(item => ({
+        to: item.route,
+        icon: iconMap[item.icon] || Home,
+        label: item.name
+      }));
+  };
 
   // Links do Visitante
   const visitorLinks = [
