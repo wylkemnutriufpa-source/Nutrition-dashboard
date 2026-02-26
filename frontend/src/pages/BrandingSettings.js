@@ -20,7 +20,16 @@ const BrandingSettings = () => {
     logo_url: '',
     primary_color: DEFAULT_BRANDING.primary_color,
     secondary_color: DEFAULT_BRANDING.secondary_color,
-    accent_color: DEFAULT_BRANDING.accent_color
+    accent_color: DEFAULT_BRANDING.accent_color,
+    // Tipografia
+    font_family: DEFAULT_BRANDING.font_family,
+    font_size_base: DEFAULT_BRANDING.font_size_base,
+    font_size_heading: DEFAULT_BRANDING.font_size_heading,
+    font_size_subheading: DEFAULT_BRANDING.font_size_subheading,
+    font_size_body: DEFAULT_BRANDING.font_size_body,
+    font_size_small: DEFAULT_BRANDING.font_size_small,
+    badge_size: DEFAULT_BRANDING.badge_size,
+    button_size: DEFAULT_BRANDING.button_size
   });
 
   useEffect(() => {
@@ -34,7 +43,15 @@ const BrandingSettings = () => {
         logo_url: branding.logo_url || '',
         primary_color: branding.primary_color || DEFAULT_BRANDING.primary_color,
         secondary_color: branding.secondary_color || DEFAULT_BRANDING.secondary_color,
-        accent_color: branding.accent_color || DEFAULT_BRANDING.accent_color
+        accent_color: branding.accent_color || DEFAULT_BRANDING.accent_color,
+        font_family: branding.font_family || DEFAULT_BRANDING.font_family,
+        font_size_base: branding.font_size_base || DEFAULT_BRANDING.font_size_base,
+        font_size_heading: branding.font_size_heading || DEFAULT_BRANDING.font_size_heading,
+        font_size_subheading: branding.font_size_subheading || DEFAULT_BRANDING.font_size_subheading,
+        font_size_body: branding.font_size_body || DEFAULT_BRANDING.font_size_body,
+        font_size_small: branding.font_size_small || DEFAULT_BRANDING.font_size_small,
+        badge_size: branding.badge_size || DEFAULT_BRANDING.badge_size,
+        button_size: branding.button_size || DEFAULT_BRANDING.button_size
       });
     }
   }, [branding]);
