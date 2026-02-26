@@ -270,6 +270,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ RE-TESTED (26/Feb): Weight Calculator + CTA fully functional. Test with altura=160cm, peso=85kg, idade=35, sexo=Feminino, objetivo=perder peso, atividade=moderada. Results display correctly: Peso Ideal: 51.0kg, IMC: 33.2, Diferença: +34.0kg, TMB: 1578 kcal, GET: 2445 kcal, Recomendação: 1945 calorias/dia para emagrecimento. CTA 'PROJETO BIQUÍNI BRANCO' appears at bottom with all elements: Badge ✅, Title 'Sua saúde merece cuidado profissional' ✅, Benefits (👙📊💪) ✅, Button 'Conhecer o Projeto' ✅, WhatsApp button 'Quero cuidar da minha saúde' ✅. CTA correctly displays 'obesidade' category styling (purple/pink gradient, Shield icon). Screenshots: calc_step1_filled.png, calc_step2_filled.png, calc_results_top.png, calc_results_bottom.png, cta_projeto_biquini_branco.png"
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED AGAIN (26/Feb/2026 P0 Test): Weight Calculator continues working perfectly. Visitor flow tested: (1) Clicked Visitor button → (2) Opened Weight Calculator → (3) Step 1: altura=165cm, peso=85kg, idade=35, Feminino → (4) Step 2: Acima do peso, Perder peso, Atividade moderada → (5) Results: Peso Ideal: 55.3kg, IMC: 31.2, Diferença: +29.8kg, TMB: 1593 kcal, GET: 2469 kcal, Recomendação: 1969 calorias/dia. CTA 'PROJETO BIQUÍNI BRANCO' visible with badge, shield icon, title, benefits, and buttons. All functionality confirmed working. Screenshots: final_calc_page.png, final_calc_step1_filled.png, final_calc_step2.png, final_calc_step2_filled.png, final_calc_results_top.png, final_calc_cta.png"
 
   - task: "P0: Fix 406/400 errors in PatientProfile"
     implemented: true
