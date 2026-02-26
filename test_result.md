@@ -268,6 +268,18 @@ frontend:
         agent: "testing"
         comment: "✅ RE-TESTED (26/Feb): Weight Calculator + CTA fully functional. Test with altura=160cm, peso=85kg, idade=35, sexo=Feminino, objetivo=perder peso, atividade=moderada. Results display correctly: Peso Ideal: 51.0kg, IMC: 33.2, Diferença: +34.0kg, TMB: 1578 kcal, GET: 2445 kcal, Recomendação: 1945 calorias/dia para emagrecimento. CTA 'PROJETO BIQUÍNI BRANCO' appears at bottom with all elements: Badge ✅, Title 'Sua saúde merece cuidado profissional' ✅, Benefits (👙📊💪) ✅, Button 'Conhecer o Projeto' ✅, WhatsApp button 'Quero cuidar da minha saúde' ✅. CTA correctly displays 'obesidade' category styling (purple/pink gradient, Shield icon). Screenshots: calc_step1_filled.png, calc_step2_filled.png, calc_results_top.png, calc_results_bottom.png, cta_projeto_biquini_branco.png"
 
+  - task: "P0: Fix 406/400 errors in PatientProfile"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/lib/supabase.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ P0 FIXED: Changed .single() to .maybeSingle() in 5 critical functions (getAnamnesis, getPatientMealPlan, saveAnamnesisDraft, getPatientStats, getBranding). This prevents 406/400 errors when data doesn't exist. Ready for testing."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
