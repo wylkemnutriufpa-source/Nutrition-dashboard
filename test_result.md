@@ -331,14 +331,14 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "PatientsList com CRUD real"
-    - "MealPlanEditor com persistência Supabase"
-    - "ProfessionalDashboard com dados reais"
+    - "Menu Dinâmico Meu Projeto"
+    - "Componente ProjectCTA"
+    - "Página VisitorProjectPage"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -348,3 +348,5 @@ agent_communication:
     message: "Implementada migração completa de mock para Supabase. Arquivos alterados: supabase.js, PatientsList.js, ProfessionalDashboard.js, PatientProfile.js, MealPlanEditor.js, PatientDashboard.js. Schema SQL completo criado em supabase_schema_complete.sql"
   - agent: "testing"
     message: "✅ Backend API testing completed successfully. All 3 endpoints (GET /api/, POST /api/status, GET /api/status) working perfectly. Created comprehensive backend_test.py file for API testing. Backend service stable and properly integrated with MongoDB. No issues found - backend is ready for production use."
+  - agent: "main"
+    message: "Implementadas Prioridade 1 e 2: Menu Meu Projeto dinâmico com 10 itens configuráveis (visibilidade, reordenação, renomear). Criada página MenuConfigPage para profissional. Criado componente ProjectCTA reutilizável com textos adaptáveis por categoria IMC. Criada página /visitor/projeto. Novas páginas do paciente: Receitas, Lista de Compras, Suplementos, Dicas, Minha Jornada, Feedbacks. Schema SQL criado em supabase_menu_config.sql"
