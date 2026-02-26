@@ -1125,3 +1125,126 @@ export const addProgressPhoto = async (patientId, photoUrl, photoType = 'progres
     return { data: null, error };
   }
 };
+
+
+// ==================== AGENDA DE CONSULTAS ====================
+
+export const getAppointments = async (professionalId) => {
+  const { data, error } = await supabase
+    .from('appointments')
+    .select('*, patient:profiles!patient_id(id, name, email, phone)')
+    .eq('professional_id', professionalId)
+    .order('date', { ascending: true })
+    .order('time', { ascending: true });
+  return { data: data || [], error };
+};
+
+export const getPatientAppointments = async (patientId) => {
+  const { data, error } = await supabase
+    .from('appointments')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('date', { ascending: true });
+  return { data: data || [], error };
+};
+
+export const createAppointment = async (appointmentData) => {
+  const { data, error } = await supabase
+    .from('appointments')
+    .insert(appointmentData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateAppointment = async (id, updates) => {
+  const { data, error } = await supabase
+    .from('appointments')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteAppointment = async (id) => {
+  const { error } = await supabase.from('appointments').delete().eq('id', id);
+  return { error };
+};
+
+// ==================== GESTÃO FINANCEIRA ====================
+
+export const getFinancialRecords = async (professionalId, year = null) => {
+  let query = supabase
+    .from('financial_records')
+    .select('*, patient:profiles!patient_id(id, name)')
+    .eq('professional_id', professionalId)
+    .order('date', { ascending: false });
+  if (year) {
+    query = query.gte('date', `${year}-01-01`).lte('date', `${year}-12-31`);
+  }
+  const { data, error } = await query;
+  return { data: data || [], error };
+};
+
+export const createFinancialRecord = async (record) => {
+  const { data, error } = await supabase
+    .from('financial_records')
+    .insert(record)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateFinancialRecord = async (id, updates) => {
+  const { data, error } = await supabase
+    .from('financial_records')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteFinancialRecord = async (id) => {
+  const { error } = await supabase.from('financial_records').delete().eq('id', id);
+  return { error };
+};
+
+// ==================== PLANO FINANCEIRO DO PACIENTE ====================
+
+export const getPatientPlan = async (patientId) => {
+  const { data, error } = await supabase
+    .from('patient_plans')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { data, error };
+};
+
+export const upsertPatientPlan = async (patientId, planData) => {
+  const { data: existing } = await supabase
+    .from('patient_plans')
+    .select('id')
+    .eq('patient_id', patientId)
+    .maybeSingle();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('patient_plans')
+      .update({ ...planData, updated_at: new Date().toISOString() })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    return { data, error };
+  } else {
+    const { data, error } = await supabase
+      .from('patient_plans')
+      .insert({ patient_id: patientId, ...planData })
+      .select()
+      .single();
+    return { data, error };
+  }
+};
