@@ -134,7 +134,7 @@ const AgendaPage = () => {
   const openEditModal = (appt) => {
     setEditingAppointment(appt);
     setForm({
-      patient_id: appt.patient_id || '',
+      patient_id: appt.patient_id || 'none',
       title: appt.title || '',
       date: appt.date || '',
       time: appt.time || '',
