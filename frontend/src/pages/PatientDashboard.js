@@ -100,6 +100,57 @@ const PatientDashboard = () => {
   return (
     <Layout title={`Olá, ${patientName.split(' ')[0]}!`} userType="patient">
       <div data-testid="patient-dashboard" className="space-y-6">
+        
+        {/* Foto de Perfil */}
+        <Card className="border-0 bg-gradient-to-r from-teal-50 to-emerald-50 shadow-sm">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-shrink-0">
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-teal-600 flex items-center justify-center ring-2 ring-teal-300">
+                  {patientData?.photo_url ? (
+                    <img
+                      src={patientData.photo_url}
+                      alt={patientName}
+                      className="w-full h-full object-cover"
+                      data-testid="patient-profile-photo"
+                    />
+                  ) : (
+                    <span className="text-white font-bold text-2xl">
+                      {patientName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <label
+                  htmlFor="profile-photo-upload"
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-teal-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-teal-700 transition-colors shadow-md"
+                  title="Alterar foto de perfil"
+                >
+                  {uploadingPhoto ? (
+                    <Loader2 size={12} className="text-white animate-spin" />
+                  ) : (
+                    <Camera size={12} className="text-white" />
+                  )}
+                  <input
+                    id="profile-photo-upload"
+                    data-testid="profile-photo-input"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                    disabled={uploadingPhoto}
+                  />
+                </label>
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">{patientName}</h3>
+                <p className="text-sm text-gray-500">
+                  {uploadingPhoto ? 'Atualizando foto...' : 'Clique na câmera para alterar sua foto'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
