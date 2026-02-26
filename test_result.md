@@ -312,8 +312,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Weight Calculator for Visitors"
-  stuck_tasks: []
+    - "Login Fix - Remove duplicate getUserProfile"
+    - "P0: Fix 406/400 errors in PatientProfile"
+  stuck_tasks:
+    - "P0: Fix 406/400 errors in PatientProfile"
   test_all: false
   test_priority: "high_first"
 
