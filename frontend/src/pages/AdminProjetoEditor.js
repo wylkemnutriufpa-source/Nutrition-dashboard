@@ -555,9 +555,27 @@ const AdminProjetoEditor = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Verdades/Mitos</CardTitle>
-                <CardDescription>Pontos que aparecem com checkmarks</CardDescription>
+                <CardDescription>Edite o título, descrição e itens desta seção</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 p-3 bg-gray-50 rounded-lg border">
+                  <div>
+                    <Label className="text-xs text-gray-500 uppercase">Título da Seção</Label>
+                    <Input
+                      value={projectData.sectionTitles?.myths || ''}
+                      onChange={(e) => updateSectionTitle('myths', e.target.value)}
+                      placeholder="Ex: ⚠️ VERDADES QUE NINGUÉM TE CONTA"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500 uppercase">Descrição (aparece abaixo do título)</Label>
+                    <Input
+                      value={projectData.sectionDescriptions?.myths || ''}
+                      onChange={(e) => updateSectionDescription('myths', e.target.value)}
+                      placeholder="Texto complementar opcional..."
+                    />
+                  </div>
+                </div>
                 {projectData.myths.map((myth, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
@@ -590,9 +608,37 @@ const AdminProjetoEditor = () => {
             <Card>
               <CardHeader>
                 <CardTitle>O que você vai ter</CardTitle>
-                <CardDescription>Benefícios do programa</CardDescription>
+                <CardDescription>Edite o título, descrição e benefícios do programa</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 p-3 bg-gray-50 rounded-lg border">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs text-gray-500 uppercase">Título da Seção</Label>
+                      <Input
+                        value={projectData.sectionTitles?.benefits || ''}
+                        onChange={(e) => updateSectionTitle('benefits', e.target.value)}
+                        placeholder="Ex: ✅ O QUE VOCÊ VAI TER"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500 uppercase">Subtítulo</Label>
+                      <Input
+                        value={projectData.sectionTitles?.benefitsSubtitle || ''}
+                        onChange={(e) => updateSectionTitle('benefitsSubtitle', e.target.value)}
+                        placeholder="Subtítulo da seção..."
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500 uppercase">Descrição</Label>
+                    <Input
+                      value={projectData.sectionDescriptions?.benefits || ''}
+                      onChange={(e) => updateSectionDescription('benefits', e.target.value)}
+                      placeholder="Descrição complementar opcional..."
+                    />
+                  </div>
+                </div>
                 {projectData.benefits.map((benefit, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
@@ -625,8 +671,19 @@ const AdminProjetoEditor = () => {
             <Card>
               <CardHeader>
                 <CardTitle>A cada 15 dias</CardTitle>
+                <CardDescription>Tarefas quinzenais do programa</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
+                <div className="p-3 bg-gray-50 rounded-lg border">
+                  <div>
+                    <Label className="text-xs text-gray-500 uppercase">Título da Seção</Label>
+                    <Input
+                      value={projectData.sectionTitles?.biweekly || ''}
+                      onChange={(e) => updateSectionTitle('biweekly', e.target.value)}
+                      placeholder="Ex: A cada 15 dias:"
+                    />
+                  </div>
+                </div>
                 {projectData.biweeklyTasks.map((task, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
@@ -659,8 +716,37 @@ const AdminProjetoEditor = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Grupos de Suporte</CardTitle>
+                <CardDescription>Edite o título e os itens dos grupos de suporte</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 p-3 bg-gray-50 rounded-lg border">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs text-gray-500 uppercase">Título da Seção</Label>
+                      <Input
+                        value={projectData.sectionTitles?.support || ''}
+                        onChange={(e) => updateSectionTitle('support', e.target.value)}
+                        placeholder="Ex: 👥 SUPORTE EXCLUSIVO..."
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500 uppercase">Subtítulo</Label>
+                      <Input
+                        value={projectData.sectionTitles?.supportSubtitle || ''}
+                        onChange={(e) => updateSectionTitle('supportSubtitle', e.target.value)}
+                        placeholder="Subtítulo..."
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500 uppercase">Descrição</Label>
+                    <Input
+                      value={projectData.sectionDescriptions?.support || ''}
+                      onChange={(e) => updateSectionDescription('support', e.target.value)}
+                      placeholder="Descrição complementar opcional..."
+                    />
+                  </div>
+                </div>
                 {projectData.supportGroups.map((group, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
