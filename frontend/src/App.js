@@ -134,6 +134,36 @@ function App() {
                   <PatientDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/patient/feedback" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientFeedbacks />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/recipes" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientRecipes />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/shopping-list" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientShoppingList />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/supplements" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientSupplements />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/tips" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientTips />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/journey" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientJourney />
+                </ProtectedRoute>
+              } />
               <Route path="/patient/calculators" element={
                 <ProtectedRoute allowedTypes={['patient']}>
                   <CalculatorsList userType="patient" />
