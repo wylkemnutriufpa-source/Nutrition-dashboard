@@ -133,7 +133,7 @@ const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
 };
 
 // Componente de Aba Anamnese
-const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate }) => {
+const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate, patient, professionalInfo }) => {
   const [data, setData] = useState(anamnesis || {});
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
