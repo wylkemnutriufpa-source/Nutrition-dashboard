@@ -151,11 +151,11 @@ const LoginPage = () => {
                 <div className="mx-auto w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mb-4">
                   <Stethoscope className="text-teal-700" size={32} />
                 </div>
-                <CardTitle className="text-xl">Profissional</CardTitle>
-                <CardDescription>Nutricionistas e profissionais de saúde</CardDescription>
+                <CardTitle className="text-xl" style={{ fontSize: 'var(--font-size-subheading, 1.5rem)' }}>Profissional</CardTitle>
+                <CardDescription style={{ fontSize: 'var(--font-size-body, 1rem)' }}>Nutricionistas e profissionais de saúde</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button data-testid="professional-login-button" className="w-full bg-teal-700 hover:bg-teal-800" size="lg">
+                <Button data-testid="professional-login-button" className="w-full bg-teal-700 hover:bg-teal-800" size="lg" style={{ fontSize: 'var(--button-size, 1rem)' }}>
                   Entrar como Profissional
                 </Button>
               </CardContent>
@@ -171,11 +171,11 @@ const LoginPage = () => {
                 <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
                   <User className="text-green-700" size={32} />
                 </div>
-                <CardTitle className="text-xl">Paciente</CardTitle>
-                <CardDescription>Acompanhe seu plano alimentar</CardDescription>
+                <CardTitle className="text-xl" style={{ fontSize: 'var(--font-size-subheading, 1.5rem)' }}>Paciente</CardTitle>
+                <CardDescription style={{ fontSize: 'var(--font-size-body, 1rem)' }}>Acompanhe seu plano alimentar</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button data-testid="patient-login-button" className="w-full bg-green-600 hover:bg-green-700" size="lg">
+                <Button data-testid="patient-login-button" className="w-full bg-green-600 hover:bg-green-700" size="lg" style={{ fontSize: 'var(--button-size, 1rem)' }}>
                   Entrar como Paciente
                 </Button>
               </CardContent>
@@ -191,11 +191,11 @@ const LoginPage = () => {
                 <div className="mx-auto w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
                   <Eye className="text-blue-700" size={32} />
                 </div>
-                <CardTitle className="text-xl">Visitante</CardTitle>
-                <CardDescription>Check nutricional + calculadoras</CardDescription>
+                <CardTitle className="text-xl" style={{ fontSize: 'var(--font-size-subheading, 1.5rem)' }}>Visitante</CardTitle>
+                <CardDescription style={{ fontSize: 'var(--font-size-body, 1rem)' }}>Check nutricional + calculadoras</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button data-testid="visitor-login-button" className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
+                <Button data-testid="visitor-login-button" className="w-full bg-blue-600 hover:bg-blue-700" size="lg" style={{ fontSize: 'var(--button-size, 1rem)' }}>
                   Acessar Ferramentas
                 </Button>
               </CardContent>
