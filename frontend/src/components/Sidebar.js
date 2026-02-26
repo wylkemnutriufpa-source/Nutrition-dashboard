@@ -2,7 +2,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, Users, Calendar, Calculator, FileText, Settings, LogOut, 
   Database, Palette, Shield, ClipboardList, MessageSquare, Stethoscope,
-  UserCog, Activity, ShoppingCart, ChefHat, Pill, Lightbulb, TrendingUp
+  UserCog, Activity, ShoppingCart, ChefHat, Pill, Lightbulb, TrendingUp,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -13,7 +14,7 @@ import { getPatientMenuConfig, DEFAULT_PATIENT_MENU } from '@/lib/supabase';
 const iconMap = {
   Home, Calendar, ClipboardList, MessageSquare, ShoppingCart,
   ChefHat, Pill, Lightbulb, TrendingUp, Calculator, Settings,
-  Users, Database, Palette, Shield, UserCog, Activity
+  Users, Database, Palette, Shield, UserCog, Activity, Sparkles
 };
 
 const Sidebar = ({ userType, onLogout, patientId }) => {
