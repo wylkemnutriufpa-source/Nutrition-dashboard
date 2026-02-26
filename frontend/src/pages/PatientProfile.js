@@ -19,11 +19,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { 
   getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, updateAnamnesis,
   getMealPlans, getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage,
-  getChecklistAdherence, upsertPatientJourney, getPatientJourney, getPatientPlan, upsertPatientPlan
+  getChecklistAdherence, upsertPatientJourney, getPatientJourney, getPatientPlan, upsertPatientPlan,
+  getCurrentUser
 } from '@/lib/supabase';
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
 import MenuConfigEditor from '@/components/MenuConfigEditor';
+import { generatePatientProgressReport } from '@/utils/pdfGenerator';
 
 // Componente de Aba Resumo
 const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
