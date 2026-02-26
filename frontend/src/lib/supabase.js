@@ -826,6 +826,11 @@ export const deleteSupplement = async (supplementId) => {
 // ==================== PATIENT JOURNEY ====================
 
 export const getPatientJourney = async (patientId, limit = 50) => {
+  if (!patientId) {
+    console.log('[getPatientJourney] No patientId provided');
+    return { data: [], error: null };
+  }
+  
   const { data, error } = await supabase
     .from('patient_journey')
     .select('*, meal_plan:meal_plans(id, name)')
