@@ -157,7 +157,7 @@ const FeedbacksList = () => {
                       )}
                     </div>
 
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" disabled>
                       <ArrowRight size={20} />
                     </Button>
                   </div>
