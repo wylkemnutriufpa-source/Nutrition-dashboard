@@ -289,7 +289,8 @@ const PatientFeedbacks = () => {
                 <CardContent className="pt-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      {getMoodIcon(feedback.mood)}
+                      <MessageCircle className="h-5 w-5 text-purple-500" />
+                      <span className="text-sm font-medium text-gray-700">{feedback.title}</span>
                       <span className="text-sm text-gray-500">
                         {new Date(feedback.created_at).toLocaleDateString('pt-BR', {
                           day: '2-digit',
@@ -300,17 +301,20 @@ const PatientFeedbacks = () => {
                         })}
                       </span>
                     </div>
-                    {getStatusBadge(feedback.status)}
+                    {feedback.is_read ? (
+                      <span className="flex items-center gap-1 text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                        <CheckCircle className="h-3 w-3" />
+                        Visualizado
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                        <Clock className="h-3 w-3" />
+                        Aguardando
+                      </span>
+                    )}
                   </div>
                   
-                  <p className="text-gray-700 mb-3">{feedback.message}</p>
-                  
-                  {feedback.reply && (
-                    <div className="bg-teal-50 border-l-4 border-teal-500 p-3 rounded-r-lg mt-3">
-                      <p className="text-sm font-medium text-teal-700 mb-1">Resposta do Nutricionista:</p>
-                      <p className="text-gray-700">{feedback.reply}</p>
-                    </div>
-                  )}
+                  <p className="text-gray-700 mb-3">{feedback.content}</p>
                 </CardContent>
               </Card>
             ))
