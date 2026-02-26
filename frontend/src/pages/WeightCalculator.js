@@ -7,52 +7,6 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import ProjectCTA from '@/components/ProjectCTA';
 
-const CTACard = () => (
-  <Card className="mt-8 border-2 border-teal-700 bg-gradient-to-br from-teal-50 to-green-50">
-    <CardHeader className="text-center">
-      <CardTitle className="text-2xl">Quer um plano alimentar personalizado?</CardTitle>
-      <CardDescription className="text-base mt-2">
-        Com base nas suas respostas, você pode ter um plano totalmente personalizado com acompanhamento profissional.
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <a
-        href="https://wa.me/5591980124814?text=Olá Dr. Wylkem, acabei de usar a calculadora no FitJourney e quero um plano personalizado."
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <Button className="w-full bg-green-600 hover:bg-green-700 text-white" size="lg">
-          <MessageCircle className="mr-2" size={20} />
-          Quero um Plano Alimentar Personalizado
-        </Button>
-      </a>
-      
-      <a
-        href="https://www.instagram.com/dr_wylkem_raiol/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" size="lg" variant="outline">
-          <Instagram className="mr-2" size={20} />
-          Falar com o Nutricionista
-        </Button>
-      </a>
-
-      <a
-        href="mailto:wylkem.nutri.ufpa@gmail.com"
-        className="block"
-      >
-        <Button className="w-full" size="lg" variant="outline">
-          <Mail className="mr-2" size={20} />
-          Enviar E-mail
-        </Button>
-      </a>
-    </CardContent>
-  </Card>
-);
-
 const WeightCalculator = ({ userType = 'visitor' }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
