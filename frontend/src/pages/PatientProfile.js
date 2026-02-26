@@ -190,6 +190,21 @@ const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate, patient, 
           {hasChanges && <span className="text-xs text-amber-600">Alterações não salvas</span>}
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              try {
+                generateAnamnesePDF(patient, anamnesis, professionalInfo);
+                toast.success('PDF gerado com sucesso!');
+              } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                toast.error('Erro ao gerar PDF');
+              }
+            }}
+          >
+            <Download size={16} className="mr-2" /> Exportar PDF
+          </Button>
           <Button variant="outline" onClick={() => handleSave(false)} disabled={saving || !hasChanges}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Salvar Rascunho'}
           </Button>
