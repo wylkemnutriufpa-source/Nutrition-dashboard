@@ -275,49 +275,99 @@ export const createPatientByProfessional = async (professionalId, patientData) =
   const patientId = crypto.randomUUID();
   
   try {
-    // 1. Criar profile
-    const profileResult = await supabase
-      .from('profiles')
-      .insert({
-        id: patientId,
+    // 1. Criar usuário no Supabase Auth (com senha)
+    if (patientData.password) {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: patientData.email,
-        name: patientData.name,
-        phone: patientData.phone || null,
-        role: 'patient',
-        status: 'active'
+        password: patientData.password,
+        options: {
+          data: {
+            name: patientData.name,
+            role: 'patient'
+          }
+        }
       });
-    
-    // Status 409 = Conflict (email duplicado)
-    if (profileResult.status === 409) {
-      console.error('❌ Email já existe');
-      return { data: null, error: { message: 'Este email já está cadastrado no sistema' } };
+
+      if (authError) {
+        console.error('❌ Erro auth:', authError);
+        return { data: null, error: { message: authError.message || 'Erro ao criar conta' } };
+      }
+
+      console.log('✅ Auth criado:', authData.user?.id);
+      
+      // Usar o ID gerado pelo Auth
+      const authUserId = authData.user?.id;
+      
+      if (authUserId) {
+        // 2. Atualizar/criar profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: authUserId,
+            email: patientData.email,
+            name: patientData.name,
+            phone: patientData.phone || null,
+            role: 'patient',
+            status: 'active'
+          });
+        
+        if (profileError) {
+          console.error('❌ Erro profile:', profileError);
+          return { data: null, error: { message: 'Erro ao criar perfil' } };
+        }
+        
+        console.log('✅ Profile criado/atualizado');
+        
+        // 3. Criar vínculo
+        try {
+          await supabase
+            .from('patient_profiles')
+            .insert({
+              patient_id: authUserId,
+              professional_id: professionalId,
+              status: 'active'
+            });
+          console.log('✅ Vínculo criado');
+        } catch (linkErr) {
+          console.warn('⚠️ Vínculo não criado');
+        }
+        
+        // 4. Anamnese (opcional)
+        try {
+          await supabase.from('anamnesis').insert({
+            patient_id: authUserId,
+            professional_id: professionalId,
+            birth_date: patientData.birth_date,
+            gender: patientData.gender,
+            height: patientData.height,
+            current_weight: patientData.current_weight,
+            goal_weight: patientData.goal_weight,
+            goal: patientData.goal,
+            notes: patientData.notes
+          });
+          console.log('✅ Anamnese criada');
+        } catch (anamErr) {
+          console.warn('⚠️ Anamnese não criada');
+        }
+        
+        return { 
+          data: { 
+            id: authUserId, 
+            email: patientData.email, 
+            name: patientData.name 
+          }, 
+          error: null 
+        };
+      }
     }
     
-    if (profileResult.error || profileResult.status !== 201) {
-      console.error('❌ Erro profile');
-      return { data: null, error: { message: 'Erro ao criar perfil. Verifique os dados.' } };
-    }
+    return { data: null, error: { message: 'Senha é obrigatória' } };
     
-    console.log('✅ Profile criado');
-    
-    // 2. Criar vínculo (se tabela existir)
-    try {
-      await supabase
-        .from('patient_profiles')
-        .insert({
-          patient_id: patientId,
-          professional_id: professionalId,
-          status: 'active'
-        });
-      console.log('✅ Vínculo criado');
-    } catch (linkErr) {
-      console.warn('⚠️ Vínculo não criado (tabela pode não existir)');
-      // Não é erro crítico, continua
-    }
-    
-    // 3. Anamnese (opcional)
-    try {
-      await supabase.from('anamnesis').insert({
+  } catch (error) {
+    console.error('❌ Erro geral:', error);
+    return { data: null, error: { message: error.message || 'Erro ao criar paciente' } };
+  }
+};
         patient_id: patientId,
         professional_id: professionalId,
         status: 'incomplete'
