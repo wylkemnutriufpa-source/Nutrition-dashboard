@@ -201,6 +201,11 @@ function App() {
                   <WaterCalculator userType="visitor" />
                 </ProtectedRoute>
               } />
+              <Route path="/visitor/projeto" element={
+                <ProtectedRoute allowedTypes={['visitor']}>
+                  <VisitorProjectPage />
+                </ProtectedRoute>
+              } />
               
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
