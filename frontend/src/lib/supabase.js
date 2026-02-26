@@ -486,6 +486,11 @@ export const getMealPlan = async (planId) => {
 };
 
 export const getPatientMealPlan = async (patientId, professionalId = null) => {
+  if (!patientId) {
+    console.log('[getPatientMealPlan] No patientId provided');
+    return { data: null, error: null };
+  }
+  
   let query = supabase
     .from('meal_plans')
     .select('*')
