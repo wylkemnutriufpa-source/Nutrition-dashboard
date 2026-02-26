@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Testar a calculadora de peso para visitantes e verificar se o CTA do Projeto Biquíni Branco aparece ao final do resultado."
+user_problem_statement: "Implementar novas funcionalidades focadas em produto e conversão: 1) Menu lateral do paciente 'Meu Projeto' dinâmico e editável pelo profissional, 2) CTA automático ao final de testes/calculadoras para o Projeto Biquíni Branco"
 
 backend:
   - task: "API Status endpoint"
