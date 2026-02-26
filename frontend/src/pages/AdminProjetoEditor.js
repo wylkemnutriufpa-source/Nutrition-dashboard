@@ -206,6 +206,13 @@ const AdminProjetoEditor = () => {
     }));
   };
 
+  const updateSectionDescription = (key, value) => {
+    setProjectData(prev => ({
+      ...prev,
+      sectionDescriptions: { ...(prev.sectionDescriptions || {}), [key]: value }
+    }));
+  };
+
   const updateArrayItem = (arrayName, index, value) => {
     setProjectData(prev => ({
       ...prev,
