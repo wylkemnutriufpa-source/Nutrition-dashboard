@@ -99,32 +99,35 @@ export const getProfessionalBranding = (email) => {
   return null;
 };
 
+/**
+ * Aplica o branding ao DOM (CSS variables)
+ */
 export const applyBrandingToDOM = (branding) => {
   const root = document.documentElement;
   
-  // Aplicar cores CSS customizadas
-  if (branding.primaryColor) {
-    root.style.setProperty('--color-primary', branding.primaryColor);
+  if (branding?.primary_color) {
+    root.style.setProperty('--color-primary', branding.primary_color);
   }
   
-  if (branding.accentColor) {
-    root.style.setProperty('--color-accent', branding.accentColor);
+  if (branding?.secondary_color) {
+    root.style.setProperty('--color-secondary', branding.secondary_color);
+  }
+  
+  if (branding?.accent_color) {
+    root.style.setProperty('--color-accent', branding.accent_color);
   }
 };
 
+/**
+ * Reseta para branding padrão
+ */
 export const resetToDefault = () => {
-  const userType = localStorage.getItem('fitjourney_user_type');
-  const userEmail = localStorage.getItem('fitjourney_user_email');
-  
-  if (userType === 'professional' && userEmail) {
-    const key = `fitjourney_branding_pro_${userEmail}`;
-    localStorage.removeItem(key);
-  }
-  
   return DEFAULT_BRANDING;
 };
 
-// Converter imagem para base64 para storage
+/**
+ * Converte imagem para base64
+ */
 export const imageToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
