@@ -825,7 +825,7 @@ const PatientProfile = () => {
     );
   }
 
-  const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(patient.name)}&background=0F766E&color=fff&size=200`;
+  const avatar = patient.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(patient.name)}&background=0F766E&color=fff&size=200`;
 
   return (
     <Layout title={patient.name} showBack userType={profile?.role || 'professional'}>
