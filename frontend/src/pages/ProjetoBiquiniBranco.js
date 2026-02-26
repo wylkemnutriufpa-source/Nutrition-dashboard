@@ -323,14 +323,14 @@ const ProjetoBiquiniBranco = () => {
         {/* PLANOS DE SUCESSO */}
         <section className="max-w-6xl mx-auto" id="planos">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-2">
-            🏆 PLANOS DE SUCESSO
+            {projectData.sectionTitles?.plans || '🏆 PLANOS DE SUCESSO'}
           </h2>
           <p className="text-center text-gray-600 mb-10 text-lg">
-            Escolha o plano ideal para sua transformação
+            {projectData.sectionTitles?.plansSubtitle || 'Escolha o plano ideal para sua transformação'}
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {projectData.plans.map((plan, index) => (
+            {projectData.plans.filter(plan => plan.active !== false).map((plan, index) => (
               <Card 
                 key={index} 
                 className={`relative overflow-hidden transition-all hover:shadow-2xl ${
