@@ -63,29 +63,40 @@ const PatientFeedbacks = () => {
 
     setSending(true);
     try {
+      // Buscar professional_id do paciente
+      const { data: patientProfile, error: profileError } = await supabase
+        .from('patient_profiles')
+        .select('professional_id')
+        .eq('patient_id', patientId)
+        .single();
+
+      if (profileError || !patientProfile) {
+        toast.error('Erro ao identificar seu profissional');
+        return;
+      }
+
       const { error } = await supabase
-        .from('patient_feedbacks')
+        .from('patient_messages')
         .insert({
           patient_id: patientId,
-          message: newFeedback.trim(),
-          mood: mood,
-          status: 'pending'
+          professional_id: patientProfile.professional_id,
+          title: mood ? `Feedback - ${getMoodLabel(mood)}` : 'Feedback',
+          content: newFeedback.trim(),
+          type: 'feedback',
+          priority: 'normal',
+          is_pinned: false,
+          is_read: false
         });
 
       if (error) {
-        // Se a tabela não existir, criar mensagem amigável
-        if (error.code === '42P01') {
-          toast.info('Sistema de feedbacks será ativado em breve!');
-        } else {
-          throw error;
-        }
-      } else {
-        toast.success('Feedback enviado! 🎉');
-        setNewFeedback('');
-        setMood(null);
-        setShowForm(false);
-        loadFeedbacks();
+        throw error;
       }
+
+      toast.success('Feedback enviado! 🎉');
+      setNewFeedback('');
+      setMood(null);
+      setShowForm(false);
+      loadFeedbacks();
     } catch (error) {
       toast.error('Erro ao enviar feedback');
       console.error(error);
