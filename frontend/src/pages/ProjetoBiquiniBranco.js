@@ -382,13 +382,22 @@ const ProjetoBiquiniBranco = () => {
         {/* DEPOIMENTOS */}
         <section className="max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-10">
-            💬 TRANSFORMAÇÕES REAIS
+            {projectData.sectionTitles?.testimonials || '💬 TRANSFORMAÇÕES REAIS'}
           </h2>
           
           <div className="grid md:grid-cols-3 gap-6">
             {projectData.testimonials.map((testimonial, index) => (
               <Card key={index} className="bg-gradient-to-br from-pink-50 to-purple-50 border-0 hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
+                  {testimonial.image && (
+                    <div className="mb-4 rounded-lg overflow-hidden">
+                      <img
+                        src={testimonial.image}
+                        alt={`Depoimento de ${testimonial.name}`}
+                        className="w-full h-40 object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-center mb-4">
                     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl">
                       {testimonial.name.charAt(0)}
