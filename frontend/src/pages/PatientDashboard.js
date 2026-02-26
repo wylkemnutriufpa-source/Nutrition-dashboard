@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Circle, Droplet, Footprints, Dumbbell, AlertTriangle, Loader2, Utensils } from 'lucide-react';
+import { CheckCircle2, Circle, Droplet, Footprints, Dumbbell, AlertTriangle, Loader2, Utensils, Camera } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getPatientStats } from '@/lib/supabase';
+import { getPatientStats, uploadProfilePhoto } from '@/lib/supabase';
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
 
