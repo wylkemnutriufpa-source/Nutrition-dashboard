@@ -134,13 +134,13 @@ const ProjetoBiquiniBranco = () => {
       const { data, error } = await supabase
         .from('project_showcase')
         .select('*')
-        .eq('project_key', 'biquini_branco')
+        .eq('project_name', 'biquini_branco')
         .maybeSingle();
 
       if (error || !data) {
         setProjectData(defaultData);
       } else {
-        setProjectData({ ...defaultData, ...data.config });
+        setProjectData({ ...defaultData, ...data.content });
       }
     } catch (error) {
       console.error('Erro:', error);
