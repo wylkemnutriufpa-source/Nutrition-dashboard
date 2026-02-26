@@ -1,15 +1,56 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, Users, Calendar, Calculator, FileText, Settings, LogOut, 
   Database, Palette, Shield, ClipboardList, MessageSquare, Stethoscope,
-  UserCog
+  UserCog, Utensils, ChefHat, ShoppingCart, Pill, Lightbulb, TrendingUp,
+  Menu as MenuIcon, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { getPatientMenuConfig } from '@/lib/supabase';
+
+// Mapa de ícones para o menu dinâmico
+const iconMap = {
+  Home, Utensils, ClipboardList, MessageSquare, ChefHat,
+  ShoppingCart, Pill, Lightbulb, TrendingUp, Calculator,
+  Calendar, Settings
+};
 
 const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
   const { branding } = useBranding();
+  const { user, profile } = useAuth();
+  const [patientMenuItems, setPatientMenuItems] = useState(null);
+  const [loadingMenu, setLoadingMenu] = useState(false);
+
+  // Carrega menu dinâmico para pacientes
+  useEffect(() => {
+    if (userType === 'patient' && user) {
+      loadPatientMenu();
+    }
+  }, [userType, user]);
+
+  const loadPatientMenu = async () => {
+    setLoadingMenu(true);
+    try {
+      // Busca configuração do menu do profissional do paciente
+      const professionalId = profile?.professional_id;
+      const { data } = await getPatientMenuConfig(user?.id, professionalId);
+      if (data?.items) {
+        setPatientMenuItems(data.items.filter(item => item.visible).sort((a, b) => a.order - b.order));
+      }
+    } catch (error) {
+      console.error('Error loading patient menu:', error);
+    } finally {
+      setLoadingMenu(false);
+    }
+  };
+
+  const getIcon = (iconName) => {
+    return iconMap[iconName] || Home;
+  };
 
   // Links do Professional (admin também tem acesso)
   const professionalLinks = [
