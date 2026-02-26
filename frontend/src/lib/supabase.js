@@ -669,30 +669,46 @@ const DEFAULT_MENU_ITEMS = [
 ];
 
 export const getPatientMenuConfig = async (patientId, professionalId) => {
-  // Primeiro tenta buscar config específica do paciente
-  let { data, error } = await supabase
-    .from('patient_menu_configs')
-    .select('*')
-    .eq('patient_id', patientId)
-    .single();
+  console.log('[getPatientMenuConfig] patientId:', patientId, 'professionalId:', professionalId);
   
-  // Se não existir, busca config padrão do profissional
-  if (error || !data) {
-    const result = await supabase
+  // Se não tem patientId e professionalId, retorna padrão
+  if (!patientId && !professionalId) {
+    console.log('[getPatientMenuConfig] No IDs provided, returning default');
+    return { data: { items: DEFAULT_MENU_ITEMS }, error: null };
+  }
+  
+  // Se tem patientId válido, tenta buscar config específica do paciente
+  if (patientId) {
+    const { data, error } = await supabase
+      .from('patient_menu_configs')
+      .select('*')
+      .eq('patient_id', patientId)
+      .single();
+    
+    if (data) {
+      console.log('[getPatientMenuConfig] Found patient-specific config');
+      return { data, error: null };
+    }
+  }
+  
+  // Se tem professionalId válido, busca config padrão do profissional
+  if (professionalId) {
+    const { data, error } = await supabase
       .from('patient_menu_configs')
       .select('*')
       .eq('professional_id', professionalId)
       .is('patient_id', null)
       .single();
-    data = result.data;
+    
+    if (data) {
+      console.log('[getPatientMenuConfig] Found professional default config');
+      return { data, error: null };
+    }
   }
   
-  // Se ainda não existir, retorna os itens padrão
-  if (!data) {
-    return { data: { items: DEFAULT_MENU_ITEMS }, error: null };
-  }
-  
-  return { data, error: null };
+  // Se não encontrou nada, retorna os itens padrão
+  console.log('[getPatientMenuConfig] No config found, returning default');
+  return { data: { items: DEFAULT_MENU_ITEMS }, error: null };
 };
 
 export const saveMenuConfig = async (professionalId, patientId, items) => {
