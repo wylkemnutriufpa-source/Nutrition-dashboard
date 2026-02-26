@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
 import NotificationBell from './NotificationBell';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 const Layout = ({ children, title, showBack = false, userType: propUserType }) => {
   const navigate = useNavigate();
