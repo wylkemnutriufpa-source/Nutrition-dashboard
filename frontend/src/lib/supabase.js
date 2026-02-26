@@ -632,6 +632,11 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
 };
 
 export const getPatientStats = async (patientId) => {
+  if (!patientId) {
+    console.log('[getPatientStats] No patientId provided');
+    return { profile: null, activePlan: null, anamnesis: null, adherence: { adherence: 0, completed: 0, total: 0 } };
+  }
+  
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
