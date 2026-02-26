@@ -127,11 +127,134 @@ frontend:
     file: "frontend/src/lib/supabase.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Atualizado supabase.js com todas as funções CRUD para pacientes, planos alimentares, alimentos customizados"
+      - working: true
+        agent: "main"
+        comment: "Corrigido configuração do Supabase client que causava erro de lock"
+
+  - task: "Menu Dinâmico Meu Projeto"
+    implemented: true
+    working: true
+    file: "frontend/src/components/Sidebar.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado menu dinâmico configurável pelo profissional. Itens: Dashboard, Meu Plano, Minhas Tarefas, Meus Feedbacks, Minhas Receitas, Lista de Compras, Suplementos, Dicas, Minha Jornada, Calculadoras"
+
+  - task: "Página MenuConfigPage para profissional"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/MenuConfigPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Criada página para profissional configurar menu do paciente com drag-and-drop para reordenar, toggle visibilidade, renomear itens"
+
+  - task: "Componente ProjectCTA"
+    implemented: true
+    working: true
+    file: "frontend/src/components/ProjectCTA.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Criado componente CTA reutilizável com texto adaptável por categoria IMC (magreza/normal/sobrepeso/obesidade), botões Conhecer Projeto e WhatsApp"
+
+  - task: "Página VisitorProjectPage"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/VisitorProjectPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Criada página /visitor/projeto com landing page completa: benefícios, features, depoimentos, como funciona, CTA final"
+
+  - task: "Página PatientRecipes"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/PatientRecipes.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada página de receitas para pacientes com filtros por categoria, visualização detalhada"
+
+  - task: "Página PatientShoppingList"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/PatientShoppingList.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada página de lista de compras baseada no plano alimentar ativo, com checklist e compartilhamento"
+
+  - task: "Página PatientSupplements"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/PatientSupplements.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada página de suplementos prescritos agrupados por horário"
+
+  - task: "Página PatientTips"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/PatientTips.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada página de dicas do nutricionista com fixadas/normais"
+
+  - task: "Página PatientJourney"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/PatientJourney.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada página Minha Jornada com histórico de peso, gráfico de evolução, progresso para meta, informações do plano ativo"
+
+  - task: "Página PatientFeedbacks"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/PatientFeedbacks.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada página para paciente enviar feedbacks com rating, sintomas e visualizar respostas do profissional"
 
   - task: "PatientsList com CRUD real"
     implemented: true
