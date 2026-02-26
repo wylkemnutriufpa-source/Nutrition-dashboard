@@ -234,9 +234,12 @@ const ProjetoBiquiniBranco = () => {
         <section className="max-w-4xl mx-auto">
           <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white border-0">
             <CardContent className="pt-8 pb-8">
-              <h2 className="text-2xl font-bold text-center mb-8 text-yellow-400">
+              <h2 className="text-2xl font-bold text-center mb-4 text-yellow-400">
                 {projectData.sectionTitles?.myths || '⚠️ VERDADES QUE NINGUÉM TE CONTA'}
               </h2>
+              {projectData.sectionDescriptions?.myths && (
+                <p className="text-center text-white/80 mb-6">{projectData.sectionDescriptions.myths}</p>
+              )}
               <div className="grid md:grid-cols-2 gap-4">
                 {projectData.myths.map((myth, index) => (
                   <div key={index} className="flex items-start gap-3 bg-white/10 p-4 rounded-lg">
