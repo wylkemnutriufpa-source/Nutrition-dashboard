@@ -90,6 +90,8 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
 
     // Diagnóstico baseado no IMC
     let diagnosis = '';
+    let category = getIMCCategory(imc);
+    
     if (imc < 18.5) {
       diagnosis = 'Você está abaixo do peso ideal. Recomendamos uma dieta balanceada para ganho de massa muscular.';
     } else if (imc < 25) {
@@ -106,6 +108,7 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
       imc: imc.toFixed(1),
       difference: (weight - idealWeight).toFixed(1),
       diagnosis,
+      category,
       tmb: Math.round(tmb),
       get: Math.round(get),
       caloriesRecommendation
