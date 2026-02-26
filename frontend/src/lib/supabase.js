@@ -1323,3 +1323,195 @@ export const getPatientProfessionalBranding = async () => {
     return { data: null, error };
   }
 };
+
+// ==================== NOTIFICATIONS ====================
+
+export const getNotifications = async (onlyUnread = false) => {
+  let query = supabase
+    .from('notifications')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (onlyUnread) {
+    query = query.eq('is_read', false);
+  }
+  
+  const { data, error } = await query.limit(50);
+  return { data, error };
+};
+
+export const getUnreadNotificationsCount = async () => {
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_read', false);
+  return { count, error };
+};
+
+export const markNotificationAsRead = async (notificationId) => {
+  const { data, error } = await supabase
+    .from('notifications')
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq('id', notificationId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const markAllNotificationsAsRead = async () => {
+  const user = await getCurrentUser();
+  if (!user) return { error: { message: 'Não autenticado' } };
+  
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq('user_id', user.id)
+    .eq('is_read', false);
+  return { error };
+};
+
+export const deleteNotification = async (notificationId) => {
+  const { error } = await supabase
+    .from('notifications')
+    .delete()
+    .eq('id', notificationId);
+  return { error };
+};
+
+// ==================== RECIPES ====================
+
+export const getRecipes = async (professionalId = null) => {
+  let query = supabase
+    .from('recipes')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (professionalId) {
+    query = query.eq('professional_id', professionalId);
+  }
+  
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const getRecipeById = async (recipeId) => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .eq('id', recipeId)
+    .single();
+  return { data, error };
+};
+
+export const createRecipe = async (recipeData) => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .insert(recipeData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateRecipe = async (recipeId, updates) => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', recipeId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteRecipe = async (recipeId) => {
+  const { error } = await supabase
+    .from('recipes')
+    .delete()
+    .eq('id', recipeId);
+  return { error };
+};
+
+// ==================== TIPS ====================
+
+export const getTips = async (professionalId = null) => {
+  let query = supabase
+    .from('tips')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (professionalId) {
+    query = query.eq('professional_id', professionalId);
+  }
+  
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const createTip = async (tipData) => {
+  const { data, error } = await supabase
+    .from('tips')
+    .insert(tipData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateTip = async (tipId, updates) => {
+  const { data, error } = await supabase
+    .from('tips')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', tipId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteTip = async (tipId) => {
+  const { error } = await supabase
+    .from('tips')
+    .delete()
+    .eq('id', tipId);
+  return { error };
+};
+
+// ==================== SUPPLEMENTS ====================
+
+export const getSupplements = async (professionalId = null) => {
+  let query = supabase
+    .from('supplements')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (professionalId) {
+    query = query.eq('professional_id', professionalId);
+  }
+  
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const createSupplement = async (supplementData) => {
+  const { data, error } = await supabase
+    .from('supplements')
+    .insert(supplementData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateSupplement = async (supplementId, updates) => {
+  const { data, error } = await supabase
+    .from('supplements')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', supplementId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteSupplement = async (supplementId) => {
+  const { error } = await supabase
+    .from('supplements')
+    .delete()
+    .eq('id', supplementId);
+  return { error };
+};
