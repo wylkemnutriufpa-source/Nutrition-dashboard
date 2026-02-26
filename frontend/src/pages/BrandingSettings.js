@@ -8,7 +8,7 @@ import { Palette, Upload, RotateCcw, Image as ImageIcon, Loader2 } from 'lucide-
 import { toast } from 'sonner';
 import { useBranding } from '@/contexts/BrandingContext';
 import { saveProfessionalBranding, DEFAULT_BRANDING } from '@/utils/branding';
-import { getCurrentUser, getProfessionalProfile, supabase } from '@/lib/supabase';
+import { getCurrentUser, supabase } from '@/lib/supabase';
 
 const BrandingSettings = () => {
   const { branding, refreshBranding } = useBranding();
@@ -47,13 +47,8 @@ const BrandingSettings = () => {
         return;
       }
 
-      const { data: profile, error } = await getProfessionalProfile(user.id);
-      if (error || !profile) {
-        toast.error('Perfil profissional não encontrado');
-        return;
-      }
-
-      setProfessionalId(profile.id);
+      // O professional_id é o próprio user.id
+      setProfessionalId(user.id);
     } catch (error) {
       console.error('Erro ao carregar dados do profissional:', error);
     }
