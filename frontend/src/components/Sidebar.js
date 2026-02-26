@@ -29,10 +29,15 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
   const isInHealthCheck = location.pathname.includes('/health-check');
   const isInCalculators = location.pathname.includes('/calculator');
 
+  // PROTEÇÃO: Garantir que userType seja válido
+  const validUserType = ['admin', 'professional', 'patient', 'visitor'].includes(userType) 
+    ? userType 
+    : 'visitor';
+
   // Carregar menu do paciente
   useEffect(() => {
     const loadPatientMenu = async () => {
-      if (userType !== 'patient' || !patientId) {
+      if (validUserType !== 'patient' || !patientId) {
         setMenuLoading(false);
         return;
       }
@@ -50,7 +55,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
     };
 
     loadPatientMenu();
-  }, [userType, patientId]);
+  }, [validUserType, patientId]);
 
   // Links do Professional (admin também tem acesso)
   const professionalLinks = [
