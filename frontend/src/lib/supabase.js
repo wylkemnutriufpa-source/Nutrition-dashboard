@@ -313,8 +313,7 @@ export const createPatientByProfessional = async (professionalId, patientData) =
             .from('patient_profiles')
             .insert({
               patient_id: authUserId,
-              professional_id: professionalId,
-              status: 'active'
+              professional_id: professionalId
             });
           console.log('✅ Vínculo criado');
         } catch (linkErr) {
