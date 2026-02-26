@@ -283,6 +283,25 @@ test_plan:
 
 agent_communication:
   - agent: "main"
+    message: "✅ P0 CORRIGIDO - Erros 406/400 no Perfil do Paciente
+    
+    Problema: Dados de meal_plans e anamnesis não carregavam, gerando erros 406/400
+    
+    Causa: Funções usando .single() no Supabase retornam erro quando não há dados
+    
+    Solução implementada:
+    - getAnamnesis() → alterado .single() para .maybeSingle()
+    - getPatientMealPlan() → alterado .single() para .maybeSingle()
+    - saveAnamnesisDraft() → alterado .single() para .maybeSingle()
+    - getPatientStats() → alterado 3x .single() para .maybeSingle()
+    - getBranding() → alterado .single() para .maybeSingle()
+    
+    .maybeSingle() retorna null quando não há dados ao invés de gerar erro 406/400
+    
+    Arquivo modificado: /app/frontend/src/lib/supabase.js
+    
+    PRONTO PARA TESTE: Verificar se PatientProfile carrega corretamente sem erros 406/400"
+  - agent: "main"
     message: "✅ CHECKLIST DIÁRIO MVP IMPLEMENTADO
     
     Implementações completas:
