@@ -687,12 +687,13 @@ const PatientProfile = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-100">
             <TabsTrigger value="resumo">Resumo</TabsTrigger>
             <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
             <TabsTrigger value="plano">Plano</TabsTrigger>
             <TabsTrigger value="checklist">Checklist</TabsTrigger>
             <TabsTrigger value="recados">Recados</TabsTrigger>
+            <TabsTrigger value="projeto">Projeto</TabsTrigger>
           </TabsList>
 
           <TabsContent value="resumo">
