@@ -7,7 +7,7 @@ import { MessageCircle, User, Calendar, ArrowRight, Loader2 } from 'lucide-react
 import { supabase, getCurrentUser } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { pt BR } from 'date-fns/locale';
+import { ptBR } from 'date-fns/locale';
 
 const FeedbacksList = () => {
   const navigate = useNavigate();
