@@ -758,7 +758,6 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
   let recentQuery = supabase
     .from('patient_profiles')
     .select('*, patient:profiles!patient_id(*)')
-    .is('patient.deleted_at', null)
     .order('created_at', { ascending: false })
     .limit(5);
   
