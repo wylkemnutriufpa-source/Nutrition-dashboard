@@ -8,6 +8,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 
 import LoginPage from '@/pages/LoginPage';
 import AdminDashboard from '@/pages/AdminDashboard';
+import AdminProjetoEditor from '@/pages/AdminProjetoEditor';
 import ProfessionalDashboard from '@/pages/ProfessionalDashboard';
 import PatientsList from '@/pages/PatientsList';
 import PatientProfile from '@/pages/PatientProfile';
