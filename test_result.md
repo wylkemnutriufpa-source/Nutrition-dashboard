@@ -328,3 +328,47 @@ agent_communication:
     
     STATUS: Sistema estável e pronto para testes com pacientes reais
     Gestão financeira será implementada posteriormente"
+  - agent: "testing"
+    message: "✅ WEIGHT CALCULATOR + PROJETO BIQUÍNI BRANCO CTA - TESTE COMPLETO
+    
+    Teste realizado com sucesso seguindo exatamente o roteiro solicitado:
+    
+    FLUXO TESTADO:
+    1. ✅ Acesso à página inicial (https://nutrition-dash-7.preview.emergentagent.com)
+    2. ✅ Clique em 'Acessar Ferramentas' no card de Visitante
+    3. ✅ Navegação para página de Ferramentas (CalculatorsList)
+    4. ✅ Clique em 'Calculadora de Peso de Referência'
+    5. ✅ Preenchimento Step 1: altura=165, peso=85, idade=35, sexo=Feminino
+    6. ✅ Clique em 'Próximo'
+    7. ✅ Preenchimento Step 2: acima do peso, perder peso, atividade moderada
+    8. ✅ Clique em 'Calcular'
+    9. ✅ Resultados exibidos corretamente
+    10. ✅ CTA do Projeto Biquíni Branco visível após rolar a página
+    
+    RESULTADOS DA CALCULADORA (CORRETOS):
+    - Peso Ideal: 55.3 kg
+    - IMC: 31.2 (categoria: obesidade)
+    - Diferença: +29.8 kg
+    - TMB (Taxa Metabólica Basal): 1593 kcal
+    - GET (Gasto Energético Total): 2469 kcal
+    - Recomendação: 1969 calorias/dia para emagrecimento
+    
+    CTA PROJETO BIQUÍNI BRANCO VERIFICADO:
+    ✅ Badge 'PROJETO BIQUÍNI BRANCO' presente
+    ✅ Ícone Shield (categoria obesidade)
+    ✅ Título: 'Sua saúde merece cuidado profissional'
+    ✅ Subtítulo: 'Não é sobre estética, é sobre qualidade de vida. Você merece viver melhor.'
+    ✅ Mensagem emocional personalizada (com emoji 💜)
+    ✅ Benefícios: Programa completo (👙), Plano personalizado (📊), Resultados em 90 dias (💪)
+    ✅ Botão 'Conhecer o Projeto' - VISÍVEL E FUNCIONAL
+    ✅ Botão WhatsApp 'Quero cuidar da minha saúde' - VISÍVEL E FUNCIONAL
+    ✅ Urgência: 'Vagas limitadas para acompanhamento personalizado'
+    
+    SCREENSHOTS CAPTURADAS:
+    - calculator_results.png - Resultados da calculadora
+    - project_cta_visible.png - CTA parcialmente visível
+    - project_cta_full.png - Vista completa do CTA
+    - cta_complete_view.png - CTA com todos elementos
+    - cta_buttons_view.png - Botões do CTA
+    
+    CONCLUSÃO: Feature 100% funcional. A calculadora calcula corretamente todos os valores (IMC, peso ideal, TMB, GET, recomendação calórica) e o CTA do Projeto Biquíni Branco aparece corretamente ao final com mensagens personalizadas baseadas na categoria do IMC (obesidade neste caso). Ambos os botões (Conhecer o Projeto e WhatsApp) estão visíveis e funcionais."
