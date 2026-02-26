@@ -1326,7 +1326,7 @@ export const getPatientProfessionalBranding = async () => {
     const { data: patientProfile, error: profileError } = await supabase
       .from('patient_profiles')
       .select('professional_id')
-      .eq('user_id', user.id)
+      .eq('patient_id', user.id)
       .maybeSingle();
 
     if (profileError || !patientProfile) {
