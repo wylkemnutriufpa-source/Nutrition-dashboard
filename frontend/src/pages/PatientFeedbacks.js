@@ -37,17 +37,14 @@ const PatientFeedbacks = () => {
 
     try {
       const { data, error } = await supabase
-        .from('patient_feedbacks')
+        .from('patient_messages')
         .select('*')
         .eq('patient_id', patientId)
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Erro ao carregar feedbacks:', error);
-        // Se a tabela não existir, mostrar mensagem
-        if (error.code === '42P01') {
-          setFeedbacks([]);
-        }
+        setFeedbacks([]);
       } else {
         setFeedbacks(data || []);
       }
