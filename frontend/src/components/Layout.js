@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const Layout = ({ children, title, showBack = false, userType }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   const handleLogout = () => {
     localStorage.removeItem('fitjourney_user_type');
@@ -23,9 +23,12 @@ const Layout = ({ children, title, showBack = false, userType }) => {
   const isInAdminArea = location.pathname.startsWith('/admin');
   const shouldCompensateAdminBar = isAdmin && !isInAdminArea;
 
+  // Obter patientId para o menu dinâmico
+  const patientId = userType === 'patient' ? (user?.id || profile?.id || localStorage.getItem('fitjourney_patient_id')) : null;
+
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar userType={userType} onLogout={handleLogout} />
+      <Sidebar userType={userType} onLogout={handleLogout} patientId={patientId} />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Compensar espaço da AdminBar quando necessário */}
         {shouldCompensateAdminBar && <div className="h-16" />}
