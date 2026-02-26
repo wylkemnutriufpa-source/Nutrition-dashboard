@@ -27,14 +27,13 @@ const FeedbacksList = () => {
         return;
       }
 
-      // Buscar todas as mensagens enviadas por pacientes
+      // Buscar todas as mensagens dos pacientes
       const { data, error } = await supabase
         .from('patient_messages')
         .select(`
           *,
           patient:profiles!patient_id(id, name, email)
         `)
-        .eq('sender', 'patient')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
