@@ -1010,6 +1010,8 @@ const PatientProfile = () => {
               anamnesis={anamnesis} 
               patientId={id} 
               professionalId={profile?.id}
+              patient={patient}
+              professionalInfo={{ name: profile?.name, email: profile?.email }}
               onUpdate={loadPatientData}
             />
           </TabsContent>
