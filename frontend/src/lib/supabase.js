@@ -441,7 +441,7 @@ export const saveAnamnesisDraft = async (patientId, professionalId, updates) => 
     .from('anamnesis')
     .select('id')
     .eq('patient_id', patientId)
-    .single();
+    .maybeSingle();
   
   if (existing) {
     return await updateAnamnesis(existing.id, { ...updates, status: 'draft' });
