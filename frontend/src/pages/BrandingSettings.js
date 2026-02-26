@@ -4,46 +4,60 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Palette, Upload, RotateCcw, Image as ImageIcon } from 'lucide-react';
+import { Palette, Upload, RotateCcw, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBranding } from '@/contexts/BrandingContext';
-import {
-  getProfessionalBranding,
-  saveProfessionalBranding,
-  resetToDefault,
-  imageToBase64,
-  DEFAULT_BRANDING
-} from '@/utils/branding';
+import { saveProfessionalBranding, DEFAULT_BRANDING } from '@/utils/branding';
+import { getCurrentUser, getProfessionalProfile, supabase } from '@/lib/supabase';
 
 const BrandingSettings = () => {
   const { branding, refreshBranding } = useBranding();
-  const userEmail = localStorage.getItem('fitjourney_user_email');
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [professionalId, setProfessionalId] = useState(null);
   
   const [formData, setFormData] = useState({
-    logo: branding.logo || '',
-    brandName: branding.brandName || '',
-    primaryColor: branding.primaryColor || '',
-    accentColor: branding.accentColor || '',
-    footerText: branding.footerText || '',
-    welcomeMessage: branding.welcomeMessage || ''
+    logo_url: '',
+    primary_color: DEFAULT_BRANDING.primary_color,
+    secondary_color: DEFAULT_BRANDING.secondary_color,
+    accent_color: DEFAULT_BRANDING.accent_color
   });
 
-  const [logoPreview, setLogoPreview] = useState(branding.logo);
+  useEffect(() => {
+    loadProfessionalData();
+  }, []);
 
   useEffect(() => {
-    // Carregar branding atual
-    const currentBranding = getProfessionalBranding(userEmail) || branding;
-    setFormData({
-      logo: currentBranding.logo || '',
-      brandName: currentBranding.brandName || DEFAULT_BRANDING.brandName,
-      primaryColor: currentBranding.primaryColor || DEFAULT_BRANDING.primaryColor,
-      accentColor: currentBranding.accentColor || DEFAULT_BRANDING.accentColor,
-      footerText: currentBranding.footerText || DEFAULT_BRANDING.footerText,
-      welcomeMessage: currentBranding.welcomeMessage || DEFAULT_BRANDING.welcomeMessage
-    });
-    setLogoPreview(currentBranding.logo);
-  }, [userEmail, branding]);
+    // Atualizar form com branding carregado do contexto
+    if (branding) {
+      setFormData({
+        logo_url: branding.logo_url || '',
+        primary_color: branding.primary_color || DEFAULT_BRANDING.primary_color,
+        secondary_color: branding.secondary_color || DEFAULT_BRANDING.secondary_color,
+        accent_color: branding.accent_color || DEFAULT_BRANDING.accent_color
+      });
+    }
+  }, [branding]);
+
+  const loadProfessionalData = async () => {
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        toast.error('Usuário não autenticado');
+        return;
+      }
+
+      const { data: profile, error } = await getProfessionalProfile(user.id);
+      if (error || !profile) {
+        toast.error('Perfil profissional não encontrado');
+        return;
+      }
+
+      setProfessionalId(profile.id);
+    } catch (error) {
+      console.error('Erro ao carregar dados do profissional:', error);
+    }
+  };
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
@@ -61,44 +75,78 @@ const BrandingSettings = () => {
       return;
     }
 
+    setUploading(true);
     try {
-      const base64 = await imageToBase64(file);
-      setFormData({ ...formData, logo: base64 });
-      setLogoPreview(base64);
+      // Upload para Supabase Storage
+      const fileName = `${professionalId}-${Date.now()}.${file.name.split('.').pop()}`;
+      const { data, error } = await supabase.storage
+        .from('branding')
+        .upload(`logos/${fileName}`, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) throw error;
+
+      // Obter URL pública
+      const { data: publicData } = supabase.storage
+        .from('branding')
+        .getPublicUrl(`logos/${fileName}`);
+
+      setFormData({ ...formData, logo_url: publicData.publicUrl });
       toast.success('Logo carregada! Clique em Salvar para aplicar');
     } catch (error) {
-      toast.error('Erro ao carregar imagem');
+      console.error('Erro ao fazer upload:', error);
+      toast.error('Erro ao fazer upload da imagem');
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleSave = () => {
-    if (!formData.brandName) {
-      toast.error('Nome da marca é obrigatório');
+  const handleSave = async () => {
+    if (!professionalId) {
+      toast.error('Profissional não identificado');
       return;
     }
 
-    // Salvar branding do profissional
-    saveProfessionalBranding(userEmail, formData);
-    
-    // Atualizar branding ativo
-    refreshBranding();
-    
-    toast.success('Configurações de marca atualizadas com sucesso!');
+    setLoading(true);
+    try {
+      const result = await saveProfessionalBranding(professionalId, formData);
+      
+      if (result.success) {
+        await refreshBranding();
+        toast.success('Configurações de marca atualizadas com sucesso!');
+      } else {
+        toast.error('Erro ao salvar configurações');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar:', error);
+      toast.error('Erro ao salvar configurações');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (window.confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
-      const defaults = resetToDefault();
       setFormData({
-        logo: '',
-        brandName: defaults.brandName,
-        primaryColor: defaults.primaryColor,
-        accentColor: defaults.accentColor,
-        footerText: defaults.footerText,
-        welcomeMessage: defaults.welcomeMessage
+        logo_url: '',
+        primary_color: DEFAULT_BRANDING.primary_color,
+        secondary_color: DEFAULT_BRANDING.secondary_color,
+        accent_color: DEFAULT_BRANDING.accent_color
       });
-      setLogoPreview(null);
-      refreshBranding();
+      
+      // Salvar o reset
+      if (professionalId) {
+        await saveProfessionalBranding(professionalId, {
+          logo_url: null,
+          primary_color: DEFAULT_BRANDING.primary_color,
+          secondary_color: DEFAULT_BRANDING.secondary_color,
+          accent_color: DEFAULT_BRANDING.accent_color
+        });
+        await refreshBranding();
+      }
+      
       toast.success('Configurações restauradas para o padrão');
     }
   };
@@ -123,6 +171,7 @@ const BrandingSettings = () => {
                 variant="outline"
                 size="sm"
                 className="text-gray-600"
+                disabled={loading}
               >
                 <RotateCcw size={16} className="mr-2" />
                 Restaurar Padrão
@@ -144,8 +193,10 @@ const BrandingSettings = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-6">
               <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                {logoPreview ? (
-                  <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain p-2" />
+                {uploading ? (
+                  <Loader2 className="animate-spin text-teal-700" size={32} />
+                ) : formData.logo_url ? (
+                  <img src={formData.logo_url} alt="Logo preview" className="max-w-full max-h-full object-contain p-2" />
                 ) : (
                   <Upload className="text-gray-400" size={32} />
                 )}
@@ -164,47 +215,9 @@ const BrandingSettings = () => {
                   accept="image/*"
                   onChange={handleLogoUpload}
                   className="hidden"
+                  disabled={uploading}
                 />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Identidade da Marca</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="brandName">Nome da Marca/Sistema</Label>
-              <Input
-                id="brandName"
-                value={formData.brandName}
-                onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                placeholder="Ex: NutriCare, MeuNutri, etc."
-              />
-              <p className="text-xs text-gray-500 mt-1">Este nome aparecerá no topo e no título das páginas</p>
-            </div>
-
-            <div>
-              <Label htmlFor="welcomeMessage">Mensagem de Boas-Vindas</Label>
-              <Textarea
-                id="welcomeMessage"
-                value={formData.welcomeMessage}
-                onChange={(e) => setFormData({ ...formData, welcomeMessage: e.target.value })}
-                placeholder="Ex: Bem-vindo ao seu painel de nutrição personalizado"
-                rows={2}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="footerText">Texto do Rodapé</Label>
-              <Input
-                id="footerText"
-                value={formData.footerText}
-                onChange={(e) => setFormData({ ...formData, footerText: e.target.value })}
-                placeholder="Ex: Sua jornada para uma vida mais saudável"
-              />
             </div>
           </CardContent>
         </Card>
@@ -217,25 +230,45 @@ const BrandingSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <Label htmlFor="primaryColor">Cor Primária</Label>
                 <div className="flex gap-3 mt-2">
                   <input
                     id="primaryColor"
                     type="color"
-                    value={formData.primaryColor}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
+                    value={formData.primary_color}
+                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
                     className="w-20 h-12 rounded border-2 border-gray-300 cursor-pointer"
                   />
                   <Input
-                    value={formData.primaryColor}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    placeholder="#0F766E"
+                    value={formData.primary_color}
+                    onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                    placeholder="#059669"
                     className="flex-1"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Usada em botões principais e sidebar ativa</p>
+                <p className="text-xs text-gray-500 mt-1">Cor principal</p>
+              </div>
+
+              <div>
+                <Label htmlFor="secondaryColor">Cor Secundária</Label>
+                <div className="flex gap-3 mt-2">
+                  <input
+                    id="secondaryColor"
+                    type="color"
+                    value={formData.secondary_color}
+                    onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
+                    className="w-20 h-12 rounded border-2 border-gray-300 cursor-pointer"
+                  />
+                  <Input
+                    value={formData.secondary_color}
+                    onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
+                    placeholder="#10b981"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Cor alternativa</p>
               </div>
 
               <div>
@@ -244,29 +277,32 @@ const BrandingSettings = () => {
                   <input
                     id="accentColor"
                     type="color"
-                    value={formData.accentColor}
-                    onChange={(e) => setFormData({ ...formData, accentColor: e.target.value })}
+                    value={formData.accent_color}
+                    onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
                     className="w-20 h-12 rounded border-2 border-gray-300 cursor-pointer"
                   />
                   <Input
-                    value={formData.accentColor}
-                    onChange={(e) => setFormData({ ...formData, accentColor: e.target.value })}
-                    placeholder="#059669"
+                    value={formData.accent_color}
+                    onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
+                    placeholder="#34d399"
                     className="flex-1"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Usada em elementos secundários e highlights</p>
+                <p className="text-xs text-gray-500 mt-1">Destaques</p>
               </div>
             </div>
 
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm font-medium text-gray-700 mb-3">Preview das Cores:</p>
               <div className="flex gap-4">
-                <Button style={{ backgroundColor: formData.primaryColor }} className="text-white">
-                  Botão Primário
+                <Button style={{ backgroundColor: formData.primary_color }} className="text-white">
+                  Primária
                 </Button>
-                <Button style={{ backgroundColor: formData.accentColor }} className="text-white">
-                  Botão Accent
+                <Button style={{ backgroundColor: formData.secondary_color }} className="text-white">
+                  Secundária
+                </Button>
+                <Button style={{ backgroundColor: formData.accent_color }} className="text-white">
+                  Destaque
                 </Button>
               </div>
             </div>
@@ -280,8 +316,16 @@ const BrandingSettings = () => {
                 onClick={handleSave}
                 className="flex-1 bg-teal-700 hover:bg-teal-800"
                 size="lg"
+                disabled={loading || !professionalId}
               >
-                Salvar Configurações
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 animate-spin" size={16} />
+                    Salvando...
+                  </>
+                ) : (
+                  'Salvar Configurações'
+                )}
               </Button>
               <Button
                 onClick={() => window.location.reload()}
