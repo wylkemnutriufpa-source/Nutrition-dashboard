@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Sidebar from './Sidebar';
+import NotificationBell from './NotificationBell';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Layout = ({ children, title, showBack = false, userType: propUserType }) => {
