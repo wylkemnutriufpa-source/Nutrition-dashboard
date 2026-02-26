@@ -1305,18 +1305,8 @@ export const getCurrentProfessionalBranding = async () => {
     const user = await getCurrentUser();
     if (!user) return { data: null, error: { message: 'Usuário não autenticado' } };
 
-    // Buscar o professional_profile do usuário atual
-    const { data: profile, error: profileError } = await supabase
-      .from('professional_profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (profileError || !profile) {
-      return { data: null, error: profileError || { message: 'Perfil profissional não encontrado' } };
-    }
-
-    return await getProfessionalBranding(profile.id);
+    // O professional_id é o próprio user.id (não há tabela professional_profiles separada)
+    return await getProfessionalBranding(user.id);
   } catch (error) {
     return { data: null, error };
   }
