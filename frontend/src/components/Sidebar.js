@@ -229,7 +229,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
         })}
 
         {/* Menu dinâmico do paciente - "Meu Projeto" */}
-        {userType === 'patient' && (
+        {validUserType === 'patient' && (
           <>
             <p className="text-xs font-semibold text-gray-400 uppercase px-4 pt-4 pb-1">Meu Projeto</p>
             {menuLoading ? (
