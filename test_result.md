@@ -387,3 +387,114 @@ agent_communication:
     - cta_buttons_view.png - Botões do CTA
     
     CONCLUSÃO: Feature 100% funcional. A calculadora calcula corretamente todos os valores (IMC, peso ideal, TMB, GET, recomendação calórica) e o CTA do Projeto Biquíni Branco aparece corretamente ao final com mensagens personalizadas baseadas na categoria do IMC (obesidade neste caso). Ambos os botões (Conhecer o Projeto e WhatsApp) estão visíveis e funcionais."
+  - agent: "testing"
+    message: "✅ COMPREHENSIVE CHECKLIST TEST COMPLETED (26/Feb/2026)
+    
+    Executed complete verification of today's checklist with 3 priorities:
+    
+    ═══════════════════════════════════════════════════════════════════════
+    [PRIORITY 1] ✅ PATIENT MENU PERMISSIONS - PASSED
+    ═══════════════════════════════════════════════════════════════════════
+    Login: maria@gmail.com / 123456
+    Verified sidebar displays ONLY patient-appropriate items:
+    
+    CORRECT ITEMS PRESENT:
+    ✅ Dashboard
+    ✅ 'MEU PROJETO' section header
+    ✅ Dynamic menu items:
+       - Meu Plano
+       - Minhas Tarefas
+       - Meus Feedbacks
+       - Minhas Receitas
+       - Minha Lista de Compras
+       - Suplementos
+       - Dicas
+       - Minha Jornada
+    ✅ Calculadoras
+    ✅ Sair (logout button)
+    
+    PROFESSIONAL/ADMIN ITEMS CORRECTLY HIDDEN:
+    ✅ Pacientes - Hidden
+    ✅ Profissionais - Hidden
+    ✅ Alimentos - Hidden
+    ✅ Personalização - Hidden
+    ✅ Painel Admin - Hidden
+    
+    Menu loads dynamically via getPatientMenuConfig() from Supabase.
+    All permissions working correctly!
+    
+    ═══════════════════════════════════════════════════════════════════════
+    [PRIORITY 2] ✅ CTA IN WEIGHT CALCULATOR - PASSED
+    ═══════════════════════════════════════════════════════════════════════
+    Flow tested:
+    1. Logout from patient account
+    2. Access as Visitor (Acessar Ferramentas)
+    3. Open 'Calculadora de Peso de Referência'
+    4. Fill Step 1: altura=160cm, peso=85kg, idade=35, sexo=Feminino
+    5. Click 'Próximo'
+    6. Fill Step 2: Acima do peso, Perder peso, Atividade moderada
+    7. Click 'Calcular'
+    8. Verify results
+    9. Scroll to bottom
+    10. Verify CTA
+    
+    CALCULATOR RESULTS (CORRECT):
+    ✅ Peso Ideal: 51.0 kg
+    ✅ IMC: 33.2 (obesidade category)
+    ✅ Diferença: +34.0 kg
+    ✅ TMB: 1578 kcal
+    ✅ GET: 2445 kcal
+    ✅ Recomendação: 1945 calorias/dia para emagrecimento
+    
+    CTA 'PROJETO BIQUÍNI BRANCO' VERIFICATION:
+    ✅ Badge 'PROJETO BIQUÍNI BRANCO' - PRESENT
+    ✅ Title: 'Sua saúde merece cuidado profissional' - PRESENT
+    ✅ Benefits section (👙 📊 💪):
+       - Programa completo
+       - Plano personalizado
+       - Resultados em 90 dias
+    ✅ Button 'Conhecer o Projeto' - PRESENT & FUNCTIONAL
+    ✅ WhatsApp button 'Quero cuidar da minha saúde' - PRESENT & FUNCTIONAL
+    ✅ Urgency message: 'Vagas limitadas' - PRESENT
+    ✅ Category styling: obesidade (purple/pink gradient, Shield icon)
+    
+    CTA appears correctly at the end of calculator results!
+    
+    ═══════════════════════════════════════════════════════════════════════
+    [PRIORITY 3] ✅ BASIC FUNCTIONALITY - PASSED
+    ═══════════════════════════════════════════════════════════════════════
+    ✅ Calculator: WORKING
+       - All calculations correct
+       - Results display properly
+       - Multi-step form works smoothly
+    
+    ✅ Login: WORKING
+       - Patient login successful (maria@gmail.com)
+       - Authentication flow correct
+       - Dashboard loads properly
+    
+    ═══════════════════════════════════════════════════════════════════════
+    SCREENSHOTS CAPTURED:
+    ═══════════════════════════════════════════════════════════════════════
+    Priority 1 (Patient Menu):
+    - patient_sidebar_full.png
+    - patient_menu_verification.png
+    
+    Priority 2 (Calculator & CTA):
+    - calculators_page.png
+    - calc_step1_filled.png
+    - calc_step2_filled.png
+    - calc_results_top.png
+    - calc_results_bottom.png
+    - cta_projeto_biquini_branco.png
+    
+    ═══════════════════════════════════════════════════════════════════════
+    FINAL VERDICT: ALL 3 PRIORITIES PASSED ✅
+    ═══════════════════════════════════════════════════════════════════════
+    
+    The application is working perfectly according to the checklist:
+    1. Patient menu shows only appropriate items with correct permissions
+    2. Weight calculator works and displays CTA correctly for visitors
+    3. All basic functionality (login, calculations) working properly
+    
+    No critical issues found. System ready for production use!"
