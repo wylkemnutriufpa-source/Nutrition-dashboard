@@ -26,13 +26,19 @@ const Layout = ({ children, title, showBack = false, userType: propUserType }) =
     return propUserType || localStorage.getItem('fitjourney_user_type') || 'visitor';
   })();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Fazer signOut do Supabase
+    await supabase.auth.signOut();
+    
+    // Limpar localStorage
     localStorage.removeItem('fitjourney_user_type');
     localStorage.removeItem('fitjourney_user_email');
     localStorage.removeItem('fitjourney_user_id');
     localStorage.removeItem('fitjourney_patient_id');
     localStorage.removeItem('fitjourney_patient_name');
-    navigate('/');
+    
+    // Navegar para home
+    navigate('/', { replace: true });
   };
 
   // Verificar se é admin fora da área admin (para adicionar padding-top)
