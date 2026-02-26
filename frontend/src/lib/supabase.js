@@ -218,43 +218,35 @@ export const updateProfile = async (profileId, updates) => {
 
 // Buscar pacientes do profissional (ou todos se admin)
 export const getProfessionalPatients = async (professionalId, isAdmin = false, filters = {}) => {
-  console.log('📋 Buscando pacientes...');
+  console.log('📋 Buscando pacientes do profissional:', professionalId);
   
   try {
-    // Buscar direto da tabela profiles filtrando por role='patient'
-    // Evita problema com patient_profiles que pode não existir ou ter schema diferente
+    // Buscar pela tabela patient_profiles com JOIN em profiles
     let query = supabase
-      .from('profiles')
-      .select('*')
-      .eq('role', 'patient')
-      .eq('status', 'active');
+      .from('patient_profiles')
+      .select('*, patient:profiles!patient_id(*)');
     
-    // Se não for admin, precisa filtrar por profissional
-    // Mas como profiles não tem professional_id, admin vê todos por enquanto
-    // TODO: Implementar tabela patient_profiles corretamente depois
+    // Se não for admin, filtrar por profissional
+    if (!isAdmin) {
+      query = query.eq('professional_id', professionalId);
+    }
+    
+    // Filtrar apenas ativos
+    query = query.eq('status', 'active');
     
     const { data, error } = await query.order('created_at', { ascending: false });
     
     if (error) {
-      console.error('❌ Erro ao buscar:', error);
-      return { data: [], error: null };
+      console.error('❌ Erro ao buscar pacientes:', error);
+      return { data: [], error };
     }
     
-    // Transformar para formato esperado pela UI
-    const formatted = (data || []).map(patient => ({
-      id: patient.id,
-      patient_id: patient.id,
-      professional_id: professionalId,
-      status: 'active',
-      patient: patient
-    }));
-    
-    console.log(`✅ ${formatted.length} pacientes`);
-    return { data: formatted, error: null };
+    console.log(`✅ ${data?.length || 0} pacientes encontrados`);
+    return { data: data || [], error: null };
     
   } catch (err) {
-    console.error('❌ Erro:', err);
-    return { data: [], error: null };
+    console.error('❌ Erro fatal:', err);
+    return { data: [], error: err };
   }
 };
 
