@@ -604,6 +604,13 @@ const HealthCheckQuiz = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* CTA Projeto Biquíni Branco */}
+          <ProjectCTA 
+            category={getScoreCategory(result.score)}
+            userData={{ score: result.score }}
+            source="health-check"
+          />
         </div>
       </Layout>
     );
