@@ -101,13 +101,15 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
       case 'professional':
         return professionalLinks;
       case 'patient':
-        return patientLinks;
+        // Retorna apenas links fixos, dinâmicos são renderizados separadamente
+        return patientFixedLinks;
       default:
         return visitorLinks;
     }
   };
 
   const links = getLinks();
+  const patientDynamicLinks = userType === 'patient' ? getPatientDynamicLinks() : [];
 
   const getUserTypeLabel = () => {
     switch(userType) {
