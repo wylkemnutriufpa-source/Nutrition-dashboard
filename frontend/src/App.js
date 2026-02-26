@@ -32,6 +32,7 @@ import HealthCheckQuiz from '@/pages/HealthCheckQuiz';
 import ProjetoBiquiniBranco from '@/pages/ProjetoBiquiniBranco';
 import AgendaPage from '@/pages/AgendaPage';
 import FinanceiroPage from '@/pages/FinanceiroPage';
+import FeedbacksList from '@/pages/FeedbacksList';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
