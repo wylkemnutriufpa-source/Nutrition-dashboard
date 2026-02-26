@@ -141,11 +141,11 @@ const AdminProjetoEditor = () => {
       const { data, error } = await supabase
         .from('project_showcase')
         .select('*')
-        .eq('project_key', 'biquini_branco')
+        .eq('project_name', 'biquini_branco')
         .maybeSingle();
 
-      if (data?.config) {
-        setProjectData(prev => ({ ...prev, ...data.config }));
+      if (data?.content) {
+        setProjectData(prev => ({ ...prev, ...data.content }));
       }
     } catch (error) {
       console.error('Erro ao carregar:', error);
