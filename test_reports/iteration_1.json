@@ -1,0 +1,50 @@
+{
+  "summary": "Frontend-only testing of ProjetoBiquiniBranco dynamic sections, PatientDashboard profile photo widget, PatientJornada progress tracking, visitor sidebar restrictions, and Professional/Admin Projeto editor tabs. All 7 test scenarios passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "Supabase project_showcase table",
+        "issue": "HTTP 400 when querying project_showcase - table likely missing or RLS blocks access. Page correctly falls back to defaultData, so no visual breakage."
+      },
+      {
+        "endpoint": "Supabase patient_journey / anamnesis tables",
+        "issue": "HTTP 406 responses on patient dashboard load - may be RLS policy missing or table schema mismatch. Fallback handles gracefully."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "PatientJornada - header",
+        "issues": ["Patient name displayed in lowercase ('maria Jornada de Transformação') because name is stored lowercase in DB. Not a code bug - cosmetic DB data issue."]
+      }
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_1.json"],
+  "action_items": [
+    "Run the SQL in Supabase to create/configure project_showcase table with proper RLS for editor save to work",
+    "Verify Supabase RLS policies for patient_journey, anamnesis, weight_history tables to resolve 406 errors"
+  ],
+  "critical_code_review_comments": [
+    "lib/supabase.js is 1128 lines - should be split into domain modules (auth.js, patients.js, mealplans.js, etc.) for maintainability",
+    "PatientProfile.js is 963 lines - multiple sub-components (AnamneseTab, RecadosTab, ProjetoTab) could be extracted to separate files",
+    "The uploadProfilePhoto() function has a base64 fallback if storage bucket doesn't exist - good resilience pattern but base64 URLs stored in profiles table could be very large"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "100% (7/7 test scenarios passed)"
+  },
+  "test_credentials": "Admin/Professional: wylkem.nutri.ufpa@gmail.com / 654321 | Patient: Maria@gmail.com / 123456",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "All frontend flows tested and passing. The app uses Supabase auth (not Emergent Google auth). Visitor session is stored via localStorage key 'fitjourney_user_type'. Direct URL navigation to protected routes loses session because ProtectedRoute checks localStorage. To test protected pages, must always do the full login flow in the same Playwright session. The professional credential is actually stored as 'admin' role in Supabase (not 'professional'), which is why it redirects to /admin/dashboard first. The editor at /professional/projeto-editor is accessible from the admin sidebar.",
+  "rca_of_issues": {
+    "400_on_project_showcase": "The project_showcase table either doesn't exist in Supabase or has RLS policies that block SELECT for anonymous/authenticated users. The ProjetoBiquiniBranco component correctly falls back to defaultData when this query fails.",
+    "406_on_patient_tables": "HTTP 406 from Supabase means 'Not Acceptable' - likely returned when a .single() call finds no rows OR RLS is blocking the query. The patient tables (anamnesis, meal_plans) may not have rows for Maria, so .single() fails with PGRST116 which Supabase returns as 406."
+  }
+}
