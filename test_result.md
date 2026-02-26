@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Migrar aplicação de dados mock/localStorage para Supabase real. Implementar multi-tenant com RLS para professional, patient e admin."
+user_problem_statement: "Implementar Checklist Diário MVP editável com Supabase. Profissional cria/edita/apaga tarefas no perfil do paciente. Paciente marca/desmarca no dashboard."
 
 backend:
   - task: "API Status endpoint"
@@ -118,9 +118,45 @@ backend:
         comment: "Backend básico FastAPI funcionando"
       - working: true
         agent: "testing"
-        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://health-metrics-198.preview.emergentagent.com with proper MongoDB integration."
+        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://patient-tracker-160.preview.emergentagent.com with proper MongoDB integration."
 
 frontend:
+  - task: "Checklist Diário MVP"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/ChecklistSimple.js, frontend/src/lib/supabase.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/PatientDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ CHECKLIST MVP COMPLETO: SQL com updated_at+trigger, funções CRUD (incluindo updateChecklistTask), ChecklistSimple com edição inline, PatientProfile simplificado, PatientDashboard OK. Professional cria/edita/apaga, paciente marca/desmarca. Sistema antigo de templates removido."
+
+  - task: "Supabase Auth Lock Fix"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/lib/supabase.js, frontend/src/contexts/AuthContext.js, frontend/src/pages/LoginPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Corrigido NavigatorLockAcquireTimeoutError. Implementado singleton, eliminadas race conditions, único listener, tratamento de sessão corrompida"
+
+  - task: "Admin Navigation Architecture"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/AdminBar.js, frontend/src/App.js, frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criado AdminBar fixo. Admin mantém contexto ao navegar. Botão 'Voltar ao Painel Admin' sempre visível quando admin está em outras áreas"
+
   - task: "Supabase Auth Integration"
     implemented: true
     working: true
@@ -213,15 +249,70 @@ metadata:
 
 test_plan:
   current_focus:
-    - "PatientsList com CRUD real"
-    - "MealPlanEditor com persistência Supabase"
-    - "ProfessionalDashboard com dados reais"
+    - "Checklist Diário MVP"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
+    message: "✅ CHECKLIST DIÁRIO MVP IMPLEMENTADO
+    
+    Implementações completas:
+    
+    1. SQL (/app/supabase_checklist.sql):
+    - Tabela checklist_tasks com updated_at
+    - Trigger automático para updated_at
+    - RLS: paciente SELECT/UPDATE suas tarefas, admin/professional tudo
+    
+    2. Backend (frontend/src/lib/supabase.js):
+    - getChecklistTasks() - listar
+    - createChecklistTask() - criar
+    - updateChecklistTask() - NOVA função para editar título
+    - toggleChecklistTask() - marcar/desmarcar
+    - deleteChecklistTask() - excluir
+    - getChecklistAdherence() - calcular % de conclusão
+    
+    3. Componente (frontend/src/components/ChecklistSimple.js):
+    - Modo PACIENTE: marcar/desmarcar apenas
+    - Modo PROFESSIONAL: criar + editar título inline + excluir
+    - Edição inline com botões salvar/cancelar
+    - Barra de progresso e contador
+    
+    4. Páginas:
+    - PatientDashboard: ChecklistSimple em modo paciente
+    - PatientProfile: ChecklistTab simplificada usando ChecklistSimple em modo profissional
+    
+    Sistema antigo (templates/entries) removido.
+    Documentação criada em CHECKLIST_MVP_IMPLEMENTATION.md
+    
+    PRONTO PARA TESTE: testar criação/edição/exclusão pelo profissional e marcação pelo paciente"
+  - agent: "main"
     message: "Implementada migração completa de mock para Supabase. Arquivos alterados: supabase.js, PatientsList.js, ProfessionalDashboard.js, PatientProfile.js, MealPlanEditor.js, PatientDashboard.js. Schema SQL completo criado em supabase_schema_complete.sql"
   - agent: "testing"
     message: "✅ Backend API testing completed successfully. All 3 endpoints (GET /api/, POST /api/status, GET /api/status) working perfectly. Created comprehensive backend_test.py file for API testing. Backend service stable and properly integrated with MongoDB. No issues found - backend is ready for production use."
+  - agent: "main"
+    message: "✅ SISTEMA ESTABILIZADO PARA PRODUÇÃO
+    
+    Correções Finais Aplicadas:
+    
+    1. AdminBar Permanente:
+    - Removido useEffect com delay que causava desaparecimento
+    - AdminBar agora calcula shouldShow diretamente
+    - Permanece visível durante toda navegação entre áreas
+    
+    2. Erro 'body stream already read':
+    - Melhorado tratamento de erro em getProfessionalPatients
+    - Não tenta processar erro do Supabase múltiplas vezes
+    - PatientsList não lança erro, apenas retorna e exibe toast
+    
+    Arquivos modificados:
+    - /app/frontend/src/components/AdminBar.js - sem useEffect/useState
+    - /app/frontend/src/lib/supabase.js - tratamento de erro simplificado
+    - /app/frontend/src/pages/PatientsList.js - não lança erro
+    
+    Documentação criada:
+    - /app/GUIA_TESTES_PRODUCAO.md - roteiro completo de testes
+    
+    STATUS: Sistema estável e pronto para testes com pacientes reais
+    Gestão financeira será implementada posteriormente"

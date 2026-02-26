@@ -46,6 +46,7 @@ const PatientsList = () => {
   // Form state separado para não causar re-render do dialog
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
+  const [formPassword, setFormPassword] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formBirthDate, setFormBirthDate] = useState('');
   const [formGender, setFormGender] = useState('');
@@ -71,7 +72,14 @@ const PatientsList = () => {
       };
       
       const { data, error } = await getProfessionalPatients(profile.id, isAdmin, filters);
-      if (error) throw error;
+      
+      if (error) {
+        console.error('❌ Erro ao buscar pacientes:', error);
+        toast.error('Erro ao carregar pacientes');
+        setPatients([]);
+        setLoading(false);
+        return;
+      }
       
       const mappedPatients = (data || []).map(item => ({
         id: item.patient.id,
@@ -111,6 +119,7 @@ const PatientsList = () => {
   const resetForm = () => {
     setFormName('');
     setFormEmail('');
+    setFormPassword('');
     setFormPhone('');
     setFormBirthDate('');
     setFormGender('');
@@ -122,8 +131,13 @@ const PatientsList = () => {
   };
 
   const handleCreatePatient = async () => {
-    if (!formName || !formEmail) {
-      toast.error('Nome e email são obrigatórios');
+    if (!formName || !formEmail || !formPassword) {
+      toast.error('Nome, email e senha são obrigatórios');
+      return;
+    }
+
+    if (formPassword.length < 6) {
+      toast.error('Senha deve ter pelo menos 6 caracteres');
       return;
     }
 
@@ -132,6 +146,7 @@ const PatientsList = () => {
       const patientData = {
         name: formName,
         email: formEmail,
+        password: formPassword,
         phone: formPhone || null,
         birth_date: formBirthDate || null,
         gender: formGender || null,
@@ -143,15 +158,21 @@ const PatientsList = () => {
       };
 
       const { data, error } = await createPatientByProfessional(profile.id, patientData);
-      if (error) throw error;
       
-      toast.success('Paciente criado com sucesso!');
+      if (error) {
+        console.error('❌ Erro ao criar paciente:', error);
+        toast.error(error.message || 'Erro ao criar paciente');
+        setSaving(false);
+        return;
+      }
+      
+      toast.success(`Paciente criado! Email: ${formEmail} | Senha: ${formPassword}`);
       setIsCreateDialogOpen(false);
       resetForm();
       await loadData();
     } catch (error) {
       console.error('Error creating patient:', error);
-      toast.error(error.message || 'Erro ao criar paciente');
+      toast.error('Erro inesperado ao criar paciente');
     } finally {
       setSaving(false);
     }
@@ -382,6 +403,16 @@ const PatientsList = () => {
                           className="pl-10"
                         />
                       </div>
+                    </div>
+                    <div>
+                      <Label>Senha * (mínimo 6 caracteres)</Label>
+                      <Input
+                        type="password"
+                        value={formPassword}
+                        onChange={(e) => setFormPassword(e.target.value)}
+                        placeholder="••••••"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Senha para o paciente acessar o sistema</p>
                     </div>
                     <div>
                       <Label>Data de Nascimento</Label>

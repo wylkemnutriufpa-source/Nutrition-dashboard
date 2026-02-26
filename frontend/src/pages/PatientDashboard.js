@@ -5,6 +5,7 @@ import { CheckCircle2, Circle, Droplet, Footprints, Dumbbell, AlertTriangle, Loa
 import { useAuth } from '@/contexts/AuthContext';
 import { getPatientStats } from '@/lib/supabase';
 import { toast } from 'sonner';
+import ChecklistSimple from '@/components/ChecklistSimple';
 
 const PatientDashboard = () => {
   const { user, profile } = useAuth();
@@ -55,14 +56,6 @@ const PatientDashboard = () => {
     };
     return goals[goal] || goal || 'Não definido';
   };
-
-  // Tasks mockadas (podem ser integradas com um sistema de tarefas real futuramente)
-  const tasks = [
-    { id: 1, title: 'Beber 2.5L de água', completed: true, icon: Droplet },
-    { id: 2, title: 'Caminhar 10.000 passos', completed: false, icon: Footprints },
-    { id: 3, title: 'Treinar 30 minutos', completed: true, icon: Dumbbell },
-    { id: 4, title: 'Seguir plano alimentar', completed: false, icon: CheckCircle2 }
-  ];
 
   const tips = [
     'Lembre-se de beber água ao longo do dia',
@@ -186,32 +179,8 @@ const PatientDashboard = () => {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Tarefas do Dia */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tarefas de Hoje</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {tasks.map((task) => {
-                  const Icon = task.icon;
-                  return (
-                    <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                      {task.completed ? (
-                        <CheckCircle2 className="text-green-600" size={24} />
-                      ) : (
-                        <Circle className="text-gray-400" size={24} />
-                      )}
-                      <Icon className="text-teal-700" size={20} />
-                      <span className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-900 font-medium'}`}>
-                        {task.title}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Checklist Diário */}
+          <ChecklistSimple patientId={user?.id} isPatientView={true} />
 
           {/* Dicas */}
           <Card>

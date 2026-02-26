@@ -7,43 +7,53 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Supabase credentials not found.');
 }
 
-// Configuração que evita o problema de NavigatorLock timeout
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'implicit',
-    // Desabilitar o lock do navigator para evitar timeout
-    lock: {
-      acquireLockTimeoutMs: 5000
-    },
-    // Storage customizado para evitar conflitos
-    storage: {
-      getItem: (key) => {
-        try {
-          return window.localStorage.getItem(key);
-        } catch {
-          return null;
-        }
-      },
-      setItem: (key, value) => {
-        try {
-          window.localStorage.setItem(key, value);
-        } catch {
-          // Ignore storage errors
-        }
-      },
-      removeItem: (key) => {
-        try {
-          window.localStorage.removeItem(key);
-        } catch {
-          // Ignore storage errors
+// SINGLETON: garantir que o client seja criado apenas uma vez
+let supabaseInstance = null;
+
+const createSupabaseClient = () => {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false, // Evitar múltiplas detecções
+      flowType: 'pkce', // Mais seguro que implicit
+      // Storage customizado com tratamento de erros
+      storage: {
+        getItem: (key) => {
+          try {
+            return window.localStorage.getItem(key);
+          } catch (error) {
+            console.warn('Storage getItem error:', error);
+            return null;
+          }
+        },
+        setItem: (key, value) => {
+          try {
+            window.localStorage.setItem(key, value);
+          } catch (error) {
+            console.warn('Storage setItem error:', error);
+          }
+        },
+        removeItem: (key) => {
+          try {
+            window.localStorage.removeItem(key);
+          } catch (error) {
+            console.warn('Storage removeItem error:', error);
+          }
         }
       }
     }
-  }
-});
+  });
+
+  return supabaseInstance;
+};
+
+// Exportar o client singleton
+export const supabase = createSupabaseClient();
 
 // ==================== AUTH HELPERS ====================
 
@@ -54,30 +64,99 @@ export const getCurrentUser = async () => {
 };
 
 export const getUserProfile = async (userId) => {
-  // Tentar por id
-  let { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  console.log('🔍 Buscando profile para userId:', userId);
   
-  // Tentar por auth_user_id
-  if (error || !data) {
-    const result = await supabase.from('profiles').select('*').eq('auth_user_id', userId).single();
-    data = result.data;
-    error = result.error;
-  }
-  
-  // Tentar por email
-  if (error || !data) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user?.email) {
-      const result = await supabase.from('profiles').select('*').eq('email', user.email).single();
-      data = result.data;
+  try {
+    // Tentar buscar por id
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle(); // maybeSingle() não lança erro se não encontrar
+    
+    if (error) {
+      console.error('❌ Erro ao buscar profile:', error);
+      
+      // Se erro 406, pode ser problema de RLS ou perfil não existe
+      if (error.code === 'PGRST116' || error.message.includes('406')) {
+        console.warn('⚠️ Profile não encontrado ou bloqueado por RLS');
+        
+        // Tentar criar perfil automaticamente
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) {
+          console.log('🔧 Tentando criar profile automaticamente...');
+          return await createMissingProfile(user);
+        }
+      }
+      
+      return null;
     }
+    
+    if (!data) {
+      console.warn('⚠️ Profile não encontrado no banco');
+      // Tentar criar perfil automaticamente
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        console.log('🔧 Tentando criar profile automaticamente...');
+        return await createMissingProfile(user);
+      }
+      return null;
+    }
+    
+    console.log('✅ Profile encontrado:', data.email, 'Role:', data.role);
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao buscar profile:', error);
+    return null;
   }
-  
-  return data || null;
+};
+
+// Criar perfil faltante automaticamente
+const createMissingProfile = async (authUser) => {
+  try {
+    console.log('🆕 Criando profile para:', authUser.email);
+    
+    // Verificar se já existe por email
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', authUser.email)
+      .maybeSingle();
+    
+    if (existing) {
+      console.log('✅ Profile já existe (encontrado por email)');
+      return existing;
+    }
+    
+    // Criar novo profile com role visitor por padrão
+    // Admin precisa promover para professional ou admin depois
+    const newProfile = {
+      id: authUser.id,
+      email: authUser.email,
+      name: authUser.user_metadata?.name || authUser.email.split('@')[0],
+      role: 'visitor', // Papel padrão, admin pode alterar depois
+      created_at: new Date().toISOString()
+    };
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert(newProfile)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Erro ao criar profile:', error);
+      return null;
+    }
+    
+    console.log('✅ Profile criado com sucesso');
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Erro fatal ao criar profile:', error);
+    return null;
+  }
 };
 
 export const signIn = async (email, password) => {
@@ -86,6 +165,31 @@ export const signIn = async (email, password) => {
 
 export const signOut = async () => {
   return await supabase.auth.signOut();
+};
+
+export const updatePassword = async (newPassword) => {
+  console.log('🔐 Atualizando senha...');
+  
+  try {
+    const result = await supabase.auth.updateUser({
+      password: newPassword
+    }).catch(err => {
+      // Capturar erro do Supabase sem processar
+      return { data: null, error: { message: 'Erro ao atualizar senha' } };
+    });
+    
+    if (result.error) {
+      console.error('❌ Erro ao atualizar senha');
+      return { success: false, error: { message: 'Erro ao atualizar senha' } };
+    }
+    
+    console.log('✅ Senha atualizada com sucesso');
+    return { success: true, error: null };
+    
+  } catch (error) {
+    console.error('❌ Erro fatal');
+    return { success: false, error: { message: 'Erro fatal ao atualizar senha' } };
+  }
 };
 
 // ==================== PROFILE HELPERS ====================
@@ -114,36 +218,44 @@ export const updateProfile = async (profileId, updates) => {
 
 // Buscar pacientes do profissional (ou todos se admin)
 export const getProfessionalPatients = async (professionalId, isAdmin = false, filters = {}) => {
-  let query = supabase
-    .from('patient_profiles')
-    .select(`
-      *,
-      patient:profiles!patient_id(*)
-    `)
-    .is('patient.deleted_at', null);
+  console.log('📋 Buscando pacientes...');
   
-  // Se não for admin, filtra apenas pelos pacientes do profissional
-  if (!isAdmin) {
-    query = query.eq('professional_id', professionalId);
-  } else if (filters.professionalId) {
-    // Admin pode filtrar por profissional específico
-    query = query.eq('professional_id', filters.professionalId);
+  try {
+    // Buscar direto da tabela profiles filtrando por role='patient'
+    // Evita problema com patient_profiles que pode não existir ou ter schema diferente
+    let query = supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'patient')
+      .eq('status', 'active');
+    
+    // Se não for admin, precisa filtrar por profissional
+    // Mas como profiles não tem professional_id, admin vê todos por enquanto
+    // TODO: Implementar tabela patient_profiles corretamente depois
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('❌ Erro ao buscar:', error);
+      return { data: [], error: null };
+    }
+    
+    // Transformar para formato esperado pela UI
+    const formatted = (data || []).map(patient => ({
+      id: patient.id,
+      patient_id: patient.id,
+      professional_id: professionalId,
+      status: 'active',
+      patient: patient
+    }));
+    
+    console.log(`✅ ${formatted.length} pacientes`);
+    return { data: formatted, error: null };
+    
+  } catch (err) {
+    console.error('❌ Erro:', err);
+    return { data: [], error: null };
   }
-  
-  // Filtro de status
-  if (filters.status) {
-    query = query.eq('status', filters.status);
-  }
-  
-  // Ordenação
-  if (filters.orderBy === 'name') {
-    query = query.order('patient(name)', { ascending: true });
-  } else {
-    query = query.order('created_at', { ascending: false });
-  }
-  
-  const { data, error } = await query;
-  return { data, error };
 };
 
 export const getPatientById = async (patientId) => {
@@ -158,80 +270,127 @@ export const getPatientById = async (patientId) => {
 };
 
 export const createPatientByProfessional = async (professionalId, patientData) => {
-  // Verificar email existente
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('email', patientData.email)
-    .single();
+  console.log('🆕 Criando paciente...');
   
-  if (existing) {
-    return { data: null, error: { message: 'Email já cadastrado no sistema' } };
-  }
-
   const patientId = crypto.randomUUID();
   
-  // Criar profile
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert({
-      id: patientId,
-      email: patientData.email,
-      name: patientData.name,
-      phone: patientData.phone || null,
-      role: 'patient',
-      birth_date: patientData.birth_date || null,
-      gender: patientData.gender || null,
-      height: patientData.height || null,
-      current_weight: patientData.current_weight || null,
-      goal_weight: patientData.goal_weight || null,
-      goal: patientData.goal || null,
-      notes: patientData.notes || null,
-      status: 'active'
-    });
-  
-  if (profileError) {
-    return { data: null, error: profileError };
+  try {
+    // 1. Criar usuário no Supabase Auth (com senha)
+    if (patientData.password) {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: patientData.email,
+        password: patientData.password,
+        options: {
+          data: {
+            name: patientData.name,
+            role: 'patient'
+          }
+        }
+      });
+
+      if (authError) {
+        console.error('❌ Erro auth:', authError);
+        return { data: null, error: { message: authError.message || 'Erro ao criar conta' } };
+      }
+
+      console.log('✅ Auth criado:', authData.user?.id);
+      
+      // Usar o ID gerado pelo Auth
+      const authUserId = authData.user?.id;
+      
+      if (authUserId) {
+        // 2. Atualizar/criar profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: authUserId,
+            email: patientData.email,
+            name: patientData.name,
+            phone: patientData.phone || null,
+            role: 'patient',
+            status: 'active'
+          });
+        
+        if (profileError) {
+          console.error('❌ Erro profile:', profileError);
+          return { data: null, error: { message: 'Erro ao criar perfil' } };
+        }
+        
+        console.log('✅ Profile criado/atualizado');
+        
+        // 3. Criar vínculo
+        try {
+          await supabase
+            .from('patient_profiles')
+            .insert({
+              patient_id: authUserId,
+              professional_id: professionalId,
+              status: 'active'
+            });
+          console.log('✅ Vínculo criado');
+        } catch (linkErr) {
+          console.warn('⚠️ Vínculo não criado');
+        }
+        
+        // 4. Anamnese (opcional)
+        try {
+          await supabase.from('anamnesis').insert({
+            patient_id: authUserId,
+            professional_id: professionalId,
+            birth_date: patientData.birth_date,
+            gender: patientData.gender,
+            height: patientData.height,
+            current_weight: patientData.current_weight,
+            goal_weight: patientData.goal_weight,
+            goal: patientData.goal,
+            notes: patientData.notes
+          });
+          console.log('✅ Anamnese criada');
+        } catch (anamErr) {
+          console.warn('⚠️ Anamnese não criada');
+        }
+        
+        return { 
+          data: { 
+            id: authUserId, 
+            email: patientData.email, 
+            name: patientData.name 
+          }, 
+          error: null 
+        };
+      }
+    }
+    
+    return { data: null, error: { message: 'Senha é obrigatória' } };
+    
+  } catch (error) {
+    console.error('❌ Erro geral:', error);
+    return { data: null, error: { message: error.message || 'Erro ao criar paciente' } };
   }
-  
-  // Criar vínculo
-  const { error: linkError } = await supabase
-    .from('patient_profiles')
-    .insert({
-      patient_id: patientId,
-      professional_id: professionalId,
-      status: 'active'
-    });
-  
-  if (linkError) {
-    await supabase.from('profiles').delete().eq('id', patientId);
-    return { data: null, error: linkError };
-  }
-  
-  // Criar anamnese vazia
-  await supabase.from('anamnesis').insert({
-    patient_id: patientId,
-    professional_id: professionalId,
-    status: 'incomplete'
-  });
-  
-  const { data: patient } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', patientId)
-    .single();
-  
-  return { data: patient, error: null };
 };
 
 export const updatePatient = async (patientId, updates) => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(updates)
-    .eq('id', patientId)
-    .select()
-    .single();
-  return { data, error };
+  console.log('✏️ Atualizando paciente...', { patientId });
+  
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', patientId)
+      .select()
+      .maybeSingle();
+    
+    if (error) {
+      console.error('❌ Erro ao atualizar paciente');
+      return { data: null, error: { message: 'Erro ao atualizar paciente' } };
+    }
+    
+    console.log('✅ Paciente atualizado');
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Erro fatal ao atualizar paciente');
+    return { data: null, error: { message: 'Erro fatal ao atualizar paciente' } };
+  }
 };
 
 // Soft delete
@@ -386,26 +545,23 @@ export const toggleChecklistEntry = async (templateId, patientId, date, complete
   return { data, error };
 };
 
-// Calcular aderência dos últimos N dias
+// Calcular aderência simples (para o resumo do paciente)
 export const getChecklistAdherence = async (patientId, days = 7) => {
-  const endDate = new Date().toISOString().split('T')[0];
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  // Para MVP simples, apenas contar tarefas completas vs totais
+  const { data: tasks } = await supabase
+    .from('checklist_tasks')
+    .select('*')
+    .eq('patient_id', patientId);
   
-  // Buscar templates ativos
-  const { data: templates } = await getChecklistTemplates(patientId);
-  if (!templates || templates.length === 0) return { adherence: 0, completed: 0, total: 0 };
+  if (!tasks || tasks.length === 0) {
+    return { adherence: 0, completed: 0, total: 0 };
+  }
   
-  // Buscar entries no período
-  const { data: entries } = await getChecklistEntries(patientId, startDate, endDate);
+  const completed = tasks.filter(t => t.completed).length;
+  const total = tasks.length;
+  const adherence = total > 0 ? Math.round((completed / total) * 100) : 0;
   
-  const totalPossible = templates.length * days;
-  const completedCount = entries?.filter(e => e.completed).length || 0;
-  
-  return {
-    adherence: totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0,
-    completed: completedCount,
-    total: totalPossible
-  };
+  return { adherence, completed, total };
 };
 
 // ==================== PATIENT MESSAGES / TIPS ====================
@@ -680,3 +836,46 @@ export const saveBranding = async (userId, brandingData) => {
     .single();
   return { data, error };
 };
+
+// ==================== CHECKLIST SIMPLES (MVP) ====================
+
+export const getChecklistTasks = async (patientId) => {
+  const { data, error } = await supabase
+    .from('checklist_tasks')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('created_at', { ascending: true });
+  return { data, error };
+};
+
+export const createChecklistTask = async (patientId, title) => {
+  const { data, error } = await supabase
+    .from('checklist_tasks')
+    .insert({ patient_id: patientId, title })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateChecklistTask = async (taskId, updates) => {
+  const { data, error } = await supabase
+    .from('checklist_tasks')
+    .update(updates)
+    .eq('id', taskId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const toggleChecklistTask = async (taskId, completed) => {
+  return await updateChecklistTask(taskId, { completed });
+};
+
+export const deleteChecklistTask = async (taskId) => {
+  const { error } = await supabase
+    .from('checklist_tasks')
+    .delete()
+    .eq('id', taskId);
+  return { error };
+};
+

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { User, Stethoscope, Eye, ArrowLeft, Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBranding } from '@/contexts/BrandingContext';
-import { signIn, getUserProfile } from '@/lib/supabase';
+import { signIn, getUserProfile, signOut } from '@/lib/supabase';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -37,7 +37,12 @@ const LoginPage = () => {
         return;
       }
 
-      if (data.user) {
+      if (data?.user) {
+        // Aguardar um pouco para o AuthContext processar o login
+        // Isso evita race condition com múltiplas chamadas getUserProfile
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Buscar profile uma única vez após login
         const profile = await getUserProfile(data.user.id);
         
         if (!profile) {
@@ -49,18 +54,21 @@ const LoginPage = () => {
         // Verificar se o tipo de login corresponde ao role do usuário
         if (loginType === 'professional' && profile.role !== 'professional' && profile.role !== 'admin') {
           toast.error('Esta conta não é de profissional');
+          await signOut(); // Fazer logout se role incorreto
           setLoading(false);
           return;
         }
 
         if (loginType === 'patient' && profile.role !== 'patient') {
           toast.error('Esta conta não é de paciente');
+          await signOut();
           setLoading(false);
           return;
         }
 
         if (loginType === 'admin' && profile.role !== 'admin') {
           toast.error('Esta conta não tem permissão de administrador');
+          await signOut();
           setLoading(false);
           return;
         }
@@ -72,21 +80,26 @@ const LoginPage = () => {
 
         toast.success('Login realizado com sucesso!');
 
+        // Aguardar para o toast e componentes estabilizarem antes de navegar
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         // Redirecionar baseado no role
         if (profile.role === 'admin') {
-          navigate('/admin/dashboard');
+          navigate('/admin/dashboard', { replace: true });
         } else if (profile.role === 'professional') {
-          navigate('/professional/dashboard');
+          navigate('/professional/dashboard', { replace: true });
         } else if (profile.role === 'patient') {
           localStorage.setItem('fitjourney_patient_id', profile.id);
           localStorage.setItem('fitjourney_patient_name', profile.name);
-          navigate('/patient/dashboard');
+          navigate('/patient/dashboard', { replace: true });
         }
       }
     } catch (error) {
       toast.error('Erro ao fazer login');
       console.error(error);
     } finally {
+      // Pequeno delay antes de liberar o botão para evitar double click
+      await new Promise(resolve => setTimeout(resolve, 200));
       setLoading(false);
     }
   };
@@ -173,19 +186,19 @@ const LoginPage = () => {
             {/* Visitante */}
             <Card 
               data-testid="visitor-login-card" 
-              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-gray-600 cursor-pointer" 
+              className="hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-600 cursor-pointer" 
               onClick={handleVisitorLogin}
             >
               <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                  <Eye className="text-gray-700" size={32} />
+                <div className="mx-auto w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                  <Eye className="text-blue-700" size={32} />
                 </div>
                 <CardTitle className="text-xl">Visitante</CardTitle>
-                <CardDescription>Experimente as calculadoras</CardDescription>
+                <CardDescription>Check nutricional + calculadoras</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button data-testid="visitor-login-button" className="w-full bg-gray-700 hover:bg-gray-800" size="lg" variant="outline">
-                  Continuar como Visitante
+                <Button data-testid="visitor-login-button" className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
+                  Acessar Ferramentas
                 </Button>
               </CardContent>
             </Card>

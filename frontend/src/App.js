@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { BrandingProvider } from '@/contexts/BrandingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import AdminBar from '@/components/AdminBar';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 import LoginPage from '@/pages/LoginPage';
 import AdminDashboard from '@/pages/AdminDashboard';
@@ -11,12 +13,21 @@ import PatientsList from '@/pages/PatientsList';
 import PatientProfile from '@/pages/PatientProfile';
 import MealPlanEditor from '@/pages/MealPlanEditor';
 import PatientDashboard from '@/pages/PatientDashboard';
+import PatientTarefas from '@/pages/PatientTarefas';
+import PatientFeedbacks from '@/pages/PatientFeedbacks';
+import PatientReceitas from '@/pages/PatientReceitas';
+import PatientListaCompras from '@/pages/PatientListaCompras';
+import PatientSuplementos from '@/pages/PatientSuplementos';
+import PatientDicas from '@/pages/PatientDicas';
+import PatientJornada from '@/pages/PatientJornada';
 import CalculatorsList from '@/pages/CalculatorsList';
 import WeightCalculator from '@/pages/WeightCalculator';
 import WaterCalculator from '@/pages/WaterCalculator';
 import SettingsPage from '@/pages/SettingsPage';
 import FoodDatabase from '@/pages/FoodDatabase';
 import BrandingSettings from '@/pages/BrandingSettings';
+import HealthCheckQuiz from '@/pages/HealthCheckQuiz';
+import ProjetoBiquiniBranco from '@/pages/ProjetoBiquiniBranco';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
@@ -26,7 +37,7 @@ const ProtectedRoute = ({ children, allowedTypes }) => {
     return <Navigate to="/" replace />;
   }
   
-  // Admin tem acesso a TUDO (override)
+  // Admin tem acesso a TUDO (override) - mantém sua role
   if (userType === 'admin') {
     return children;
   }
@@ -44,12 +55,16 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <AuthProvider>
-        <BrandingProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<LoginPage />} />
+    <ErrorBoundary>
+      <div className="App">
+        <AuthProvider>
+          <BrandingProvider>
+            <BrowserRouter>
+              {/* AdminBar: aparece automaticamente quando admin está em outras áreas */}
+              <AdminBar />
+              
+              <Routes>
+                <Route path="/" element={<LoginPage />} />
               
               {/* Admin Routes */}
               <Route path="/admin/dashboard" element={
@@ -108,12 +123,47 @@ function App() {
               } />
               <Route path="/patient/meal-plan" element={
                 <ProtectedRoute allowedTypes={['patient']}>
-                  <PatientDashboard />
+                  <MealPlanEditor userType="patient" />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/tarefas" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientTarefas />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/feedbacks" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientFeedbacks />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/receitas" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientReceitas />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/lista-compras" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientListaCompras />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/suplementos" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientSuplementos />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/dicas" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientDicas />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/jornada" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientJornada />
                 </ProtectedRoute>
               } />
               <Route path="/patient/checklist" element={
                 <ProtectedRoute allowedTypes={['patient']}>
-                  <PatientDashboard />
+                  <PatientTarefas />
                 </ProtectedRoute>
               } />
               <Route path="/patient/messages" element={
@@ -143,6 +193,16 @@ function App() {
               } />
               
               {/* Visitor Routes */}
+              <Route path="/visitor/health-check" element={
+                <ProtectedRoute allowedTypes={['visitor']}>
+                  <HealthCheckQuiz />
+                </ProtectedRoute>
+              } />
+              <Route path="/visitor/projeto" element={
+                <ProtectedRoute allowedTypes={['visitor']}>
+                  <ProjetoBiquiniBranco />
+                </ProtectedRoute>
+              } />
               <Route path="/visitor/calculators" element={
                 <ProtectedRoute allowedTypes={['visitor']}>
                   <CalculatorsList userType="visitor" />
@@ -162,10 +222,12 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
-          <Toaster />
         </BrandingProvider>
       </AuthProvider>
+      {/* Toaster fora do Router para evitar unmount durante navegação */}
+      <Toaster position="top-right" duration={3000} />
     </div>
+    </ErrorBoundary>
   );
 }
 
