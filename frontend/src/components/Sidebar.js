@@ -2,10 +2,19 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, Users, Calendar, Calculator, FileText, Settings, LogOut, 
   Database, Palette, Shield, ClipboardList, MessageSquare, Stethoscope,
-  UserCog, Activity
+  UserCog, Activity, ShoppingCart, ChefHat, Pill, Lightbulb, TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
+import { useState, useEffect } from 'react';
+import { getPatientMenuConfig, DEFAULT_PATIENT_MENU } from '@/lib/supabase';
+
+// Mapeamento de ícones para menu dinâmico
+const iconMap = {
+  Home, Calendar, ClipboardList, MessageSquare, ShoppingCart,
+  ChefHat, Pill, Lightbulb, TrendingUp, Calculator, Settings,
+  Users, Database, Palette, Shield, UserCog, Activity
+};
 
 const Sidebar = ({ userType, onLogout }) => {
   const location = useLocation();
