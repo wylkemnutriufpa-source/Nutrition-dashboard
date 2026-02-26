@@ -463,7 +463,7 @@ const ProjetoBiquiniBranco = () => {
               </h2>
               
               <p className="text-xl mb-8 text-white/90">
-                Centenas de mulheres já transformaram suas vidas. Agora é sua vez!
+                {projectData.ctaFinal || 'Centenas de mulheres já transformaram suas vidas. Agora é sua vez!'}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
