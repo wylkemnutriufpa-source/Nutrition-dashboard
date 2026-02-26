@@ -252,10 +252,10 @@ const ProjetoBiquiniBranco = () => {
         {/* O QUE VOCÊ VAI TER */}
         <section className="max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
-            ✅ O QUE VOCÊ VAI TER
+            {projectData.sectionTitles?.benefits || '✅ O QUE VOCÊ VAI TER'}
           </h2>
           <p className="text-center text-gray-600 mb-10 text-lg">
-            Um programa completo para transformação real
+            {projectData.sectionTitles?.benefitsSubtitle || 'Um programa completo para transformação real'}
           </p>
           
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -280,7 +280,7 @@ const ProjetoBiquiniBranco = () => {
               <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                 <div className="flex items-center gap-3">
                   <Camera className="w-8 h-8" />
-                  <span className="text-xl font-bold">A cada 15 dias:</span>
+                  <span className="text-xl font-bold">{projectData.sectionTitles?.biweekly || 'A cada 15 dias:'}</span>
                 </div>
                 <div className="flex flex-wrap gap-4 justify-center">
                   {projectData.biweeklyTasks.map((task, index) => (
@@ -299,10 +299,10 @@ const ProjetoBiquiniBranco = () => {
           <Card className="bg-gradient-to-br from-purple-600 to-pink-600 text-white border-0 overflow-hidden">
             <CardContent className="py-10">
               <h2 className="text-3xl font-bold text-center mb-2">
-                👥 SUPORTE EXCLUSIVO EM 2 GRUPOS
+                {projectData.sectionTitles?.support || '👥 SUPORTE EXCLUSIVO EM 2 GRUPOS'}
               </h2>
               <p className="text-center text-purple-200 mb-8">
-                Você não vai estar sozinha nessa jornada!
+                {projectData.sectionTitles?.supportSubtitle || 'Você não vai estar sozinha nessa jornada!'}
               </p>
               
               <div className="grid md:grid-cols-3 gap-6">
