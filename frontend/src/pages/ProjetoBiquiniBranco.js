@@ -257,6 +257,9 @@ const ProjetoBiquiniBranco = () => {
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
             {projectData.sectionTitles?.benefits || '✅ O QUE VOCÊ VAI TER'}
           </h2>
+          {projectData.sectionDescriptions?.benefits && (
+            <p className="text-center text-gray-600 mb-2 text-base">{projectData.sectionDescriptions.benefits}</p>
+          )}
           <p className="text-center text-gray-600 mb-10 text-lg">
             {projectData.sectionTitles?.benefitsSubtitle || 'Um programa completo para transformação real'}
           </p>
