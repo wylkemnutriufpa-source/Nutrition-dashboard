@@ -90,12 +90,12 @@ const ProjectCTA = ({ category = 'normal', userData = {}, source = 'calculator' 
           </div>
         </div>
         
-        <div className="inline-flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white text-xs font-bold rounded-full mx-auto mb-3">
+        <div className="inline-flex items-center gap-2 px-4 py-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-full mx-auto mb-3" style={{ fontSize: 'var(--badge-size, 0.75rem)' }}>
           <Sparkles size={12} />
           PROJETO BIQUÍNI BRANCO
         </div>
         
-        <CardTitle className="text-2xl md:text-3xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+        <CardTitle className="text-2xl md:text-3xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent" style={{ fontSize: 'var(--font-size-heading, 2rem)' }}>
           {config.title}
         </CardTitle>
         <CardDescription className="text-base mt-2 text-gray-600">
