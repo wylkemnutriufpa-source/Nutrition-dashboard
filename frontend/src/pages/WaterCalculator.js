@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { MessageCircle, Instagram, Mail } from 'lucide-react';
+import ProjectCTA from '@/components/ProjectCTA';
 
 const CTACard = () => (
   <Card className="mt-8 border-2 border-teal-700 bg-gradient-to-br from-teal-50 to-green-50">
