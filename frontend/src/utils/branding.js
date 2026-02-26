@@ -1,81 +1,102 @@
 // Sistema de White-Label / Branding
 // Hierarquia: GLOBAL (ADM) > PROFESSIONAL > Paciente herda do profissional
+// AGORA PERSISTIDO NO SUPABASE (não mais em localStorage)
+
+import { 
+  getCurrentProfessionalBranding, 
+  getPatientProfessionalBranding,
+  upsertProfessionalBranding 
+} from '@/lib/supabase';
 
 export const DEFAULT_BRANDING = {
-  logo: null, // URL ou base64
-  brandName: 'FitJourney',
-  primaryColor: '#0F766E', // teal-700
-  accentColor: '#059669', // green-600
-  footerText: 'Sua jornada para uma vida mais saudável',
-  welcomeMessage: 'Bem-vindo ao seu painel de nutrição'
+  logo_url: null,
+  primary_color: '#059669', // green-600
+  secondary_color: '#10b981', // green-500
+  accent_color: '#34d399' // green-400
 };
 
-// Estrutura que seria no Supabase:
-// Table: branding_configs
-// Columns:
-// - id (uuid, primary key)
-// - user_email (text, unique) - null para global
-// - user_type (text) - 'ADMIN', 'PROFESSIONAL'
-// - logo (text) - URL ou base64
-// - brand_name (text)
-// - primary_color (text)
-// - accent_color (text)
-// - footer_text (text)
-// - welcome_message (text)
-// - created_at (timestamp)
-// - updated_at (timestamp)
+// ==================== FUNÇÕES PRINCIPAIS ====================
 
-// Helper functions
-export const getGlobalBranding = () => {
-  const stored = localStorage.getItem('fitjourney_branding_global');
-  return stored ? JSON.parse(stored) : DEFAULT_BRANDING;
-};
-
-export const saveGlobalBranding = (branding) => {
-  localStorage.setItem('fitjourney_branding_global', JSON.stringify({
-    ...branding,
-    updated_at: new Date().toISOString()
-  }));
-  return true;
-};
-
-export const getProfessionalBranding = (email) => {
-  const key = `fitjourney_branding_pro_${email}`;
-  const stored = localStorage.getItem(key);
-  return stored ? JSON.parse(stored) : null;
-};
-
-export const saveProfessionalBranding = (email, branding) => {
-  const key = `fitjourney_branding_pro_${email}`;
-  localStorage.setItem(key, JSON.stringify({
-    ...branding,
-    userEmail: email,
-    updated_at: new Date().toISOString()
-  }));
-  return true;
-};
-
-export const getActiveBranding = () => {
-  const userType = localStorage.getItem('fitjourney_user_type');
-  const userEmail = localStorage.getItem('fitjourney_user_email');
-  
-  // Se for profissional, tenta pegar branding personalizado
-  if (userType === 'professional' && userEmail) {
-    const proBranding = getProfessionalBranding(userEmail);
-    if (proBranding) {
-      return { ...getGlobalBranding(), ...proBranding };
+/**
+ * Busca o branding ativo do usuário logado
+ * - Se profissional: retorna seu branding
+ * - Se paciente: retorna branding do seu profissional
+ * - Default: branding padrão
+ */
+export const getActiveBranding = async () => {
+  try {
+    const userType = localStorage.getItem('fitjourney_user_type');
+    
+    if (userType === 'professional') {
+      const { data, error } = await getCurrentProfessionalBranding();
+      if (error) {
+        console.error('Erro ao buscar branding profissional:', error);
+        return DEFAULT_BRANDING;
+      }
+      return data || DEFAULT_BRANDING;
     }
+    
+    if (userType === 'patient') {
+      const { data, error } = await getPatientProfessionalBranding();
+      if (error) {
+        console.error('Erro ao buscar branding do profissional:', error);
+        return DEFAULT_BRANDING;
+      }
+      return data || DEFAULT_BRANDING;
+    }
+    
+    // Admin ou visitante
+    return DEFAULT_BRANDING;
+  } catch (error) {
+    console.error('Erro ao buscar branding:', error);
+    return DEFAULT_BRANDING;
   }
-  
-  // Se for paciente, pega branding do profissional (mock: usar global por enquanto)
-  // Em produção, faria query para pegar o email do profissional do paciente
-  if (userType === 'patient') {
-    // TODO: Buscar profissional do paciente e retornar seu branding
-    return getGlobalBranding();
+};
+
+/**
+ * Salva o branding do profissional no Supabase
+ * @param {string} professionalId - UUID do profissional
+ * @param {Object} branding - {logo_url, primary_color, secondary_color, accent_color}
+ */
+export const saveProfessionalBranding = async (professionalId, branding) => {
+  try {
+    const { data, error } = await upsertProfessionalBranding(professionalId, branding);
+    if (error) {
+      console.error('Erro ao salvar branding:', error);
+      return { success: false, error };
+    }
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao salvar branding:', error);
+    return { success: false, error };
   }
-  
-  // Default: branding global
-  return getGlobalBranding();
+};
+
+/**
+ * DEPRECATED - Mantido para compatibilidade
+ * @deprecated Use getActiveBranding() async
+ */
+export const getGlobalBranding = () => {
+  console.warn('getGlobalBranding() deprecated - use getActiveBranding() async');
+  return DEFAULT_BRANDING;
+};
+
+/**
+ * DEPRECATED - Mantido para compatibilidade
+ * @deprecated Use saveProfessionalBranding() async
+ */
+export const saveGlobalBranding = (branding) => {
+  console.warn('saveGlobalBranding() deprecated - use saveProfessionalBranding() async');
+  return true;
+};
+
+/**
+ * DEPRECATED - Mantido para compatibilidade
+ * @deprecated Use getActiveBranding() async
+ */
+export const getProfessionalBranding = (email) => {
+  console.warn('getProfessionalBranding() deprecated - use getActiveBranding() async');
+  return null;
 };
 
 export const applyBrandingToDOM = (branding) => {
