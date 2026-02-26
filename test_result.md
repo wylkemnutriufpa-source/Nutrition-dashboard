@@ -241,6 +241,18 @@ frontend:
         agent: "main"
         comment: "Já estava funcionando com Supabase"
 
+  - task: "Weight Calculator for Visitors"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/WeightCalculator.js, frontend/src/components/ProjectCTA.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED AND WORKING: Calculadora de Peso tested successfully. Complete flow verified: (1) Visitor login → (2) Calculators list page → (3) Weight calculator form Step 1 (altura: 165cm, peso: 85kg, idade: 35, sexo: feminino) → (4) Step 2 (acima do peso, perder peso, atividade moderada) → (5) Results displayed correctly (Peso Ideal: 55.3kg, IMC: 31.2, Diferença: +29.8kg, TMB: 1593 kcal, GET: 2469 kcal, Recomendação: 1969 calorias/dia). ProjectCTA component appears at the end with all required elements: Badge 'PROJETO BIQUÍNI BRANCO', title 'Sua saúde merece cuidado profissional', emotional message, benefits (Programa completo, Plano personalizado, Resultados em 90 dias), button 'Conhecer o Projeto', and WhatsApp button 'Quero cuidar da minha saúde'. CTA correctly shows 'obesidade' category styling and messaging based on IMC 31.2. All UI elements visible and functional. Screenshots captured."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
