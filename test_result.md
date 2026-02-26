@@ -550,6 +550,61 @@ agent_communication:
     ✅ Service running stable on supervisor (pid 497, active)
     ✅ MongoDB integration functioning correctly
     ✅ Logs clean with no errors or warnings
+  - agent: "testing"
+    message: "❌ CRITICAL: P0 FIX VERIFICATION BLOCKED BY LOGIN FAILURES
+    
+    ATTEMPTED TESTING:
+    1. Professional Login (admin@teste.com / 123456)
+       - Result: FAILED with 400 error
+       - Error: 'AuthUnknownError: Failed to execute json on Response: body stream already read'
+       - Network: 400 error from https://safovouvjiikaickutvi.supabase.co/auth/v1/token
+       - Console error logged in browser
+       - This is THE SAME ERROR mentioned in test_result.md line 366-374 that was supposedly fixed
+    
+    2. Patient Login (maria@gmail.com / 123456)
+       - Result: FAILED - credentials submitted but dashboard did not load
+       - Cannot access patient features to test
+    
+    3. Weight Calculator (Visitor mode)
+       - Calculator page loads successfully
+       - Form visible with proper fields (Altura, Peso Atual, Idade, Sexo)
+       - Did not complete test due to time spent troubleshooting login
+    
+    ROOT CAUSE ANALYSIS:
+    - Supabase Auth is returning 400 errors during login
+    - Possible causes:
+      a) Invalid test credentials (users don't exist in database)
+      b) Supabase Auth configuration issue
+      c) Rate limiting or API key issue
+      d) The 'body stream already read' error suggests response is being read multiple times
+    
+    P0 FIX STATUS:
+    ❌ CANNOT VERIFY - Unable to access PatientProfile due to login failures
+    - The .single() to .maybeSingle() changes in supabase.js look correct (verified in code)
+    - But without working login, cannot test if 406/400 errors are truly fixed in PatientProfile
+    
+    BLOCKING ISSUES:
+    1. LOGIN COMPLETELY BROKEN (both professional and patient)
+    2. Cannot test any authenticated features
+    3. Cannot verify P0 fix for PatientProfile 406/400 errors
+    
+    URGENT ACTIONS REQUIRED BY MAIN AGENT:
+    1. 🔴 HIGH PRIORITY: Use WEBSEARCH tool to find solution for Supabase auth 400 errors
+    2. 🔴 Verify test credentials exist in Supabase database
+    3. 🔴 Check Supabase project configuration and API keys
+    4. 🔴 Fix the 'body stream already read' error in auth flow
+    5. After login is fixed, re-test P0 fix for PatientProfile
+    
+    TESTED COMPONENTS:
+    - ✅ Weight Calculator page loads (visitor mode)
+    - ❌ Professional login FAILED
+    - ❌ Patient login FAILED
+    - ❌ PatientProfile NOT TESTED (blocked)
+    - ❌ Patient sidebar NOT TESTED (blocked)
+    
+    NEXT STEPS:
+    Main agent MUST fix login before any P0 verification can proceed."
+
     ✅ Test data persistence verified (ID: e25948e9-c05a-4141-a86b-36aa470035c6)
     
     CONCLUSION: P0 fixes were frontend-only (supabase.js) and did NOT impact backend functionality. Backend remains stable and ready for production use. No backend issues found related to the 406/400 error fixes in PatientProfile."
