@@ -461,7 +461,7 @@ const AgendaPage = () => {
                 <Select value={form.patient_id} onValueChange={v => setForm({ ...form, patient_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecionar paciente..." /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
+                    <SelectItem value="none">Nenhum</SelectItem>
                     {patients.map(p => (
                       <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                     ))}
