@@ -98,7 +98,7 @@ const ProjectCTA = ({ category = 'normal', userData = {}, source = 'calculator' 
         <CardTitle className="text-2xl md:text-3xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent" style={{ fontSize: 'var(--font-size-heading, 2rem)' }}>
           {config.title}
         </CardTitle>
-        <CardDescription className="text-base mt-2 text-gray-600">
+        <CardDescription className="mt-2 text-gray-600" style={{ fontSize: 'var(--font-size-body, 1rem)' }}>
           {config.subtitle}
         </CardDescription>
       </CardHeader>
@@ -106,13 +106,13 @@ const ProjectCTA = ({ category = 'normal', userData = {}, source = 'calculator' 
       <CardContent className="space-y-6 relative z-10">
         {/* Mensagem emocional */}
         <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm">
-          <p className="text-gray-700 text-center leading-relaxed">
+          <p className="text-gray-700 text-center leading-relaxed" style={{ fontSize: 'var(--font-size-body, 1rem)' }}>
             {config.emotional}
           </p>
         </div>
         
         {/* Benefícios rápidos */}
-        <div className="grid grid-cols-3 gap-2 text-center text-sm">
+        <div className="grid grid-cols-3 gap-2 text-center" style={{ fontSize: 'var(--font-size-small, 0.875rem)' }}>
           <div className="flex flex-col items-center">
             <span className="text-2xl mb-1">👙</span>
             <span className="text-gray-600">Programa completo</span>
@@ -131,7 +131,8 @@ const ProjectCTA = ({ category = 'normal', userData = {}, source = 'calculator' 
         <div className="space-y-3">
           <Button 
             onClick={handleKnowMore}
-            className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+            className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white py-6 shadow-lg hover:shadow-xl transition-all"
+            style={{ fontSize: 'var(--button-size, 1rem)' }}
             size="lg"
           >
             <Sparkles className="mr-2" size={20} />
@@ -140,7 +141,8 @@ const ProjectCTA = ({ category = 'normal', userData = {}, source = 'calculator' 
           
           <Button 
             onClick={handleWhatsApp}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg shadow-md hover:shadow-lg transition-all"
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-6 shadow-md hover:shadow-lg transition-all"
+            style={{ fontSize: 'var(--button-size, 1rem)' }}
             size="lg"
           >
             <MessageCircle className="mr-2" size={20} />
@@ -149,7 +151,7 @@ const ProjectCTA = ({ category = 'normal', userData = {}, source = 'calculator' 
         </div>
         
         {/* Urgência */}
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-gray-500" style={{ fontSize: 'var(--font-size-small, 0.875rem)' }}>
           🔥 Vagas limitadas para acompanhamento personalizado
         </p>
       </CardContent>
