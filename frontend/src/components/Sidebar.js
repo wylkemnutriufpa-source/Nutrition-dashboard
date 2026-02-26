@@ -79,7 +79,8 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
 
   // Links fixos do Paciente (Dashboard sempre visível)
   const patientFixedLinks = [
-    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' }
+    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' },
+    { to: '/patient/agenda', icon: Bell, label: 'Minha Agenda' }
   ];
 
   // Links dinâmicos do Paciente (configurados pelo profissional)
