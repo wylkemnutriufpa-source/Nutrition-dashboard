@@ -57,6 +57,7 @@ const Sidebar = ({ userType, onLogout }) => {
     { to: '/professional/dashboard', icon: Home, label: 'Dashboard' },
     { to: '/professional/patients', icon: Users, label: 'Pacientes' },
     { to: '/professional/food-database', icon: Database, label: 'Alimentos' },
+    { to: '/professional/menu-config', icon: MenuIcon, label: 'Menu Paciente' },
     { to: '/professional/branding', icon: Palette, label: 'Personalização' },
     { to: '/professional/settings', icon: Settings, label: 'Configurações' }
   ];
@@ -67,12 +68,17 @@ const Sidebar = ({ userType, onLogout }) => {
     { to: '/admin/professionals', icon: UserCog, label: 'Profissionais' }
   ];
 
-  // Links do Paciente
-  const patientLinks = [
+  // Links padrão do Paciente (usado se não tiver config dinâmica)
+  const defaultPatientLinks = [
     { to: '/patient/dashboard', icon: Home, label: 'Dashboard' },
-    { to: '/patient/meal-plan', icon: Calendar, label: 'Meu Plano' },
-    { to: '/patient/checklist', icon: ClipboardList, label: 'Tarefas' },
-    { to: '/patient/messages', icon: MessageSquare, label: 'Recados' },
+    { to: '/patient/meal-plan', icon: Utensils, label: 'Meu Plano' },
+    { to: '/patient/checklist', icon: ClipboardList, label: 'Minhas Tarefas' },
+    { to: '/patient/feedback', icon: MessageSquare, label: 'Meus Feedbacks' },
+    { to: '/patient/recipes', icon: ChefHat, label: 'Minhas Receitas' },
+    { to: '/patient/shopping-list', icon: ShoppingCart, label: 'Lista de Compras' },
+    { to: '/patient/supplements', icon: Pill, label: 'Suplementos' },
+    { to: '/patient/tips', icon: Lightbulb, label: 'Dicas' },
+    { to: '/patient/journey', icon: TrendingUp, label: 'Minha Jornada' },
     { to: '/patient/calculators', icon: Calculator, label: 'Calculadoras' }
   ];
 
