@@ -161,7 +161,7 @@ const AdminProjetoEditor = () => {
       const { data: existing } = await supabase
         .from('project_showcase')
         .select('id')
-        .eq('project_key', 'biquini_branco')
+        .eq('project_name', 'biquini_branco')
         .maybeSingle();
 
       let result;
@@ -170,17 +170,17 @@ const AdminProjetoEditor = () => {
         result = await supabase
           .from('project_showcase')
           .update({
-            config: projectData,
+            content: projectData,
             updated_at: new Date().toISOString()
           })
-          .eq('project_key', 'biquini_branco');
+          .eq('project_name', 'biquini_branco');
       } else {
         // INSERT
         result = await supabase
           .from('project_showcase')
           .insert({
-            project_key: 'biquini_branco',
-            config: projectData
+            project_name: 'biquini_branco',
+            content: projectData
           });
       }
 
