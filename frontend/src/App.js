@@ -134,6 +134,11 @@ function App() {
                   <FinanceiroPage />
                 </ProtectedRoute>
               } />
+              <Route path="/professional/feedbacks" element={
+                <ProtectedRoute allowedTypes={['professional', 'admin']}>
+                  <FeedbacksList />
+                </ProtectedRoute>
+              } />
               
               {/* Patient Routes */}
               <Route path="/patient/dashboard" element={
