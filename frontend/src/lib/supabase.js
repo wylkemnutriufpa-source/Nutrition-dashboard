@@ -278,6 +278,11 @@ export const saveAnamnesisDraft = async (patientId, professionalId, updates) => 
 // ==================== CHECKLIST / TASKS ====================
 
 export const getChecklistTemplates = async (patientId) => {
+  if (!patientId) {
+    console.log('[getChecklistTemplates] No patientId provided');
+    return { data: [], error: null };
+  }
+  
   const { data, error } = await supabase
     .from('checklist_templates')
     .select('*')
