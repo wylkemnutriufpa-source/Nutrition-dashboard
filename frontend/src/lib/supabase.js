@@ -375,6 +375,11 @@ export const toggleChecklistEntry = async (templateId, patientId, date, complete
 
 // Calcular aderência dos últimos N dias
 export const getChecklistAdherence = async (patientId, days = 7) => {
+  if (!patientId) {
+    console.log('[getChecklistAdherence] No patientId provided');
+    return { adherence: 0, completed: 0, total: 0 };
+  }
+  
   const endDate = new Date().toISOString().split('T')[0];
   const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   
