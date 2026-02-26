@@ -41,71 +41,66 @@ const LoginPage = () => {
       }
 
       if (data?.user) {
-        // Aguardar um pouco para o AuthContext processar o login
-        // Isso evita race condition com múltiplas chamadas getUserProfile
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Buscar profile uma única vez após login
-        const profile = await getUserProfile(data.user.id);
-        
-        if (!profile) {
-          toast.error('Perfil não encontrado. Contate o administrador.');
-          setLoading(false);
-          return;
-        }
-
-        // Verificar se o tipo de login corresponde ao role do usuário
-        if (loginType === 'professional' && profile.role !== 'professional' && profile.role !== 'admin') {
-          toast.error('Esta conta não é de profissional');
-          await signOut(); // Fazer logout se role incorreto
-          setLoading(false);
-          return;
-        }
-
-        if (loginType === 'patient' && profile.role !== 'patient') {
-          toast.error('Esta conta não é de paciente');
-          await signOut();
-          setLoading(false);
-          return;
-        }
-
-        if (loginType === 'admin' && profile.role !== 'admin') {
-          toast.error('Esta conta não tem permissão de administrador');
-          await signOut();
-          setLoading(false);
-          return;
-        }
-
-        // Armazenar no localStorage
-        localStorage.setItem('fitjourney_user_type', profile.role);
-        localStorage.setItem('fitjourney_user_email', profile.email);
-        localStorage.setItem('fitjourney_user_id', profile.id);
-
         toast.success('Login realizado com sucesso!');
-
-        // Aguardar para o toast e componentes estabilizarem antes de navegar
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Redirecionar baseado no role
-        if (profile.role === 'admin') {
-          navigate('/admin/dashboard', { replace: true });
-        } else if (profile.role === 'professional') {
-          navigate('/professional/dashboard', { replace: true });
-        } else if (profile.role === 'patient') {
-          localStorage.setItem('fitjourney_patient_id', profile.id);
-          localStorage.setItem('fitjourney_patient_name', profile.name);
-          navigate('/patient/dashboard', { replace: true });
-        }
+        // Aguardar AuthContext processar e carregar o profile
+        setPendingLogin(true);
+        // O useEffect abaixo irá navegar quando o profile for carregado
       }
     } catch (error) {
       toast.error('Erro ao fazer login');
       console.error(error);
-    } finally {
-      // Pequeno delay antes de liberar o botão para evitar double click
-      await new Promise(resolve => setTimeout(resolve, 200));
       setLoading(false);
     }
   };
+
+  // Navegar quando o profile for carregado após login
+  useEffect(() => {
+    if (!pendingLogin || !profile) return;
+
+    // Verificar se o tipo de login corresponde ao role do usuário
+    if (loginType === 'professional' && profile.role !== 'professional' && profile.role !== 'admin') {
+      toast.error('Esta conta não é de profissional');
+      signOut();
+      setPendingLogin(false);
+      setLoading(false);
+      return;
+    }
+
+    if (loginType === 'patient' && profile.role !== 'patient') {
+      toast.error('Esta conta não é de paciente');
+      signOut();
+      setPendingLogin(false);
+      setLoading(false);
+      return;
+    }
+
+    if (loginType === 'admin' && profile.role !== 'admin') {
+      toast.error('Esta conta não tem permissão de administrador');
+      signOut();
+      setPendingLogin(false);
+      setLoading(false);
+      return;
+    }
+
+    // Armazenar no localStorage
+    localStorage.setItem('fitjourney_user_type', profile.role);
+    localStorage.setItem('fitjourney_user_email', profile.email);
+    localStorage.setItem('fitjourney_user_id', profile.id);
+
+    // Redirecionar baseado no role
+    if (profile.role === 'admin') {
+      navigate('/admin/dashboard', { replace: true });
+    } else if (profile.role === 'professional') {
+      navigate('/professional/dashboard', { replace: true });
+    } else if (profile.role === 'patient') {
+      localStorage.setItem('fitjourney_patient_id', profile.id);
+      localStorage.setItem('fitjourney_patient_name', profile.name);
+      navigate('/patient/dashboard', { replace: true });
+    }
+
+    setPendingLogin(false);
+    setLoading(false);
+  }, [profile, pendingLogin, loginType, navigate]);
 
   const handleVisitorLogin = () => {
     localStorage.setItem('fitjourney_user_type', 'visitor');
