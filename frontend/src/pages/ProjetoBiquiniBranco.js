@@ -422,7 +422,7 @@ const ProjetoBiquiniBranco = () => {
         {/* FAQ */}
         <section className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-10">
-            ❓ PERGUNTAS FREQUENTES
+            {projectData.sectionTitles?.faq || '❓ PERGUNTAS FREQUENTES'}
           </h2>
           
           <div className="space-y-4">
