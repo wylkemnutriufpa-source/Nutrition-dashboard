@@ -115,8 +115,7 @@ const FeedbacksList = () => {
             {feedbacks.map((feedback) => (
               <Card
                 key={feedback.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate('/professional/patients')}
+                className="hover:shadow-md transition-shadow"
               >
                 <CardContent className="py-4">
                   <div className="flex items-start justify-between gap-4">
