@@ -112,7 +112,7 @@ const Sidebar = ({ userType, onLogout }) => {
       case 'professional':
         return professionalLinks;
       case 'patient':
-        return patientLinks;
+        return getPatientLinks();
       default:
         return visitorLinks;
     }
