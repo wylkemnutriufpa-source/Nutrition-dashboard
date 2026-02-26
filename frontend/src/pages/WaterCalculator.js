@@ -201,7 +201,14 @@ const WaterCalculator = ({ userType = 'visitor' }) => {
         Fazer Novo Cálculo
       </Button>
 
-      {userType === 'visitor' && <CTACard />}
+      {/* CTA para Projeto Biquíni Branco */}
+      {userType === 'visitor' && (
+        <ProjectCTA 
+          category="normal"
+          userData={{ water: result.recommendedWater }}
+          source="water-calculator"
+        />
+      )}
     </div>
   );
 
