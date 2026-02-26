@@ -740,9 +740,7 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
     patientQuery = patientQuery.eq('professional_id', professionalId);
   }
   
-  const { data: patients, count: totalPatients } = await patientQuery
-    .eq('status', 'active')
-    .is('patient.deleted_at', null);
+  const { data: patients, count: totalPatients } = await patientQuery;
   
   // Planos ativos
   let plansQuery = supabase
