@@ -1248,3 +1248,103 @@ export const upsertPatientPlan = async (patientId, planData) => {
     return { data, error };
   }
 };
+
+// ==================== BRANDING ====================
+
+/**
+ * Busca o branding de um profissional
+ * @param {string} professionalId - UUID do profissional
+ * @returns {Promise<{data: Object|null, error: Object|null}>}
+ */
+export const getProfessionalBranding = async (professionalId) => {
+  const { data, error } = await supabase
+    .from('professional_branding')
+    .select('*')
+    .eq('professional_id', professionalId)
+    .maybeSingle();
+  return { data, error };
+};
+
+/**
+ * Atualiza ou cria branding do profissional
+ * @param {string} professionalId - UUID do profissional
+ * @param {Object} brandingData - {logo_url, primary_color, secondary_color, accent_color}
+ * @returns {Promise<{data: Object|null, error: Object|null}>}
+ */
+export const upsertProfessionalBranding = async (professionalId, brandingData) => {
+  const { data: existing } = await supabase
+    .from('professional_branding')
+    .select('id')
+    .eq('professional_id', professionalId)
+    .maybeSingle();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('professional_branding')
+      .update({ ...brandingData, updated_at: new Date().toISOString() })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    return { data, error };
+  } else {
+    const { data, error } = await supabase
+      .from('professional_branding')
+      .insert({ professional_id: professionalId, ...brandingData })
+      .select()
+      .single();
+    return { data, error };
+  }
+};
+
+/**
+ * Busca branding do profissional atual logado
+ * @returns {Promise<{data: Object|null, error: Object|null}>}
+ */
+export const getCurrentProfessionalBranding = async () => {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { data: null, error: { message: 'Usuário não autenticado' } };
+
+    // Buscar o professional_profile do usuário atual
+    const { data: profile, error: profileError } = await supabase
+      .from('professional_profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      return { data: null, error: profileError || { message: 'Perfil profissional não encontrado' } };
+    }
+
+    return await getProfessionalBranding(profile.id);
+  } catch (error) {
+    return { data: null, error };
+  }
+};
+
+/**
+ * Busca branding do profissional do paciente atual
+ * Usado quando paciente está logado e precisa ver o branding do seu nutricionista
+ * @returns {Promise<{data: Object|null, error: Object|null}>}
+ */
+export const getPatientProfessionalBranding = async () => {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { data: null, error: { message: 'Usuário não autenticado' } };
+
+    // Buscar o patient_profile do usuário atual para pegar professional_id
+    const { data: patientProfile, error: profileError } = await supabase
+      .from('patient_profiles')
+      .select('professional_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (profileError || !patientProfile) {
+      return { data: null, error: profileError || { message: 'Perfil de paciente não encontrado' } };
+    }
+
+    return await getProfessionalBranding(patientProfile.professional_id);
+  } catch (error) {
+    return { data: null, error };
+  }
+};
