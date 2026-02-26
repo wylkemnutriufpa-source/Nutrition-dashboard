@@ -583,6 +583,170 @@ const RecadosTab = ({ patientId, professionalId }) => {
   );
 };
 
+// Componente de Aba Projeto (Menu e Jornada)
+const ProjetoTab = ({ patientId, professionalId, patient }) => {
+  const [journey, setJourney] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [journeyForm, setJourneyForm] = useState({
+    plan_name: '',
+    plan_start_date: '',
+    plan_end_date: '',
+    initial_weight: '',
+    target_weight: '',
+    notes: ''
+  });
+
+  useEffect(() => {
+    loadJourney();
+  }, [patientId]);
+
+  const loadJourney = async () => {
+    try {
+      const { data } = await getPatientJourney(patientId);
+      if (data) {
+        setJourney(data);
+        setJourneyForm({
+          plan_name: data.plan_name || '',
+          plan_start_date: data.plan_start_date || '',
+          plan_end_date: data.plan_end_date || '',
+          initial_weight: data.initial_weight || '',
+          target_weight: data.target_weight || '',
+          notes: data.notes || ''
+        });
+      } else {
+        // Pré-preencher com dados do paciente
+        setJourneyForm(prev => ({
+          ...prev,
+          initial_weight: patient?.current_weight || '',
+          target_weight: patient?.goal_weight || ''
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar jornada:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveJourney = async () => {
+    setSaving(true);
+    try {
+      const { error } = await upsertPatientJourney(patientId, {
+        ...journeyForm,
+        initial_weight: journeyForm.initial_weight ? parseFloat(journeyForm.initial_weight) : null,
+        target_weight: journeyForm.target_weight ? parseFloat(journeyForm.target_weight) : null
+      });
+
+      if (error) {
+        toast.error('Erro ao salvar jornada');
+        return;
+      }
+
+      toast.success('Jornada do paciente atualizada!');
+      loadJourney();
+    } catch (error) {
+      toast.error('Erro ao salvar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Configuração do Menu */}
+      <MenuConfigEditor 
+        patientId={patientId} 
+        professionalId={professionalId}
+      />
+
+      {/* Configuração da Jornada */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar size={20} />
+            Configurar Jornada do Paciente
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label>Nome do Projeto/Plano</Label>
+                  <Input
+                    value={journeyForm.plan_name}
+                    onChange={(e) => setJourneyForm({ ...journeyForm, plan_name: e.target.value })}
+                    placeholder="Ex: Projeto Biquíni Branco - 90 dias"
+                  />
+                </div>
+                <div>
+                  <Label>Data de Início</Label>
+                  <Input
+                    type="date"
+                    value={journeyForm.plan_start_date}
+                    onChange={(e) => setJourneyForm({ ...journeyForm, plan_start_date: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Data de Término</Label>
+                  <Input
+                    type="date"
+                    value={journeyForm.plan_end_date}
+                    onChange={(e) => setJourneyForm({ ...journeyForm, plan_end_date: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Peso Inicial (kg)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={journeyForm.initial_weight}
+                    onChange={(e) => setJourneyForm({ ...journeyForm, initial_weight: e.target.value })}
+                    placeholder="Ex: 75.5"
+                  />
+                </div>
+                <div>
+                  <Label>Peso Meta (kg)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={journeyForm.target_weight}
+                    onChange={(e) => setJourneyForm({ ...journeyForm, target_weight: e.target.value })}
+                    placeholder="Ex: 65.0"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label>Observações</Label>
+                  <Textarea
+                    value={journeyForm.notes}
+                    onChange={(e) => setJourneyForm({ ...journeyForm, notes: e.target.value })}
+                    placeholder="Anotações sobre o projeto do paciente..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleSaveJourney} 
+                disabled={saving}
+                className="w-full bg-teal-600 hover:bg-teal-700"
+              >
+                <Save size={16} className="mr-2" />
+                {saving ? 'Salvando...' : 'Salvar Configuração da Jornada'}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 // Componente Principal
 const PatientProfile = () => {
   const { id } = useParams();
