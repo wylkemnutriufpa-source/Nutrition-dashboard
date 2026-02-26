@@ -46,6 +46,7 @@ const PatientsList = () => {
   // Form state separado para não causar re-render do dialog
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
+  const [formPassword, setFormPassword] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formBirthDate, setFormBirthDate] = useState('');
   const [formGender, setFormGender] = useState('');
@@ -118,6 +119,7 @@ const PatientsList = () => {
   const resetForm = () => {
     setFormName('');
     setFormEmail('');
+    setFormPassword('');
     setFormPhone('');
     setFormBirthDate('');
     setFormGender('');
@@ -129,8 +131,13 @@ const PatientsList = () => {
   };
 
   const handleCreatePatient = async () => {
-    if (!formName || !formEmail) {
-      toast.error('Nome e email são obrigatórios');
+    if (!formName || !formEmail || !formPassword) {
+      toast.error('Nome, email e senha são obrigatórios');
+      return;
+    }
+
+    if (formPassword.length < 6) {
+      toast.error('Senha deve ter pelo menos 6 caracteres');
       return;
     }
 
@@ -139,6 +146,7 @@ const PatientsList = () => {
       const patientData = {
         name: formName,
         email: formEmail,
+        password: formPassword,
         phone: formPhone || null,
         birth_date: formBirthDate || null,
         gender: formGender || null,
@@ -158,7 +166,7 @@ const PatientsList = () => {
         return;
       }
       
-      toast.success('Paciente criado com sucesso!');
+      toast.success(`Paciente criado! Email: ${formEmail} | Senha: ${formPassword}`);
       setIsCreateDialogOpen(false);
       resetForm();
       await loadData();
