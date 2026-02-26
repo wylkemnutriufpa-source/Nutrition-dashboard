@@ -321,6 +321,153 @@ const BrandingSettings = () => {
           </CardContent>
         </Card>
 
+        {/* Tipografia */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">⚙️ Configurações de Tipografia</CardTitle>
+            <CardDescription>
+              Personalize fontes, tamanhos de texto, badges e botões
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Fonte */}
+            <div>
+              <Label htmlFor="fontFamily">Família de Fonte</Label>
+              <select
+                id="fontFamily"
+                value={formData.font_family}
+                onChange={(e) => setFormData({ ...formData, font_family: e.target.value })}
+                className="w-full mt-2 p-2 border rounded-md"
+              >
+                <option value="Inter, system-ui, sans-serif">Inter (Padrão)</option>
+                <option value="Roboto, sans-serif">Roboto</option>
+                <option value="Open Sans, sans-serif">Open Sans</option>
+                <option value="Lato, sans-serif">Lato</option>
+                <option value="Montserrat, sans-serif">Montserrat</option>
+                <option value="Poppins, sans-serif">Poppins</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="Georgia, serif">Georgia (Serifada)</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Fonte padrão de todo o sistema</p>
+            </div>
+
+            {/* Tamanhos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="fontSize_base">Tamanho Base</Label>
+                <Input
+                  id="fontSize_base"
+                  value={formData.font_size_base}
+                  onChange={(e) => setFormData({ ...formData, font_size_base: e.target.value })}
+                  placeholder="16px"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 16px, 18px</p>
+              </div>
+
+              <div>
+                <Label htmlFor="fontSize_heading">Título Principal</Label>
+                <Input
+                  id="fontSize_heading"
+                  value={formData.font_size_heading}
+                  onChange={(e) => setFormData({ ...formData, font_size_heading: e.target.value })}
+                  placeholder="2rem"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 2rem, 2.5rem</p>
+              </div>
+
+              <div>
+                <Label htmlFor="fontSize_subheading">Subtítulo</Label>
+                <Input
+                  id="fontSize_subheading"
+                  value={formData.font_size_subheading}
+                  onChange={(e) => setFormData({ ...formData, font_size_subheading: e.target.value })}
+                  placeholder="1.5rem"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 1.5rem, 1.75rem</p>
+              </div>
+
+              <div>
+                <Label htmlFor="fontSize_body">Texto Normal</Label>
+                <Input
+                  id="fontSize_body"
+                  value={formData.font_size_body}
+                  onChange={(e) => setFormData({ ...formData, font_size_body: e.target.value })}
+                  placeholder="1rem"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 1rem, 1.125rem</p>
+              </div>
+
+              <div>
+                <Label htmlFor="fontSize_small">Texto Pequeno</Label>
+                <Input
+                  id="fontSize_small"
+                  value={formData.font_size_small}
+                  onChange={(e) => setFormData({ ...formData, font_size_small: e.target.value })}
+                  placeholder="0.875rem"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 0.875rem, 0.75rem</p>
+              </div>
+
+              <div>
+                <Label htmlFor="badge_size">Tamanho Badge</Label>
+                <Input
+                  id="badge_size"
+                  value={formData.badge_size}
+                  onChange={(e) => setFormData({ ...formData, badge_size: e.target.value })}
+                  placeholder="0.75rem"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 0.75rem, 0.875rem</p>
+              </div>
+
+              <div>
+                <Label htmlFor="button_size">Tamanho Botão</Label>
+                <Input
+                  id="button_size"
+                  value={formData.button_size}
+                  onChange={(e) => setFormData({ ...formData, button_size: e.target.value })}
+                  placeholder="1rem"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-1">Ex: 1rem, 1.125rem</p>
+              </div>
+            </div>
+
+            {/* Preview Tipografia */}
+            <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
+              <p className="text-sm font-medium text-gray-700 mb-3">Preview da Tipografia:</p>
+              <h1 style={{ fontSize: formData.font_size_heading, fontFamily: formData.font_family, fontWeight: 'bold' }}>
+                Título Principal (Heading)
+              </h1>
+              <h2 style={{ fontSize: formData.font_size_subheading, fontFamily: formData.font_family, fontWeight: 'bold' }}>
+                Subtítulo (Subheading)
+              </h2>
+              <p style={{ fontSize: formData.font_size_body, fontFamily: formData.font_family }}>
+                Este é um texto de corpo normal. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </p>
+              <p style={{ fontSize: formData.font_size_small, fontFamily: formData.font_family }}>
+                Texto pequeno para notas e informações secundárias.
+              </p>
+              <div className="flex gap-3 items-center">
+                <span 
+                  className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium"
+                  style={{ fontSize: formData.badge_size, fontFamily: formData.font_family }}
+                >
+                  Badge Exemplo
+                </span>
+                <Button style={{ fontSize: formData.button_size, fontFamily: formData.font_family }}>
+                  Botão Exemplo
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardContent className="py-6">
             <div className="flex gap-4">
