@@ -21,6 +21,7 @@ import PatientListaCompras from '@/pages/PatientListaCompras';
 import PatientSuplementos from '@/pages/PatientSuplementos';
 import PatientDicas from '@/pages/PatientDicas';
 import PatientJornada from '@/pages/PatientJornada';
+import PatientAgenda from '@/pages/PatientAgenda';
 import CalculatorsList from '@/pages/CalculatorsList';
 import WeightCalculator from '@/pages/WeightCalculator';
 import WaterCalculator from '@/pages/WaterCalculator';
@@ -29,6 +30,8 @@ import FoodDatabase from '@/pages/FoodDatabase';
 import BrandingSettings from '@/pages/BrandingSettings';
 import HealthCheckQuiz from '@/pages/HealthCheckQuiz';
 import ProjetoBiquiniBranco from '@/pages/ProjetoBiquiniBranco';
+import AgendaPage from '@/pages/AgendaPage';
+import FinanceiroPage from '@/pages/FinanceiroPage';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
