@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Save, Plus, Trash2, Loader2, Eye, Sparkles, 
-  MessageCircle, DollarSign, Users, HelpCircle
+  MessageCircle, DollarSign, Users, HelpCircle,
+  Upload, Image as ImageIcon, X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -17,12 +18,30 @@ const AdminProjetoEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('hero');
+  const fileInputRef = useRef(null);
+  const [uploadingImage, setUploadingImage] = useState(null);
   
   const [projectData, setProjectData] = useState({
+    // Hero Section
     projectName: 'Projeto Biquíni Branco',
     heroSubtitle: 'EMAGRECIMENTO INTELIGENTE',
     heroTagline: 'Um processo completo para emagrecer com saúde, sem efeito sanfona e sem sofrimento.',
     
+    // Títulos das Seções (NOVOS - EDITÁVEIS)
+    sectionTitles: {
+      myths: '⚠️ VERDADES QUE NINGUÉM TE CONTA',
+      benefits: '✅ O QUE VOCÊ VAI TER',
+      benefitsSubtitle: 'Um programa completo para transformação real',
+      biweekly: 'A cada 15 dias:',
+      support: '👥 SUPORTE EXCLUSIVO EM 2 GRUPOS',
+      supportSubtitle: 'Você não vai estar sozinha nessa jornada!',
+      plans: '🏆 PLANOS DE SUCESSO',
+      plansSubtitle: 'Escolha o plano ideal para sua transformação',
+      testimonials: '💬 TRANSFORMAÇÕES REAIS',
+      faq: '❓ PERGUNTAS FREQUENTES'
+    },
+    
+    // Mitos
     myths: [
       'Emagrecer em 1 mês é furada',
       'Remédio não resolve',
@@ -30,28 +49,42 @@ const AdminProjetoEditor = () => {
       'A mudança começa na mente e reflete no corpo'
     ],
     
+    // Benefícios
     benefits: [
       { icon: 'Calendar', text: '3 meses de acompanhamento' },
       { icon: 'Utensils', text: '3 ajustes estratégicos na dieta' },
       { icon: 'Clock', text: 'Mudança de protocolo a cada 30 dias' }
     ],
     
+    // Tarefas quinzenais
     biweeklyTasks: ['Envio de peso', 'Fotos de acompanhamento'],
     
+    // Grupos de suporte
     supportGroups: [
       { icon: 'Users', text: 'Grupo de bate-papo' },
       { icon: 'Camera', text: 'Fotos das refeições' },
       { icon: 'Dumbbell', text: 'Treinos e academia' }
     ],
     
+    // Planos (COM MENSAL)
     plans: [
+      { 
+        name: 'MENSAL', 
+        price: 'R$ 80', 
+        priceNote: 'Experimente primeiro',
+        tagline: '1 MÊS PARA COMEÇAR',
+        features: ['Plano alimentar personalizado', 'Checklist diário', 'Suporte WhatsApp'],
+        highlight: false,
+        active: true
+      },
       { 
         name: 'TRIMESTRAL', 
         price: 'R$ 200', 
-        priceNote: 'Plano trimestral',
+        priceNote: 'Plano mais popular',
         tagline: '3 MESES DE FOCO TOTAL',
-        features: ['Plano alimentar personalizado', 'Checklist diário', 'Suporte WhatsApp', 'Ajustes a cada 30 dias', 'Acesso aos 2 grupos'],
-        highlight: true
+        features: ['Tudo do plano mensal', 'Ajustes a cada 30 dias', 'Acesso aos 2 grupos', '3 ajustes estratégicos'],
+        highlight: true,
+        active: true
       },
       { 
         name: 'SEMESTRAL', 
@@ -59,7 +92,8 @@ const AdminProjetoEditor = () => {
         priceNote: 'Economia de R$40',
         tagline: '6 MESES PARA TRANSFORMAR',
         features: ['Tudo do plano trimestral', 'Receitas exclusivas', 'Prioridade no atendimento', 'Suplementação básica'],
-        highlight: false
+        highlight: false,
+        active: true
       },
       { 
         name: 'ANUAL', 
@@ -67,16 +101,19 @@ const AdminProjetoEditor = () => {
         priceNote: 'Melhor custo-benefício',
         tagline: '1 ANO PELA SUA SAÚDE',
         features: ['Tudo dos planos anteriores', 'Grupo VIP exclusivo', 'Consultas extras', 'Bônus surpresa'],
-        highlight: false
+        highlight: false,
+        active: true
       }
     ],
     
+    // Depoimentos (COM IMAGEM)
     testimonials: [
-      { name: 'Ana Paula', text: 'Perdi 12kg em 3 meses! Finalmente entendi como comer direito.', result: '-12kg' },
-      { name: 'Carla Santos', text: 'O suporte no grupo faz toda diferença. Não me sinto sozinha!', result: '-8kg' },
-      { name: 'Mariana Costa', text: 'Sem passar fome e sem efeito sanfona. Recomendo muito!', result: '-10kg' }
+      { name: 'Ana Paula', text: 'Perdi 12kg em 3 meses! Finalmente entendi como comer direito.', result: '-12kg', image: '' },
+      { name: 'Carla Santos', text: 'O suporte no grupo faz toda diferença. Não me sinto sozinha!', result: '-8kg', image: '' },
+      { name: 'Mariana Costa', text: 'Sem passar fome e sem efeito sanfona. Recomendo muito!', result: '-10kg', image: '' }
     ],
     
+    // FAQ
     faq: [
       { question: 'Como funciona o acompanhamento?', answer: 'Você terá acesso à plataforma FitJourney com seu plano personalizado, tarefas diárias, e suporte direto comigo via WhatsApp.' },
       { question: 'Preciso malhar?', answer: 'Não é obrigatório, mas atividade física potencializa os resultados.' },
@@ -84,10 +121,13 @@ const AdminProjetoEditor = () => {
       { question: 'E se eu não conseguir seguir?', answer: 'Por isso temos os grupos de suporte! Você não está sozinha.' }
     ],
     
+    // CTAs
     ctaMain: 'QUERO TRANSFORMAR MEU CORPO',
     ctaUrgency: '🔥 VAGAS LIMITADAS',
     ctaEmotional: 'Seu biquíni branco não vai se conquistar sozinho. Garanta sua vaga agora e comece a mudança hoje!',
+    ctaFinal: 'Centenas de mulheres já transformaram suas vidas. Agora é sua vez!',
     
+    // Contatos
     whatsappNumber: '5591980124814',
     instagramUrl: 'https://www.instagram.com/dr_wylkem_raiol/'
   });
@@ -117,20 +157,39 @@ const AdminProjetoEditor = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase
+      // Verificar se já existe
+      const { data: existing } = await supabase
         .from('project_showcase')
-        .upsert({
-          project_key: 'biquini_branco',
-          config: projectData,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'project_key' });
+        .select('id')
+        .eq('project_key', 'biquini_branco')
+        .maybeSingle();
 
-      if (error) throw error;
+      let result;
+      if (existing) {
+        // UPDATE
+        result = await supabase
+          .from('project_showcase')
+          .update({
+            config: projectData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('project_key', 'biquini_branco');
+      } else {
+        // INSERT
+        result = await supabase
+          .from('project_showcase')
+          .insert({
+            project_key: 'biquini_branco',
+            config: projectData
+          });
+      }
+
+      if (result.error) throw result.error;
       
       toast.success('Projeto salvo com sucesso! 🎉');
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      toast.error('Erro ao salvar. Verifique se a tabela existe no Supabase.');
+      toast.error('Erro ao salvar: ' + (error.message || 'Verifique se a tabela existe no Supabase'));
     } finally {
       setSaving(false);
     }
@@ -138,6 +197,13 @@ const AdminProjetoEditor = () => {
 
   const updateField = (field, value) => {
     setProjectData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateSectionTitle = (key, value) => {
+    setProjectData(prev => ({
+      ...prev,
+      sectionTitles: { ...prev.sectionTitles, [key]: value }
+    }));
   };
 
   const updateArrayItem = (arrayName, index, value) => {
@@ -181,6 +247,82 @@ const AdminProjetoEditor = () => {
     }));
   };
 
+  const addPlan = () => {
+    setProjectData(prev => ({
+      ...prev,
+      plans: [...prev.plans, {
+        name: 'NOVO PLANO',
+        price: 'R$ 0',
+        priceNote: 'Descrição do preço',
+        tagline: 'TAGLINE DO PLANO',
+        features: ['Feature 1', 'Feature 2'],
+        highlight: false,
+        active: true
+      }]
+    }));
+  };
+
+  const removePlan = (index) => {
+    setProjectData(prev => ({
+      ...prev,
+      plans: prev.plans.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Upload de imagem para depoimento
+  const handleImageUpload = async (testimonialIndex, file) => {
+    if (!file) return;
+    
+    setUploadingImage(testimonialIndex);
+    
+    try {
+      // Upload para Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `testimonial_${Date.now()}.${fileExt}`;
+      const filePath = `testimonials/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('public')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        // Se storage não existe, usar base64
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          updateArrayItem('testimonials', testimonialIndex, {
+            ...projectData.testimonials[testimonialIndex],
+            image: reader.result
+          });
+          toast.success('Imagem adicionada!');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const { data: { publicUrl } } = supabase.storage
+          .from('public')
+          .getPublicUrl(filePath);
+        
+        updateArrayItem('testimonials', testimonialIndex, {
+          ...projectData.testimonials[testimonialIndex],
+          image: publicUrl
+        });
+        toast.success('Imagem enviada!');
+      }
+    } catch (error) {
+      // Fallback para base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateArrayItem('testimonials', testimonialIndex, {
+          ...projectData.testimonials[testimonialIndex],
+          image: reader.result
+        });
+        toast.success('Imagem adicionada!');
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setUploadingImage(null);
+    }
+  };
+
   if (loading) {
     return (
       <Layout title="Editor do Projeto" userType="admin">
@@ -221,27 +363,13 @@ const AdminProjetoEditor = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100">
-            <TabsTrigger value="hero">
-              <Sparkles className="h-4 w-4 mr-1" />
-              Hero
-            </TabsTrigger>
-            <TabsTrigger value="conteudo">
-              <MessageCircle className="h-4 w-4 mr-1" />
-              Conteúdo
-            </TabsTrigger>
-            <TabsTrigger value="planos">
-              <DollarSign className="h-4 w-4 mr-1" />
-              Planos
-            </TabsTrigger>
-            <TabsTrigger value="depoimentos">
-              <Users className="h-4 w-4 mr-1" />
-              Depoimentos
-            </TabsTrigger>
-            <TabsTrigger value="faq">
-              <HelpCircle className="h-4 w-4 mr-1" />
-              FAQ
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6 bg-gray-100">
+            <TabsTrigger value="hero">Hero</TabsTrigger>
+            <TabsTrigger value="titulos">Títulos</TabsTrigger>
+            <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
+            <TabsTrigger value="planos">Planos</TabsTrigger>
+            <TabsTrigger value="depoimentos">Depoimentos</TabsTrigger>
+            <TabsTrigger value="faq">FAQ</TabsTrigger>
           </TabsList>
 
           {/* Tab Hero */}
@@ -298,6 +426,13 @@ const AdminProjetoEditor = () => {
                     rows={2}
                   />
                 </div>
+                <div>
+                  <Label>Texto Final (abaixo do CTA)</Label>
+                  <Input
+                    value={projectData.ctaFinal}
+                    onChange={(e) => updateField('ctaFinal', e.target.value)}
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>WhatsApp (apenas números)</Label>
@@ -314,6 +449,94 @@ const AdminProjetoEditor = () => {
                       onChange={(e) => updateField('instagramUrl', e.target.value)}
                     />
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Tab Títulos de Seções */}
+          <TabsContent value="titulos" className="space-y-4 mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Títulos das Seções</CardTitle>
+                <CardDescription>Personalize os títulos de cada seção da página</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Seção "Verdades/Mitos"</Label>
+                  <Input
+                    value={projectData.sectionTitles?.myths || ''}
+                    onChange={(e) => updateSectionTitle('myths', e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Seção "O que você vai ter"</Label>
+                    <Input
+                      value={projectData.sectionTitles?.benefits || ''}
+                      onChange={(e) => updateSectionTitle('benefits', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Subtítulo dos Benefícios</Label>
+                    <Input
+                      value={projectData.sectionTitles?.benefitsSubtitle || ''}
+                      onChange={(e) => updateSectionTitle('benefitsSubtitle', e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Título "A cada 15 dias"</Label>
+                  <Input
+                    value={projectData.sectionTitles?.biweekly || ''}
+                    onChange={(e) => updateSectionTitle('biweekly', e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Seção "Suporte em Grupos"</Label>
+                    <Input
+                      value={projectData.sectionTitles?.support || ''}
+                      onChange={(e) => updateSectionTitle('support', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Subtítulo do Suporte</Label>
+                    <Input
+                      value={projectData.sectionTitles?.supportSubtitle || ''}
+                      onChange={(e) => updateSectionTitle('supportSubtitle', e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Seção "Planos"</Label>
+                    <Input
+                      value={projectData.sectionTitles?.plans || ''}
+                      onChange={(e) => updateSectionTitle('plans', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Subtítulo dos Planos</Label>
+                    <Input
+                      value={projectData.sectionTitles?.plansSubtitle || ''}
+                      onChange={(e) => updateSectionTitle('plansSubtitle', e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Seção "Depoimentos"</Label>
+                  <Input
+                    value={projectData.sectionTitles?.testimonials || ''}
+                    onChange={(e) => updateSectionTitle('testimonials', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Seção "FAQ"</Label>
+                  <Input
+                    value={projectData.sectionTitles?.faq || ''}
+                    onChange={(e) => updateSectionTitle('faq', e.target.value)}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -424,23 +647,82 @@ const AdminProjetoEditor = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Grupos de Suporte */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Grupos de Suporte</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {projectData.supportGroups.map((group, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      value={group.text}
+                      onChange={(e) => updateArrayItem('supportGroups', index, { ...group, text: e.target.value })}
+                      className="flex-1"
+                    />
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => removeArrayItem('supportGroups', index)}
+                      className="text-red-500"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  onClick={() => addArrayItem('supportGroups', { icon: 'Users', text: 'Novo grupo' })}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Grupo
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Tab Planos */}
           <TabsContent value="planos" className="space-y-4 mt-4">
+            <div className="flex justify-end">
+              <Button onClick={addPlan} className="bg-green-600 hover:bg-green-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Novo Plano
+              </Button>
+            </div>
+            
             {projectData.plans.map((plan, planIndex) => (
-              <Card key={planIndex} className={plan.highlight ? 'border-2 border-pink-500' : ''}>
+              <Card key={planIndex} className={`${plan.highlight ? 'border-2 border-pink-500' : ''} ${!plan.active ? 'opacity-50' : ''}`}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>Plano {plan.name}</span>
-                    <label className="flex items-center gap-2 text-sm font-normal">
-                      <input
-                        type="checkbox"
-                        checked={plan.highlight}
-                        onChange={(e) => updatePlan(planIndex, 'highlight', e.target.checked)}
-                      />
-                      Destacar
-                    </label>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 text-sm font-normal">
+                        <input
+                          type="checkbox"
+                          checked={plan.active !== false}
+                          onChange={(e) => updatePlan(planIndex, 'active', e.target.checked)}
+                        />
+                        Ativo
+                      </label>
+                      <label className="flex items-center gap-2 text-sm font-normal">
+                        <input
+                          type="checkbox"
+                          checked={plan.highlight}
+                          onChange={(e) => updatePlan(planIndex, 'highlight', e.target.checked)}
+                        />
+                        Destacar
+                      </label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => removePlan(planIndex)}
+                        className="text-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -462,7 +744,7 @@ const AdminProjetoEditor = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Nota do Preço</Label>
+                      <Label>Nota do Preço (ex: "Economia de R$40")</Label>
                       <Input
                         value={plan.priceNote}
                         onChange={(e) => updatePlan(planIndex, 'priceNote', e.target.value)}
@@ -477,7 +759,7 @@ const AdminProjetoEditor = () => {
                     </div>
                   </div>
                   <div>
-                    <Label>Features (uma por linha)</Label>
+                    <Label>Features</Label>
                     <div className="space-y-2">
                       {plan.features.map((feature, fIndex) => (
                         <div key={fIndex} className="flex gap-2">
@@ -518,7 +800,7 @@ const AdminProjetoEditor = () => {
           <TabsContent value="depoimentos" className="space-y-4 mt-4">
             {projectData.testimonials.map((testimonial, index) => (
               <Card key={index}>
-                <CardContent className="pt-4 space-y-3">
+                <CardContent className="pt-4 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Nome</Label>
@@ -543,6 +825,61 @@ const AdminProjetoEditor = () => {
                       rows={2}
                     />
                   </div>
+                  
+                  {/* Upload de Imagem */}
+                  <div>
+                    <Label>Print do WhatsApp (opcional)</Label>
+                    <div className="flex gap-4 items-center mt-2">
+                      {testimonial.image ? (
+                        <div className="relative">
+                          <img 
+                            src={testimonial.image} 
+                            alt="Print" 
+                            className="w-24 h-24 object-cover rounded-lg border"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-6 w-6"
+                            onClick={() => updateArrayItem('testimonials', index, { ...testimonial, image: '' })}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400">
+                          <ImageIcon className="h-8 w-8" />
+                        </div>
+                      )}
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(index, e.target.files[0])}
+                          className="hidden"
+                          id={`image-upload-${index}`}
+                        />
+                        <label htmlFor={`image-upload-${index}`}>
+                          <Button 
+                            variant="outline" 
+                            className="cursor-pointer"
+                            disabled={uploadingImage === index}
+                            asChild
+                          >
+                            <span>
+                              {uploadingImage === index ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <Upload className="h-4 w-4 mr-2" />
+                              )}
+                              {uploadingImage === index ? 'Enviando...' : 'Upload Print'}
+                            </span>
+                          </Button>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <Button 
                     variant="ghost" 
                     size="sm"
@@ -557,7 +894,7 @@ const AdminProjetoEditor = () => {
             ))}
             <Button 
               variant="outline" 
-              onClick={() => addArrayItem('testimonials', { name: 'Nome', text: 'Depoimento aqui...', result: '-Xkg' })}
+              onClick={() => addArrayItem('testimonials', { name: 'Nome', text: 'Depoimento aqui...', result: '-Xkg', image: '' })}
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
