@@ -1066,6 +1066,39 @@ export const getProgressPhotos = async (patientId) => {
   }
 };
 
+// Upload de foto de perfil do paciente
+export const uploadProfilePhoto = async (userId, file) => {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `profile_${userId}_${Date.now()}.${fileExt}`;
+
+    // Tentar upload para Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('profile-photos')
+      .upload(fileName, file, { upsert: true });
+
+    if (!uploadError) {
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(fileName);
+      return await updateProfile(userId, { photo_url: publicUrl });
+    }
+
+    // Fallback: base64 direto no profile
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const result = await updateProfile(userId, { photo_url: reader.result });
+        resolve(result);
+      };
+      reader.readAsDataURL(file);
+    });
+  } catch (error) {
+    console.error('❌ Erro ao fazer upload da foto:', error);
+    return { data: null, error };
+  }
+};
+
 // Adicionar foto de progresso
 export const addProgressPhoto = async (patientId, photoUrl, photoType = 'progress', notes = '') => {
   try {
