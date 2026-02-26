@@ -27,17 +27,26 @@ const Sidebar = ({ userType, onLogout }) => {
 
   // Carrega menu dinâmico para pacientes
   useEffect(() => {
-    if (userType === 'patient' && user) {
+    if (userType === 'patient' && user && profile) {
       loadPatientMenu();
     }
-  }, [userType, user]);
+  }, [userType, user, profile]);
 
   const loadPatientMenu = async () => {
+    // Só faz a chamada se tem IDs válidos
+    const patientId = user?.id;
+    const professionalId = profile?.professional_id;
+    
+    console.log('[Sidebar] Loading menu - patientId:', patientId, 'professionalId:', professionalId);
+    
+    if (!patientId) {
+      console.log('[Sidebar] No patientId, using default menu');
+      return;
+    }
+    
     setLoadingMenu(true);
     try {
-      // Busca configuração do menu do profissional do paciente
-      const professionalId = profile?.professional_id;
-      const { data } = await getPatientMenuConfig(user?.id, professionalId);
+      const { data } = await getPatientMenuConfig(patientId, professionalId);
       if (data?.items) {
         setPatientMenuItems(data.items.filter(item => item.visible).sort((a, b) => a.order - b.order));
       }
