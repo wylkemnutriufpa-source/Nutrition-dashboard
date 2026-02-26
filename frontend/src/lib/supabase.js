@@ -809,7 +809,7 @@ export const getBranding = async (userId) => {
     .from('branding_configs')
     .select('*')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
   return { data, error };
 };
 
