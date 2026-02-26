@@ -398,6 +398,11 @@ export const getChecklistAdherence = async (patientId, days = 7) => {
 // ==================== PATIENT MESSAGES / TIPS ====================
 
 export const getPatientMessages = async (patientId, onlyActive = true) => {
+  if (!patientId) {
+    console.log('[getPatientMessages] No patientId provided');
+    return { data: [], error: null };
+  }
+  
   let query = supabase
     .from('patient_messages')
     .select('*')
