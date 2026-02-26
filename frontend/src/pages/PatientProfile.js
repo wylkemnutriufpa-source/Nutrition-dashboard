@@ -598,6 +598,19 @@ const ProjetoTab = ({ patientId, professionalId, patient }) => {
     notes: ''
   });
 
+  // Plano Financeiro
+  const [patientPlan, setPatientPlan] = useState(null);
+  const [savingPlan, setSavingPlan] = useState(false);
+  const [planForm, setPlanForm] = useState({
+    plan_name: '',
+    plan_price: '',
+    start_date: '',
+    end_date: '',
+    status: 'active',
+    payment_status: 'paid',
+    notes: ''
+  });
+
   useEffect(() => {
     loadJourney();
   }, [patientId]);
