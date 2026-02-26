@@ -231,9 +231,6 @@ export const getProfessionalPatients = async (professionalId, isAdmin = false, f
       query = query.eq('professional_id', professionalId);
     }
     
-    // Filtrar apenas ativos
-    query = query.eq('status', 'active');
-    
     const { data, error } = await query.order('created_at', { ascending: false });
     
     if (error) {
