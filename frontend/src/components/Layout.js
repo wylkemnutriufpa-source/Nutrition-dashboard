@@ -50,19 +50,26 @@ const Layout = ({ children, title, showBack = false, userType: propUserType }) =
         {shouldCompensateAdminBar && <div className="h-16" />}
         
         <header className="bg-white border-b border-gray-200 px-8 py-4 shadow-sm">
-          <div className="flex items-center space-x-4">
-            {showBack && (
-              <Button
-                data-testid="back-button"
-                onClick={() => navigate(-1)}
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft size={20} />
-              </Button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {showBack && (
+                <Button
+                  data-testid="back-button"
+                  onClick={() => navigate(-1)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <ArrowLeft size={20} />
+                </Button>
+              )}
+              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            </div>
+            
+            {/* Sino de notificações apenas para profissionais e admin */}
+            {(effectiveUserType === 'professional' || effectiveUserType === 'admin') && (
+              <NotificationBell />
             )}
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-8">
