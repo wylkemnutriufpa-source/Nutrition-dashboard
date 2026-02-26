@@ -68,10 +68,20 @@ frontend/src/
 ### Sessão 3 (26/02/2026)
 - ProjetoBiquiniBranco.js: títulos de seções dinâmicos (Plans, Testimonials, FAQ, ctaFinal)
 - ProjetoBiquiniBranco.js: planos filtrados pelo campo `active`
-- ProjetoBiquiniBranco.js: depoimentos com imagens quando disponíveis
+- ProjetoBiquiniBranco.js: depoimentos com imagens quando disponíveis + descrições dinâmicas
 - PatientDashboard.js: widget de foto de perfil com upload via câmera
 - lib/supabase.js: função uploadProfilePhoto() com fallback base64
-- PatientProfile.js: exibe photo_url real do paciente (fallback para ui-avatars)
+- PatientProfile.js: exibe photo_url real do paciente
+- AdminProjetoEditor.js tab Conteúdo: título + descrição editáveis em cada seção (Mitos, Benefícios, Quinzenal, Suporte)
+- AgendaPage.js: calendário mensal para profissionais com add/edit/delete de consultas
+- PatientAgenda.js: agenda simplificada para pacientes (lembretes e consultas)
+- FinanceiroPage.js: dashboard financeiro com Recharts (KPIs, gráfico barras, gráfico linha acumulado, CRUD lançamentos)
+- PatientProfile.js ProjetoTab: card de Plano Financeiro por paciente (nome, valor, datas, status pagamento)
+- Sidebar.js: links Agenda e Financeiro para profissional/admin; Minha Agenda para paciente
+- App.js: rotas /professional/agenda, /professional/financeiro, /patient/agenda
+
+## Tabelas criadas no Supabase
+- appointments, financial_records, patient_plans
 
 ## SQLs Pendentes para Executar no Supabase
 Ver arquivo /app/memory/SUPABASE_SQL.md
