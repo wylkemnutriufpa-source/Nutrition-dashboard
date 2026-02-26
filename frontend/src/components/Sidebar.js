@@ -3,7 +3,7 @@ import {
   Home, Users, Calendar, Calculator, FileText, Settings, LogOut, 
   Database, Palette, Shield, ClipboardList, MessageSquare, Stethoscope,
   UserCog, Activity, ShoppingCart, ChefHat, Pill, Lightbulb, TrendingUp,
-  Sparkles
+  Sparkles, DollarSign, CalendarDays, Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -14,7 +14,8 @@ import { getPatientMenuConfig, DEFAULT_PATIENT_MENU } from '@/lib/supabase';
 const iconMap = {
   Home, Calendar, ClipboardList, MessageSquare, ShoppingCart,
   ChefHat, Pill, Lightbulb, TrendingUp, Calculator, Settings,
-  Users, Database, Palette, Shield, UserCog, Activity, Sparkles
+  Users, Database, Palette, Shield, UserCog, Activity, Sparkles,
+  DollarSign, CalendarDays, Bell
 };
 
 const Sidebar = ({ userType, onLogout, patientId }) => {
