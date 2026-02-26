@@ -412,7 +412,7 @@ export const getAnamnesis = async (patientId) => {
     .eq('patient_id', patientId)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
   return { data, error };
 };
 
@@ -650,7 +650,7 @@ export const getPatientMealPlan = async (patientId, professionalId = null) => {
     query = query.eq('professional_id', professionalId);
   }
   
-  const { data, error } = await query.single();
+  const { data, error } = await query.maybeSingle();
   return { data, error };
 };
 
