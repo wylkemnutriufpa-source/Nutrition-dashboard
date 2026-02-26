@@ -47,7 +47,7 @@ const AgendaPage = () => {
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
-    patient_id: '',
+    patient_id: 'none',
     title: '',
     date: '',
     time: '',
