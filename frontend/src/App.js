@@ -115,6 +115,11 @@ function App() {
                   <BrandingSettings />
                 </ProtectedRoute>
               } />
+              <Route path="/professional/projeto-editor" element={
+                <ProtectedRoute allowedTypes={['professional', 'admin']}>
+                  <AdminProjetoEditor />
+                </ProtectedRoute>
+              } />
               
               {/* Patient Routes */}
               <Route path="/patient/dashboard" element={
