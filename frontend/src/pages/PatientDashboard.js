@@ -13,6 +13,7 @@ const PatientDashboard = () => {
   const [patientData, setPatientData] = useState(null);
   const [activePlan, setActivePlan] = useState(null);
   const [anamnesis, setAnamnesis] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     if (user) {
