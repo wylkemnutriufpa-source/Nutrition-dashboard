@@ -183,7 +183,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
         )}
         
         {/* Navegação condicional para visitante */}
-        {userType === 'visitor' && (isInHealthCheck || isInCalculators) && (
+        {validUserType === 'visitor' && (isInHealthCheck || isInCalculators) && (
           <>
             {isInHealthCheck && (
               <button
