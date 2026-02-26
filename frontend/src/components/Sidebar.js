@@ -143,7 +143,9 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
           )}
           <div>
             <h1 className="text-xl font-bold text-gray-900">{branding.brandName || 'FitJourney'}</h1>
-            <p className="text-xs text-gray-500">{getUserTypeLabel()}</p>
+            <p className="text-xs text-gray-500">
+              {userType === 'patient' ? 'Meu Projeto' : getUserTypeLabel()}
+            </p>
           </div>
         </Link>
       </div>
