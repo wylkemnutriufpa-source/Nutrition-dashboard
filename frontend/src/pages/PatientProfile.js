@@ -12,13 +12,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { 
   Calendar, FileText, Utensils, AlertTriangle, Edit, Loader2, User, Save, Plus,
-  ClipboardList, MessageSquare, CheckCircle2, Circle, Trash2, Send, Pin, Settings2
+  ClipboardList, MessageSquare, CheckCircle2, Circle, Trash2, Send, Pin, Settings2,
+  DollarSign
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, updateAnamnesis,
   getMealPlans, getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage,
-  getChecklistAdherence, upsertPatientJourney, getPatientJourney
+  getChecklistAdherence, upsertPatientJourney, getPatientJourney, getPatientPlan, upsertPatientPlan
 } from '@/lib/supabase';
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
