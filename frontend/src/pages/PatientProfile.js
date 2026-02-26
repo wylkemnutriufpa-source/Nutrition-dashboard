@@ -786,6 +786,81 @@ const ProjetoTab = ({ patientId, professionalId, patient }) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Plano Financeiro do Paciente */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign size={20} />
+            Plano Financeiro do Paciente
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <Label>Nome do Plano</Label>
+              <Input
+                value={planForm.plan_name}
+                onChange={(e) => setPlanForm({ ...planForm, plan_name: e.target.value })}
+                placeholder="Ex: Projeto Biquíni Branco - Trimestral"
+              />
+            </div>
+            <div>
+              <Label>Valor (R$)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={planForm.plan_price}
+                onChange={(e) => setPlanForm({ ...planForm, plan_price: e.target.value })}
+                placeholder="Ex: 200,00"
+              />
+            </div>
+            <div>
+              <Label>Status do Pagamento</Label>
+              <Select value={planForm.payment_status} onValueChange={v => setPlanForm({ ...planForm, payment_status: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="paid">Pago</SelectItem>
+                  <SelectItem value="pending">Pendente</SelectItem>
+                  <SelectItem value="overdue">Em Atraso</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Data de Início</Label>
+              <Input type="date" value={planForm.start_date} onChange={(e) => setPlanForm({ ...planForm, start_date: e.target.value })} />
+            </div>
+            <div>
+              <Label>Data de Término</Label>
+              <Input type="date" value={planForm.end_date} onChange={(e) => setPlanForm({ ...planForm, end_date: e.target.value })} />
+            </div>
+            <div>
+              <Label>Status do Plano</Label>
+              <Select value={planForm.status} onValueChange={v => setPlanForm({ ...planForm, status: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Ativo</SelectItem>
+                  <SelectItem value="completed">Concluído</SelectItem>
+                  <SelectItem value="cancelled">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-2">
+              <Label>Observações Financeiras</Label>
+              <Textarea
+                value={planForm.notes}
+                onChange={(e) => setPlanForm({ ...planForm, notes: e.target.value })}
+                placeholder="Ex: Parcelado em 3x, desconto de indicação..."
+                rows={2}
+              />
+            </div>
+          </div>
+          <Button onClick={handleSavePlan} disabled={savingPlan} className="w-full bg-teal-600 hover:bg-teal-700">
+            <Save size={16} className="mr-2" />
+            {savingPlan ? 'Salvando...' : 'Salvar Plano Financeiro'}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
