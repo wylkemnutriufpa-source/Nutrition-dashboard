@@ -25,7 +25,7 @@ import {
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
 import MenuConfigEditor from '@/components/MenuConfigEditor';
-import { generatePatientProgressReport } from '@/utils/pdfGenerator';
+import { generateAnamnesePDF, generateMealPlanPDF } from '@/utils/pdfGenerator';
 
 // Componente de Aba Resumo
 const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
