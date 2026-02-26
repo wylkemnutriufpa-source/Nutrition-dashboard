@@ -961,6 +961,25 @@ const PatientProfile = () => {
                 <p className="text-gray-500 text-sm">{patient.phone || 'Sem telefone'}</p>
               </div>
               <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={async () => {
+                    try {
+                      const user = await getCurrentUser();
+                      const professionalInfo = {
+                        name: profile?.name || 'Profissional',
+                        email: profile?.email
+                      };
+                      await generatePatientProgressReport(patient, journeyData, professionalInfo);
+                      toast.success('Relatório PDF gerado com sucesso!');
+                    } catch (error) {
+                      console.error('Erro ao gerar PDF:', error);
+                      toast.error('Erro ao gerar relatório PDF');
+                    }
+                  }}
+                >
+                  <Download size={18} className="mr-2" /> Exportar PDF
+                </Button>
                 <Button variant="outline" onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}`)}>
                   <Utensils size={18} className="mr-2" /> Plano Alimentar
                 </Button>
