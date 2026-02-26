@@ -27,6 +27,7 @@ import SettingsPage from '@/pages/SettingsPage';
 import FoodDatabase from '@/pages/FoodDatabase';
 import BrandingSettings from '@/pages/BrandingSettings';
 import HealthCheckQuiz from '@/pages/HealthCheckQuiz';
+import ProjetoBiquiniBranco from '@/pages/ProjetoBiquiniBranco';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
@@ -195,6 +196,11 @@ function App() {
               <Route path="/visitor/health-check" element={
                 <ProtectedRoute allowedTypes={['visitor']}>
                   <HealthCheckQuiz />
+                </ProtectedRoute>
+              } />
+              <Route path="/visitor/projeto" element={
+                <ProtectedRoute allowedTypes={['visitor']}>
+                  <ProjetoBiquiniBranco />
                 </ProtectedRoute>
               } />
               <Route path="/visitor/calculators" element={
