@@ -368,31 +368,6 @@ export const createPatientByProfessional = async (professionalId, patientData) =
     return { data: null, error: { message: error.message || 'Erro ao criar paciente' } };
   }
 };
-        patient_id: patientId,
-        professional_id: professionalId,
-        status: 'incomplete'
-      });
-    } catch (anamErr) {
-      console.warn('⚠️ Anamnese não criada');
-    }
-    
-    console.log('✅ PACIENTE CRIADO');
-    return { 
-      data: { 
-        id: patientId, 
-        email: patientData.email,
-        name: patientData.name,
-        role: 'patient',
-        status: 'active'
-      }, 
-      error: null 
-    };
-    
-  } catch (err) {
-    console.error('❌ ERRO:', err);
-    return { data: null, error: { message: 'Erro inesperado' } };
-  }
-};
 
 export const updatePatient = async (patientId, updates) => {
   console.log('✏️ Atualizando paciente...', { patientId });
