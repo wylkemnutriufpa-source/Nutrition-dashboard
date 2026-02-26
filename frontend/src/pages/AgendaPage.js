@@ -120,7 +120,7 @@ const AgendaPage = () => {
   const openAddModal = (dateStr = null) => {
     setEditingAppointment(null);
     setForm({
-      patient_id: '',
+      patient_id: 'none',
       title: '',
       date: dateStr || selectedDate || new Date().toISOString().split('T')[0],
       time: '09:00',
