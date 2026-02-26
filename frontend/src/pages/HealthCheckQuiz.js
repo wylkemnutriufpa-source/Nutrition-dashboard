@@ -14,6 +14,15 @@ import {
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import WhatsAppFloating from '@/components/WhatsAppFloating';
+import ProjectCTA from '@/components/ProjectCTA';
+
+// Função para determinar categoria baseada no score
+const getScoreCategory = (score) => {
+  if (score >= 80) return 'normal';
+  if (score >= 60) return 'sobrepeso';
+  if (score >= 40) return 'sobrepeso';
+  return 'obesidade';
+};
 
 // Configuração das perguntas
 const QUESTIONS = [
