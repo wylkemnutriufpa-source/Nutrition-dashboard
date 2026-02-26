@@ -241,6 +241,18 @@ frontend:
         agent: "main"
         comment: "Já estava funcionando com Supabase"
 
+  - task: "Patient Menu Permissions & Dynamic Menu"
+    implemented: true
+    working: true
+    file: "frontend/src/components/Sidebar.js, frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED AND WORKING (26/Feb): Patient menu permissions verified with login maria@gmail.com/123456. Sidebar correctly displays ONLY patient-appropriate items: (1) Dashboard ✅, (2) 'MEU PROJETO' section with dynamic items: Meu Plano, Minhas Tarefas, Meus Feedbacks, Minhas Receitas, Minha Lista de Compras, Suplementos, Dicas, Minha Jornada ✅, (3) Calculadoras ✅, (4) Sair button ✅. Professional/admin items (Pacientes, Profissionais, Alimentos, Personalização, Painel Admin) are ALL correctly hidden from patient view. Menu loads dynamically from patient configuration via getPatientMenuConfig(). Note: 'Lista de Compras' shows as 'Minha Lista de Compras' in the configured menu. All menu items functional and properly styled. Screenshots captured: patient_sidebar_full.png, patient_menu_verification.png"
+
   - task: "Weight Calculator for Visitors"
     implemented: true
     working: true
@@ -252,6 +264,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED AND WORKING: Calculadora de Peso tested successfully. Complete flow verified: (1) Visitor login → (2) Calculators list page → (3) Weight calculator form Step 1 (altura: 165cm, peso: 85kg, idade: 35, sexo: feminino) → (4) Step 2 (acima do peso, perder peso, atividade moderada) → (5) Results displayed correctly (Peso Ideal: 55.3kg, IMC: 31.2, Diferença: +29.8kg, TMB: 1593 kcal, GET: 2469 kcal, Recomendação: 1969 calorias/dia). ProjectCTA component appears at the end with all required elements: Badge 'PROJETO BIQUÍNI BRANCO', title 'Sua saúde merece cuidado profissional', emotional message, benefits (Programa completo, Plano personalizado, Resultados em 90 dias), button 'Conhecer o Projeto', and WhatsApp button 'Quero cuidar da minha saúde'. CTA correctly shows 'obesidade' category styling and messaging based on IMC 31.2. All UI elements visible and functional. Screenshots captured."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED (26/Feb): Weight Calculator + CTA fully functional. Test with altura=160cm, peso=85kg, idade=35, sexo=Feminino, objetivo=perder peso, atividade=moderada. Results display correctly: Peso Ideal: 51.0kg, IMC: 33.2, Diferença: +34.0kg, TMB: 1578 kcal, GET: 2445 kcal, Recomendação: 1945 calorias/dia para emagrecimento. CTA 'PROJETO BIQUÍNI BRANCO' appears at bottom with all elements: Badge ✅, Title 'Sua saúde merece cuidado profissional' ✅, Benefits (👙📊💪) ✅, Button 'Conhecer o Projeto' ✅, WhatsApp button 'Quero cuidar da minha saúde' ✅. CTA correctly displays 'obesidade' category styling (purple/pink gradient, Shield icon). Screenshots: calc_step1_filled.png, calc_step2_filled.png, calc_results_top.png, calc_results_bottom.png, cta_projeto_biquini_branco.png"
 
 metadata:
   created_by: "main_agent"
