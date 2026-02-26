@@ -96,7 +96,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
 
   // Montar menu baseado no tipo de usuário
   const getLinks = () => {
-    switch (userType) {
+    switch (validUserType) {
       case 'admin':
         // Admin tem TUDO do professional + links admin extras
         return [...adminExtraLinks, ...professionalLinks.map(l => ({
@@ -114,10 +114,10 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
   };
 
   const links = getLinks();
-  const patientDynamicLinks = userType === 'patient' ? getPatientDynamicLinks() : [];
+  const patientDynamicLinks = validUserType === 'patient' ? getPatientDynamicLinks() : [];
 
   const getUserTypeLabel = () => {
-    switch(userType) {
+    switch(validUserType) {
       case 'admin': return 'Administrador';
       case 'professional': return 'Profissional';
       case 'patient': return 'Paciente';
@@ -126,7 +126,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
   };
 
   const getPrimaryColor = () => {
-    if (userType === 'admin') return '#7C3AED';
+    if (validUserType === 'admin') return '#7C3AED';
     return branding.primaryColor || '#0F766E';
   };
 
