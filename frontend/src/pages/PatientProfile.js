@@ -1033,12 +1033,28 @@ const PatientProfile = () => {
                         <Badge className="bg-green-100 text-green-700">Ativo</Badge>
                       </div>
                     </div>
-                    <Button 
-                      className="w-full bg-teal-700 hover:bg-teal-800"
-                      onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}`)}
-                    >
-                      <Edit className="mr-2" size={18} /> Editar Plano
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          try {
+                            generateMealPlanPDF(patient, mealPlan, { name: profile?.name, email: profile?.email });
+                            toast.success('PDF gerado com sucesso!');
+                          } catch (error) {
+                            console.error('Erro ao gerar PDF:', error);
+                            toast.error('Erro ao gerar PDF');
+                          }
+                        }}
+                      >
+                        <Download className="mr-2" size={18} /> Exportar PDF
+                      </Button>
+                      <Button 
+                        className="flex-1 bg-teal-700 hover:bg-teal-800"
+                        onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}`)}
+                      >
+                        <Edit className="mr-2" size={18} /> Editar Plano
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-8">
