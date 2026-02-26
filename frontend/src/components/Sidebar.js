@@ -84,8 +84,21 @@ const Sidebar = ({ userType, onLogout }) => {
 
   // Links do Visitante
   const visitorLinks = [
-    { to: '/visitor/calculators', icon: Calculator, label: 'Calculadoras' }
+    { to: '/visitor/calculators', icon: Calculator, label: 'Calculadoras' },
+    { to: '/visitor/projeto', icon: TrendingUp, label: 'Conheça o Projeto' }
   ];
+
+  // Gerar links do paciente dinamicamente
+  const getPatientLinks = () => {
+    if (patientMenuItems && patientMenuItems.length > 0) {
+      return patientMenuItems.map(item => ({
+        to: item.route,
+        icon: getIcon(item.icon),
+        label: item.label
+      }));
+    }
+    return defaultPatientLinks;
+  };
 
   // Montar menu baseado no tipo de usuário
   const getLinks = () => {
