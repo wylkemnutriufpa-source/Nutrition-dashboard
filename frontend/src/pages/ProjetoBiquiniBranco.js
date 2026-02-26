@@ -235,7 +235,7 @@ const ProjetoBiquiniBranco = () => {
           <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white border-0">
             <CardContent className="pt-8 pb-8">
               <h2 className="text-2xl font-bold text-center mb-8 text-yellow-400">
-                ⚠️ VERDADES QUE NINGUÉM TE CONTA
+                {projectData.sectionTitles?.myths || '⚠️ VERDADES QUE NINGUÉM TE CONTA'}
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 {projectData.myths.map((myth, index) => (
