@@ -680,3 +680,359 @@ export const saveBranding = async (userId, brandingData) => {
     .single();
   return { data, error };
 };
+
+// ==================== MENU CONFIG ====================
+
+const DEFAULT_MENU_ITEMS = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'Home', route: '/patient/dashboard', visible: true, order: 0 },
+  { key: 'meal_plan', label: 'Meu Plano', icon: 'Utensils', route: '/patient/meal-plan', visible: true, order: 1 },
+  { key: 'tasks', label: 'Minhas Tarefas', icon: 'ClipboardList', route: '/patient/checklist', visible: true, order: 2 },
+  { key: 'feedback', label: 'Meus Feedbacks', icon: 'MessageSquare', route: '/patient/feedback', visible: true, order: 3 },
+  { key: 'recipes', label: 'Minhas Receitas', icon: 'ChefHat', route: '/patient/recipes', visible: true, order: 4 },
+  { key: 'shopping', label: 'Lista de Compras', icon: 'ShoppingCart', route: '/patient/shopping-list', visible: true, order: 5 },
+  { key: 'supplements', label: 'Suplementos', icon: 'Pill', route: '/patient/supplements', visible: true, order: 6 },
+  { key: 'tips', label: 'Dicas', icon: 'Lightbulb', route: '/patient/tips', visible: true, order: 7 },
+  { key: 'journey', label: 'Minha Jornada', icon: 'TrendingUp', route: '/patient/journey', visible: true, order: 8 },
+  { key: 'calculators', label: 'Calculadoras', icon: 'Calculator', route: '/patient/calculators', visible: true, order: 9 }
+];
+
+export const getPatientMenuConfig = async (patientId, professionalId) => {
+  // Primeiro tenta buscar config específica do paciente
+  let { data, error } = await supabase
+    .from('patient_menu_configs')
+    .select('*')
+    .eq('patient_id', patientId)
+    .single();
+  
+  // Se não existir, busca config padrão do profissional
+  if (error || !data) {
+    const result = await supabase
+      .from('patient_menu_configs')
+      .select('*')
+      .eq('professional_id', professionalId)
+      .is('patient_id', null)
+      .single();
+    data = result.data;
+  }
+  
+  // Se ainda não existir, retorna os itens padrão
+  if (!data) {
+    return { data: { items: DEFAULT_MENU_ITEMS }, error: null };
+  }
+  
+  return { data, error: null };
+};
+
+export const saveMenuConfig = async (professionalId, patientId, items) => {
+  const { data, error } = await supabase
+    .from('patient_menu_configs')
+    .upsert({
+      professional_id: professionalId,
+      patient_id: patientId,
+      items
+    }, {
+      onConflict: 'professional_id,patient_id'
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const getDefaultMenuItems = () => DEFAULT_MENU_ITEMS;
+
+// ==================== RECIPES ====================
+
+export const getRecipes = async (professionalId, patientId = null) => {
+  let query = supabase.from('recipes').select('*');
+  
+  if (patientId) {
+    // Paciente vê receitas públicas do seu profissional ou específicas para ele
+    query = query.or(`is_public.eq.true,visible_to_patients.cs.{${patientId}}`);
+    query = query.eq('professional_id', professionalId);
+  } else {
+    // Profissional vê todas as suas receitas
+    query = query.eq('professional_id', professionalId);
+  }
+  
+  const { data, error } = await query.order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getRecipeById = async (recipeId) => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .eq('id', recipeId)
+    .single();
+  return { data, error };
+};
+
+export const createRecipe = async (recipeData) => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .insert(recipeData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateRecipe = async (recipeId, updates) => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .update(updates)
+    .eq('id', recipeId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteRecipe = async (recipeId) => {
+  const { error } = await supabase.from('recipes').delete().eq('id', recipeId);
+  return { error };
+};
+
+// ==================== SUPPLEMENTS ====================
+
+export const getPatientSupplements = async (patientId) => {
+  const { data, error } = await supabase
+    .from('patient_supplements')
+    .select('*')
+    .eq('patient_id', patientId)
+    .eq('is_active', true)
+    .order('time_of_day', { ascending: true });
+  return { data, error };
+};
+
+export const createSupplement = async (supplementData) => {
+  const { data, error } = await supabase
+    .from('patient_supplements')
+    .insert(supplementData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateSupplement = async (supplementId, updates) => {
+  const { data, error } = await supabase
+    .from('patient_supplements')
+    .update(updates)
+    .eq('id', supplementId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteSupplement = async (supplementId) => {
+  const { error } = await supabase
+    .from('patient_supplements')
+    .update({ is_active: false })
+    .eq('id', supplementId);
+  return { error };
+};
+
+// ==================== PATIENT JOURNEY ====================
+
+export const getPatientJourney = async (patientId, limit = 50) => {
+  const { data, error } = await supabase
+    .from('patient_journey')
+    .select('*, meal_plan:meal_plans(id, name)')
+    .eq('patient_id', patientId)
+    .order('record_date', { ascending: false })
+    .limit(limit);
+  return { data, error };
+};
+
+export const createJourneyEntry = async (entryData) => {
+  const { data, error } = await supabase
+    .from('patient_journey')
+    .insert(entryData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateJourneyEntry = async (entryId, updates) => {
+  const { data, error } = await supabase
+    .from('patient_journey')
+    .update(updates)
+    .eq('id', entryId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteJourneyEntry = async (entryId) => {
+  const { error } = await supabase.from('patient_journey').delete().eq('id', entryId);
+  return { error };
+};
+
+// ==================== PATIENT FEEDBACKS ====================
+
+export const getPatientFeedbacks = async (patientId) => {
+  const { data, error } = await supabase
+    .from('patient_feedbacks')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getProfessionalFeedbacks = async (professionalId, unreadOnly = false) => {
+  let query = supabase
+    .from('patient_feedbacks')
+    .select('*, patient:profiles!patient_id(id, name, email)')
+    .eq('professional_id', professionalId);
+  
+  if (unreadOnly) {
+    query = query.eq('is_read', false);
+  }
+  
+  const { data, error } = await query.order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const createFeedback = async (feedbackData) => {
+  const { data, error } = await supabase
+    .from('patient_feedbacks')
+    .insert(feedbackData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const respondToFeedback = async (feedbackId, response) => {
+  const { data, error } = await supabase
+    .from('patient_feedbacks')
+    .update({
+      professional_response: response,
+      responded_at: new Date().toISOString(),
+      is_read: true
+    })
+    .eq('id', feedbackId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const markFeedbackAsRead = async (feedbackId) => {
+  const { data, error } = await supabase
+    .from('patient_feedbacks')
+    .update({ is_read: true })
+    .eq('id', feedbackId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// ==================== PROJECT CTA CONFIG ====================
+
+export const getProjectCTAConfig = async (professionalId) => {
+  // Busca config específica ou usa valores padrão
+  const { data, error } = await supabase
+    .from('project_cta_config')
+    .select('*')
+    .eq('professional_id', professionalId)
+    .single();
+  
+  if (error || !data) {
+    // Retorna config padrão
+    return {
+      data: {
+        texts: {
+          magreza: {
+            title: 'Precisando ganhar peso de forma saudável?',
+            description: 'Com um plano alimentar personalizado, você pode alcançar seu peso ideal com saúde e energia.'
+          },
+          normal: {
+            title: 'Quer manter sua saúde em dia?',
+            description: 'Um acompanhamento nutricional pode ajudar você a manter seus resultados e melhorar ainda mais.'
+          },
+          sobrepeso: {
+            title: 'Hora de cuidar da sua saúde!',
+            description: 'Com orientação profissional, você pode alcançar seu peso ideal de forma saudável e sustentável.'
+          },
+          obesidade: {
+            title: 'Sua saúde merece atenção especial',
+            description: 'Acompanhamento nutricional profissional é essencial para uma mudança segura e eficaz.'
+          },
+          default: {
+            title: 'Quer um plano alimentar personalizado?',
+            description: 'Com base nas suas respostas, você pode ter um plano totalmente personalizado.'
+          }
+        },
+        whatsapp_number: '5591980124814',
+        whatsapp_message: 'Olá! Acabei de usar a calculadora no FitJourney e gostaria de saber mais sobre o projeto.',
+        instagram_url: 'https://www.instagram.com/dr_wylkem_raiol/',
+        project_name: 'FitJourney',
+        project_description: 'Transforme sua saúde com acompanhamento nutricional profissional',
+        project_benefits: [
+          'Plano alimentar 100% personalizado',
+          'Acompanhamento semanal',
+          'Receitas exclusivas',
+          'Suporte via WhatsApp'
+        ]
+      },
+      error: null
+    };
+  }
+  
+  return { data, error };
+};
+
+export const saveProjectCTAConfig = async (professionalId, configData) => {
+  const { data, error } = await supabase
+    .from('project_cta_config')
+    .upsert({
+      professional_id: professionalId,
+      ...configData
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+// ==================== SHOPPING LIST (baseada no plano) ====================
+
+export const generateShoppingList = async (mealPlanId) => {
+  const { data: plan, error } = await supabase
+    .from('meal_plans')
+    .select('plan_data')
+    .eq('id', mealPlanId)
+    .single();
+  
+  if (error || !plan) return { data: null, error };
+  
+  // Agregar alimentos de todas as refeições
+  const foodMap = new Map();
+  
+  plan.plan_data?.meals?.forEach(meal => {
+    meal.foods?.forEach(food => {
+      const key = food.name?.toLowerCase();
+      if (key) {
+        if (foodMap.has(key)) {
+          const existing = foodMap.get(key);
+          existing.quantity = (existing.quantity || 0) + (food.quantity || 1);
+        } else {
+          foodMap.set(key, {
+            name: food.name,
+            quantity: food.quantity || 1,
+            unit: food.unit || 'porção',
+            category: food.category || 'Outros'
+          });
+        }
+      }
+    });
+  });
+  
+  // Agrupar por categoria
+  const groupedList = {};
+  foodMap.forEach((item) => {
+    const category = item.category || 'Outros';
+    if (!groupedList[category]) {
+      groupedList[category] = [];
+    }
+    groupedList[category].push(item);
+  });
+  
+  return { data: groupedList, error: null };
+};
