@@ -320,6 +320,11 @@ export const deleteChecklistTemplate = async (templateId) => {
 };
 
 export const getChecklistEntries = async (patientId, startDate, endDate) => {
+  if (!patientId) {
+    console.log('[getChecklistEntries] No patientId provided');
+    return { data: [], error: null };
+  }
+  
   const { data, error } = await supabase
     .from('checklist_entries')
     .select(`
@@ -334,6 +339,11 @@ export const getChecklistEntries = async (patientId, startDate, endDate) => {
 };
 
 export const getChecklistEntriesForDate = async (patientId, date) => {
+  if (!patientId) {
+    console.log('[getChecklistEntriesForDate] No patientId provided');
+    return { data: [], error: null };
+  }
+  
   const { data, error } = await supabase
     .from('checklist_entries')
     .select(`
