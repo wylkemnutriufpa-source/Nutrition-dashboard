@@ -780,14 +780,14 @@ export const getPatientStats = async (patientId) => {
     .from('profiles')
     .select('*')
     .eq('id', patientId)
-    .single();
+    .maybeSingle();
   
   const { data: activePlan } = await supabase
     .from('meal_plans')
     .select('*')
     .eq('patient_id', patientId)
     .eq('is_active', true)
-    .single();
+    .maybeSingle();
   
   const { data: anamnesis } = await supabase
     .from('anamnesis')
@@ -795,7 +795,7 @@ export const getPatientStats = async (patientId) => {
     .eq('patient_id', patientId)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
   
   const adherence = await getChecklistAdherence(patientId, 7);
   
