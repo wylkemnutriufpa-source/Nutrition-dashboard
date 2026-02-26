@@ -320,40 +320,13 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
         Fazer Novo Cálculo
       </Button>
 
+      {/* CTA para Projeto Biquíni Branco */}
       {userType === 'visitor' && (
-        <Card className="border-2 border-teal-700 bg-gradient-to-br from-teal-50 to-green-50 mt-4">
-          <CardHeader className="text-center pb-3">
-            <CardTitle className="text-xl">Preciso de um Plano Personalizado</CardTitle>
-            <CardDescription className="text-sm mt-1">
-              Baseado no seu objetivo: <strong>{result.caloriesRecommendation.type}</strong>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <a
-              href={`https://wa.me/5591980124814?text=Olá! Calculadora: ${result.caloriesRecommendation.type} - ${result.caloriesRecommendation.calories} kcal/dia. Quero plano personalizado!`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button className="w-full bg-green-600 hover:bg-green-700 text-white" size="lg">
-                <MessageCircle className="mr-2" size={20} />
-                Quero Meu Plano Personalizado
-              </Button>
-            </a>
-            
-            <a
-              href="https://www.instagram.com/dr_wylkem_raiol/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                <Instagram className="mr-2" size={20} />
-                Seguir no Instagram
-              </Button>
-            </a>
-          </CardContent>
-        </Card>
+        <ProjectCTA 
+          category={result.category} 
+          userData={{ weight: result.currentWeight, imc: result.imc, goal: result.caloriesRecommendation.type }}
+          source="weight-calculator"
+        />
       )}
     </div>
   );
