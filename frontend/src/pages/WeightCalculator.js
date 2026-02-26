@@ -228,7 +228,13 @@ const WeightCalculator = ({ userType = 'visitor' }) => {
         Fazer Novo Cálculo
       </Button>
 
-      {userType === 'visitor' && <CTACard />}
+      {/* CTA sempre aparece para visitantes */}
+      {userType === 'visitor' && (
+        <ProjectCTA 
+          imc={result.imc} 
+          calculatorType="peso"
+        />
+      )}
     </div>
   );
 
