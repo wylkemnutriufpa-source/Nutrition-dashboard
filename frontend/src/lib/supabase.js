@@ -7,17 +7,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('⚠️ Supabase credentials not found.');
 }
 
-// Configuração que evita o problema de NavigatorLock timeout
+// Configuração simplificada para evitar erros de lock
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
     flowType: 'implicit',
-    // Desabilitar o lock do navigator para evitar timeout
-    lock: {
-      acquireLockTimeoutMs: 5000
-    },
     // Storage customizado para evitar conflitos
     storage: {
       getItem: (key) => {
