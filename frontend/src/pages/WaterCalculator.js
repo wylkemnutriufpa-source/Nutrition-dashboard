@@ -201,7 +201,13 @@ const WaterCalculator = ({ userType = 'visitor' }) => {
         Fazer Novo Cálculo
       </Button>
 
-      {userType === 'visitor' && <CTACard />}
+      {/* CTA sempre aparece para visitantes */}
+      {userType === 'visitor' && (
+        <ProjectCTA 
+          category="normal"
+          calculatorType="água"
+        />
+      )}
     </div>
   );
 
