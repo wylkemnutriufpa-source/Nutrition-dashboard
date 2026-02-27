@@ -93,6 +93,7 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
                     if (e.key === 'Enter') handleSaveName();
                     if (e.key === 'Escape') handleCancelEditName();
                   }}
+                  onBlur={handleSaveName}
                   autoFocus
                 />
                 <Button onClick={handleSaveName} size="sm" variant="ghost" className="text-green-600">
