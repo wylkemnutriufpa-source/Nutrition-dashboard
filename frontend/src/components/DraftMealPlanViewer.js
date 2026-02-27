@@ -46,7 +46,7 @@ const DraftMealPlanViewer = ({
             O pré-plano será gerado automaticamente quando a anamnese for concluída
           </p>
           {onRegenerate && (
-            <Button onClick={onRegenerate} variant="outline">
+            <Button onClick={() => onRegenerate(1)} variant="outline">
               <RefreshCw className="mr-2" size={16} />
               Gerar Pré-Plano Agora
             </Button>
@@ -55,6 +55,20 @@ const DraftMealPlanViewer = ({
       </Card>
     );
   }
+
+  const handleRegenerateVariation = (variation) => {
+    setCurrentVariation(variation);
+    if (onRegenerate) {
+      onRegenerate(variation);
+    }
+  };
+
+  const variationLabels = [
+    { id: 1, label: 'Clássico', icon: '🍽️', description: 'Plano tradicional e equilibrado' },
+    { id: 2, label: 'Prático', icon: '⚡', description: 'Refeições rápidas e simples' },
+    { id: 3, label: 'Proteico', icon: '💪', description: 'Foco em proteínas e ganho muscular' },
+    { id: 4, label: 'Low Carb', icon: '🥑', description: 'Baixo carboidrato' }
+  ];
 
   const handleSave = () => {
     setSaving(true);
