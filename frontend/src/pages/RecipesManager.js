@@ -166,14 +166,20 @@ const RecipesManager = () => {
     setShowForm(false);
     setEditingRecipe(null);
     setFormData({
-      name: '',
+      title: '',
+      description: '',
       category: 'almoco',
-      time: 30,
+      prep_time: 30,
       servings: 2,
       calories: 300,
-      image: '',
-      ingredients: [''],
-      instructions: [''],
+      image_url: '',
+      ingredients: '',
+      instructions: '',
+      visibility_mode: 'selected',
+      is_active: true,
+      is_global: false
+    });
+  };
       tips: '',
       visibility_mode: 'selected',
       is_active: true,
