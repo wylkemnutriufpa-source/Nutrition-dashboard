@@ -954,17 +954,31 @@ const PatientProfile = () => {
     try {
       // Gerar pré-plano usando IA
       const smartPlan = generateSmartMealPlan(anamnesis, patient);
+      console.log('Pré-plano gerado:', smartPlan);
       
       // Salvar no banco
-      await saveDraftMealPlan(id, profile.id, smartPlan);
+      const { data: savedDraft, error: saveError } = await saveDraftMealPlan(id, profile.id, smartPlan);
+      
+      if (saveError) {
+        console.error('Erro ao salvar pré-plano:', saveError);
+        toast.error('Erro ao salvar pré-plano no banco: ' + (saveError.message || 'Verifique se a tabela draft_meal_plans existe'));
+        // Ainda assim mostrar o plano gerado
+        setDraftPlan(smartPlan);
+        return;
+      }
+      
+      console.log('Pré-plano salvo com sucesso:', savedDraft);
       
       // Criar dicas automáticas
       if (smartPlan.tips && smartPlan.tips.length > 0) {
-        await createAutomaticTips(id, profile.id, smartPlan.tips);
+        const { error: tipsError } = await createAutomaticTips(id, profile.id, smartPlan.tips);
+        if (tipsError) {
+          console.warn('Aviso: Dicas automáticas não foram criadas:', tipsError);
+        }
       }
       
       setDraftPlan(smartPlan);
-      toast.success('Pré-plano gerado com sucesso!');
+      toast.success('Pré-plano gerado e salvo com sucesso!');
     } catch (error) {
       console.error('Error generating draft plan:', error);
       toast.error('Erro ao gerar pré-plano');
