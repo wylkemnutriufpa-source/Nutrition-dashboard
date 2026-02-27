@@ -720,7 +720,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
   return (
     <Layout title="Editor de Plano Alimentar" showBack userType="professional">
       <div data-testid="meal-plan-editor" className="space-y-6">
-        {/* Seleção de Paciente */}
+        {/* Info do Paciente */}
         <Card>
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
@@ -736,7 +736,8 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                 )}
               </div>
               
-              {!isPatientView && (
+              {/* Só mostra botão de trocar paciente se NÃO veio do pré-plano e não é paciente */}
+              {!isPatientView && !hidePatientSelector && (
                 <Dialog open={isSelectingPatient} onOpenChange={setIsSelectingPatient}>
                   <DialogTrigger asChild>
                     <Button variant="outline">
