@@ -1136,6 +1136,7 @@ const PatientProfile = () => {
           <TabsList className="grid w-full grid-cols-8 bg-gray-100">
             <TabsTrigger value="resumo">Resumo</TabsTrigger>
             <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
+            <TabsTrigger value="avaliacao">Av. Física</TabsTrigger>
             <TabsTrigger value="pre-plano">Pré-Plano</TabsTrigger>
             <TabsTrigger value="plano">Plano</TabsTrigger>
             <TabsTrigger value="checklist">Checklist</TabsTrigger>
