@@ -159,8 +159,15 @@ const PatientReceitas = () => {
         console.log('Nenhuma receita personalizada encontrada, usando padrão');
         setRecipes(defaultRecipes);
       } else {
-        // Tem receitas personalizadas
-        setRecipes(data);
+        // Mapear campos do banco para o formato esperado pelo componente
+        const mappedRecipes = data.map(r => ({
+          ...r,
+          name: r.title || r.name, // Compatibilidade com ambos os campos
+          time: r.prep_time || r.time,
+          image: r.image_url || r.image,
+          tips: r.description || r.tips
+        }));
+        setRecipes(mappedRecipes);
       }
     } catch (error) {
       console.error('Erro:', error);
