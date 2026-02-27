@@ -450,3 +450,258 @@ export const generateMealPlanPDF = (patient, mealPlan, professionalInfo) => {
 
   doc.save(`plano_alimentar_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
 };
+
+
+/**
+ * Gera PDF de Receitas do paciente
+ * @param {Object} patient - Dados do paciente
+ * @param {Array} recipes - Array de receitas
+ * @param {Object} professionalInfo - Informações do profissional
+ */
+export const generateRecipesPDF = async (patient, recipes, professionalInfo) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
+  let yPosition = 20;
+
+  // Função auxiliar para adicionar nova página se necessário
+  const checkPageBreak = (requiredSpace = 20) => {
+    if (yPosition + requiredSpace > pageHeight - 20) {
+      doc.addPage();
+      yPosition = 20;
+      return true;
+    }
+    return false;
+  };
+
+  // ===== CABEÇALHO =====
+  doc.setFontSize(20);
+  doc.setTextColor(15, 118, 110);
+  doc.text('Receitas Personalizadas', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 10;
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 15;
+
+  // ===== PROFISSIONAL =====
+  if (professionalInfo) {
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Profissional: ${professionalInfo.name}`, 14, yPosition);
+    yPosition += 7;
+    if (professionalInfo.email) {
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Email: ${professionalInfo.email}`, 14, yPosition);
+      yPosition += 10;
+    }
+  }
+
+  // ===== PACIENTE =====
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Paciente: ${patient.name || 'N/A'}`, 14, yPosition);
+  yPosition += 15;
+
+  // ===== RECEITAS =====
+  if (!recipes || recipes.length === 0) {
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Nenhuma receita disponível', 14, yPosition);
+  } else {
+    recipes.forEach((recipe, index) => {
+      checkPageBreak(40);
+
+      // Título da receita
+      doc.setFontSize(14);
+      doc.setTextColor(15, 118, 110);
+      doc.text(`${index + 1}. ${recipe.title || 'Receita sem título'}`, 14, yPosition);
+      yPosition += 8;
+
+      // Categoria
+      if (recipe.category) {
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Categoria: ${recipe.category}`, 14, yPosition);
+        yPosition += 6;
+      }
+
+      // Tempo de preparo
+      if (recipe.prep_time) {
+        doc.text(`Tempo de preparo: ${recipe.prep_time} minutos`, 14, yPosition);
+        yPosition += 6;
+      }
+
+      // Ingredientes
+      if (recipe.ingredients && recipe.ingredients.length > 0) {
+        checkPageBreak(15);
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Ingredientes:', 14, yPosition);
+        yPosition += 6;
+
+        doc.setFontSize(10);
+        recipe.ingredients.forEach(ingredient => {
+          checkPageBreak();
+          doc.text(`• ${ingredient}`, 18, yPosition);
+          yPosition += 5;
+        });
+        yPosition += 3;
+      }
+
+      // Modo de preparo
+      if (recipe.instructions) {
+        checkPageBreak(15);
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Modo de Preparo:', 14, yPosition);
+        yPosition += 6;
+
+        doc.setFontSize(10);
+        const lines = doc.splitTextToSize(recipe.instructions, pageWidth - 28);
+        lines.forEach(line => {
+          checkPageBreak();
+          doc.text(line, 14, yPosition);
+          yPosition += 5;
+        });
+      }
+
+      // Informação nutricional
+      if (recipe.nutrition_info) {
+        checkPageBreak(15);
+        doc.setFontSize(11);
+        doc.setTextColor(15, 118, 110);
+        doc.text('Informação Nutricional:', 14, yPosition);
+        yPosition += 6;
+
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        const nutrition = recipe.nutrition_info;
+        if (nutrition.calories) doc.text(`Calorias: ${nutrition.calories} kcal`, 18, yPosition), yPosition += 5;
+        if (nutrition.protein) doc.text(`Proteína: ${nutrition.protein}g`, 18, yPosition), yPosition += 5;
+        if (nutrition.carbs) doc.text(`Carboidratos: ${nutrition.carbs}g`, 18, yPosition), yPosition += 5;
+        if (nutrition.fat) doc.text(`Gordura: ${nutrition.fat}g`, 18, yPosition), yPosition += 5;
+      }
+
+      yPosition += 10; // Espaço entre receitas
+    });
+  }
+
+  // Rodapé
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+  }
+
+  doc.save(`receitas_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
+};
+
+/**
+ * Gera PDF de Dicas do paciente
+ * @param {Object} patient - Dados do paciente
+ * @param {Array} tips - Array de dicas
+ * @param {Object} professionalInfo - Informações do profissional
+ */
+export const generateTipsPDF = async (patient, tips, professionalInfo) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
+  let yPosition = 20;
+
+  const checkPageBreak = (requiredSpace = 20) => {
+    if (yPosition + requiredSpace > pageHeight - 20) {
+      doc.addPage();
+      yPosition = 20;
+      return true;
+    }
+    return false;
+  };
+
+  // ===== CABEÇALHO =====
+  doc.setFontSize(20);
+  doc.setTextColor(15, 118, 110);
+  doc.text('Dicas de Nutrição', pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 10;
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, pageWidth / 2, yPosition, { align: 'center' });
+  
+  yPosition += 15;
+
+  // ===== PROFISSIONAL =====
+  if (professionalInfo) {
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Profissional: ${professionalInfo.name}`, 14, yPosition);
+    yPosition += 7;
+    if (professionalInfo.email) {
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Email: ${professionalInfo.email}`, 14, yPosition);
+      yPosition += 10;
+    }
+  }
+
+  // ===== PACIENTE =====
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Paciente: ${patient.name || 'N/A'}`, 14, yPosition);
+  yPosition += 15;
+
+  // ===== DICAS =====
+  if (!tips || tips.length === 0) {
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Nenhuma dica disponível', 14, yPosition);
+  } else {
+    tips.forEach((tip, index) => {
+      checkPageBreak(30);
+
+      // Título da dica
+      doc.setFontSize(14);
+      doc.setTextColor(15, 118, 110);
+      doc.text(`${index + 1}. ${tip.title || 'Dica'}`, 14, yPosition);
+      yPosition += 8;
+
+      // Categoria
+      if (tip.category) {
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Categoria: ${tip.category}`, 14, yPosition);
+        yPosition += 6;
+      }
+
+      // Conteúdo
+      if (tip.content) {
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        const lines = doc.splitTextToSize(tip.content, pageWidth - 28);
+        lines.forEach(line => {
+          checkPageBreak();
+          doc.text(line, 14, yPosition);
+          yPosition += 5;
+        });
+      }
+
+      yPosition += 10; // Espaço entre dicas
+    });
+  }
+
+  // Rodapé
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+  }
+
+  doc.save(`dicas_${patient.name?.replace(/\s+/g, '_')}_${format(new Date(), 'yyyyMMdd')}.pdf`);
+};
