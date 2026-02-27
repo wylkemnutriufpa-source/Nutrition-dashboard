@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Calendar, FileText, Utensils, AlertTriangle, Edit, Loader2, User, Save, Plus,
   ClipboardList, MessageSquare, CheckCircle2, Circle, Trash2, Send, Pin, Settings2,
-  DollarSign, Download
+  DollarSign, Download, ChefHat
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
