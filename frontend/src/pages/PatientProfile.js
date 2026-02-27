@@ -20,12 +20,14 @@ import {
   getPatientById, updatePatient, getPatientMealPlan, getAnamnesis, updateAnamnesis,
   getMealPlans, getPatientMessages, createPatientMessage, deletePatientMessage, updatePatientMessage,
   getChecklistAdherence, upsertPatientJourney, getPatientJourney, getPatientPlan, upsertPatientPlan,
-  getCurrentUser
+  getCurrentUser, getDraftMealPlan, saveDraftMealPlan, updateDraftMealPlan, createAutomaticTips
 } from '@/lib/supabase';
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
 import MenuConfigEditor from '@/components/MenuConfigEditor';
+import DraftMealPlanViewer from '@/components/DraftMealPlanViewer';
 import { generateAnamnesePDF, generateMealPlanPDF } from '@/utils/pdfGenerator';
+import generateSmartMealPlan from '@/utils/smartAnamnesis';
 
 // Componente de Aba Resumo
 const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
