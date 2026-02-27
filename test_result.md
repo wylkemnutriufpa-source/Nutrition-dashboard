@@ -417,14 +417,45 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Login Fix - Remove duplicate getUserProfile"
-    - "P0: Fix 406/400 errors in PatientProfile"
-  stuck_tasks:
-    - "P0: Fix 406/400 errors in PatientProfile"
+    - "Modal Visualizar Plano Alimentar"
+    - "Botão Acessar Planos no Dashboard Profissional"
+    - "PDF Export com customName e observations"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "✅ IMPLEMENTAÇÕES COMPLETADAS (Tarefas 1, 2 e 3)
+    
+    TAREFA 1 - Botão Visualizar com Modal:
+    - Criado MealPlanViewerModal.js completo
+    - Modal com header mostrando resumo nutricional (calorias, proteína, carbs, gordura)
+    - Refeições expansíveis com detalhes dos alimentos
+    - Tab de observações com customName e observations de cada alimento
+    - Botões Exportar PDF e Editar Plano dentro do modal
+    - PatientProfile atualizado para abrir modal ao invés de redirecionar
+    
+    TAREFA 2 - Botão no Dashboard Profissional:
+    - Nova seção 'Planos Alimentares Ativos' no ProfessionalDashboard
+    - Lista pacientes com planos ativos
+    - Botões Ver (abre aba plano do paciente) e Editar (abre editor)
+    - getProfessionalStats() atualizada para retornar patientsWithActivePlans
+    
+    TAREFA 3 - PDF com customName e observations:
+    - generateMealPlanPDF() atualizada
+    - Usa customName quando disponível
+    - Exibe observações de cada alimento
+    - Nova seção 'Observações e Orientações' no final do PDF
+    
+    ARQUIVOS MODIFICADOS:
+    - frontend/src/components/MealPlanViewerModal.js (NOVO)
+    - frontend/src/pages/PatientProfile.js
+    - frontend/src/pages/ProfessionalDashboard.js
+    - frontend/src/lib/supabase.js
+    - frontend/src/utils/pdfGenerator.js
+    
+    PRONTO PARA TESTE"
   - agent: "main"
     message: "✅ P0 CORRIGIDO - Erros 406/400 no Perfil do Paciente
     
