@@ -455,66 +455,16 @@ const RecipesManager = () => {
                   placeholder="200g de frango&#10;1 colher de azeite&#10;Sal a gosto"
                   rows={5}
                 />
-                        onChange={(e) => updateArrayItem('ingredients', index, e.target.value)}
-                        placeholder="Ex: 200g de frango"
-                      />
-                      {formData.ingredients.length > 1 && (
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => removeArrayItem('ingredients', index)}
-                        >
-                          <X className="w-4 h-4 text-red-500" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Instruções */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <Label>Modo de Preparo</Label>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => addArrayItem('instructions')}>
-                    <Plus className="w-4 h-4 mr-1" /> Adicionar Passo
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  {formData.instructions.map((instruction, index) => (
-                    <div key={index} className="flex gap-2">
-                      <span className="flex items-center justify-center w-8 h-10 bg-teal-100 text-teal-700 rounded-md font-medium">
-                        {index + 1}
-                      </span>
-                      <Input
-                        value={instruction}
-                        onChange={(e) => updateArrayItem('instructions', index, e.target.value)}
-                        placeholder="Descreva o passo..."
-                      />
-                      {formData.instructions.length > 1 && (
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => removeArrayItem('instructions', index)}
-                        >
-                          <X className="w-4 h-4 text-red-500" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Dicas */}
-              <div>
-                <Label>Dicas (opcional)</Label>
+                <Label>Modo de Preparo (um passo por linha)</Label>
                 <Textarea
-                  value={formData.tips}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tips: e.target.value }))}
-                  placeholder="Dicas extras para o preparo..."
-                  rows={2}
+                  value={formData.instructions}
+                  onChange={(e) => setFormData(prev => ({ ...prev, instructions: e.target.value }))}
+                  placeholder="Tempere o frango&#10;Grelhe em fogo médio&#10;Sirva quente"
+                  rows={5}
                 />
               </div>
 
