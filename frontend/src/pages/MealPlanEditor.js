@@ -348,6 +348,21 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
           </SortableContext>
         </DndContext>
 
+        {/* Campo de Observações */}
+        <div className="mt-4">
+          <Label className="text-sm text-gray-600 flex items-center gap-2">
+            <FileText size={14} />
+            Observações desta refeição (opcional)
+          </Label>
+          <Textarea
+            value={meal.observations || ''}
+            onChange={(e) => onUpdate(meal.id, 'observations', e.target.value)}
+            placeholder="Ex: substituir arroz por batata doce caso paciente prefira, evitar alimentos com glúten..."
+            className="mt-2 text-sm"
+            rows={2}
+          />
+        </div>
+
         <Dialog open={isAddingFood} onOpenChange={setIsAddingFood}>
           <DialogTrigger asChild>
             <Button
