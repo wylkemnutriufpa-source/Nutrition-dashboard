@@ -874,24 +874,23 @@ export const createMealPlan = async (planData) => {
     return { data: null, error: { message: err.message || 'Erro ao criar plano' } };
   }
 };
-  }
-};
 
 export const updateMealPlan = async (planId, updates) => {
   try {
-    const { data, error } = await supabase
+    const { data: updatedList, error } = await supabase
       .from('meal_plans')
       .update({
         ...updates,
         updated_at: new Date().toISOString()
       })
       .eq('id', planId)
-      .select()
-      .single();
+      .select();
+    
+    const data = updatedList && updatedList.length > 0 ? updatedList[0] : null;
     return { data, error };
   } catch (err) {
     console.error('Erro em updateMealPlan:', err);
-    return { data: null, error: err };
+    return { data: null, error: { message: err.message || 'Erro ao atualizar plano' } };
   }
 };
 
