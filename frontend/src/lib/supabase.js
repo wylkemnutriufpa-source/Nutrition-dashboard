@@ -848,12 +848,15 @@ export const createMealPlan = async (planData) => {
       .limit(1);
     
     if (selectError) {
-      console.error('❌ Erro ao verificar plano existente:', selectError);
+      console.error('❌ Erro ao verificar plano existente');
+      console.error('Message:', selectError?.message || 'Sem mensagem');
+      
       return { 
         data: null, 
         error: { 
-          message: String(selectError.message || selectError.msg || 'Erro ao verificar plano existente'),
-          code: String(selectError.code || '')
+          message: selectError?.message || selectError?.msg || 'Erro ao verificar plano existente',
+          code: selectError?.code || '',
+          type: 'select_error'
         } 
       };
     }
@@ -879,18 +882,19 @@ export const createMealPlan = async (planData) => {
         .select();
       
       if (error) {
-        console.error('❌ Erro ao atualizar plano existente:', error);
+        console.error('❌ Erro ao atualizar plano existente');
+        console.error('Message:', error?.message || 'Sem mensagem');
+        console.error('Code:', error?.code || 'Sem código');
         
-        const errorMessage = String(error.message || error.msg || 'Sem permissão para atualizar este plano');
-        const errorCode = String(error.code || '');
+        const cleanError = {
+          message: error?.message || error?.msg || 'Erro ao atualizar plano',
+          code: error?.code || '',
+          type: 'update_error'
+        };
         
         return { 
           data: null, 
-          error: { 
-            message: errorMessage,
-            code: errorCode,
-            originalError: 'Supabase error - veja console para detalhes'
-          } 
+          error: cleanError
         };
       }
       
@@ -925,19 +929,21 @@ export const createMealPlan = async (planData) => {
       .select();
     
     if (error) {
-      console.error('❌ Erro ao criar novo plano:', error);
+      // NÃO logar error object - causa body stream already read
+      console.error('❌ Erro ao criar novo plano');
+      console.error('Message:', error?.message || 'Sem mensagem');
+      console.error('Code:', error?.code || 'Sem código');
       
-      // Capturar apenas message e code sem tentar ler body
-      const errorMessage = String(error.message || error.msg || 'Sem permissão para criar plano');
-      const errorCode = String(error.code || '');
+      // Criar novo error object limpo
+      const cleanError = {
+        message: error?.message || error?.msg || 'Erro ao criar plano',
+        code: error?.code || '',
+        type: 'create_error'
+      };
       
       return { 
         data: null, 
-        error: { 
-          message: errorMessage,
-          code: errorCode,
-          originalError: 'Supabase error - veja console para detalhes'
-        } 
+        error: cleanError
       };
     }
     

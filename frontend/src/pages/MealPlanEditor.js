@@ -747,13 +747,15 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         });
         
         if (error) {
-          console.error('❌ ERRO AO ATUALIZAR PLANO:', error);
+          console.error('❌ ERRO AO ATUALIZAR PLANO');
+          console.error('Mensagem:', error?.message || 'Erro desconhecido');
+          console.error('Código:', error?.code || 'Sem código');
           
-          const errorMsg = error.message || 'Erro ao atualizar plano';
+          const errorMsg = error?.message || 'Erro ao atualizar plano';
           toast.error(`❌ ${errorMsg}`);
           
-          if (error.code === '42501' || error.code === 42501) {
-            toast.error('🔒 Erro de permissão. Verifique se o paciente está vinculado.');
+          if (error?.code === '42501' || error?.code === 42501) {
+            toast.error('🔒 Erro de permissão.');
           }
           
           return;
@@ -775,20 +777,18 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         const { data, error } = await createMealPlan(planData);
         
         if (error) {
-          console.error('❌ ERRO AO CRIAR PLANO:', error);
+          // NÃO logar error object completo
+          console.error('❌ ERRO AO CRIAR PLANO');
+          console.error('Mensagem:', error?.message || 'Erro desconhecido');
+          console.error('Código:', error?.code || 'Sem código');
+          console.error('Tipo:', error?.type || 'Desconhecido');
           
-          // Mensagem de erro simples sem tentar acessar propriedades profundas
-          const errorMsg = error.message || 'Erro ao criar plano';
+          const errorMsg = error?.message || 'Erro ao criar plano';
           toast.error(`❌ ${errorMsg}`);
           
           // Verificar código de erro RLS
-          if (error.code === '42501' || error.code === 42501) {
-            toast.error('🔒 Erro de permissão RLS. Verifique se o paciente está vinculado.');
-          }
-          
-          // Se for erro 400, pode ser dados inválidos
-          if (error.code === '400' || errorMsg.includes('400')) {
-            toast.error('⚠️ Dados inválidos enviados ao banco. Veja console.');
+          if (error?.code === '42501' || error?.code === 42501) {
+            toast.error('🔒 Erro de permissão RLS.');
           }
           
           return;
