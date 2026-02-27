@@ -460,6 +460,48 @@ export const generateMealPlanPDF = (patient, mealPlan, professionalInfo) => {
     });
   }
 
+  // Observações gerais do plano
+  if (mealPlan.observations || mealPlan.orientations) {
+    if (yPosition > 220) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    yPosition += 5;
+    doc.setFontSize(13);
+    doc.setTextColor(15, 118, 110);
+    doc.text('Observações e Orientações', 14, yPosition);
+    yPosition += 8;
+    
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    
+    if (mealPlan.observations) {
+      const obsLines = doc.splitTextToSize(mealPlan.observations, pageWidth - 28);
+      obsLines.forEach(line => {
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(line, 14, yPosition);
+        yPosition += 5;
+      });
+      yPosition += 5;
+    }
+    
+    if (mealPlan.orientations) {
+      const orientLines = doc.splitTextToSize(mealPlan.orientations, pageWidth - 28);
+      orientLines.forEach(line => {
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(line, 14, yPosition);
+        yPosition += 5;
+      });
+    }
+  }
+
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
