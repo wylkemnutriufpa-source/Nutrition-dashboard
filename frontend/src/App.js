@@ -14,6 +14,7 @@ import PatientsList from '@/pages/PatientsList';
 import PatientProfile from '@/pages/PatientProfile';
 import MealPlanEditor from '@/pages/MealPlanEditor';
 import PatientDashboard from '@/pages/PatientDashboard';
+import PatientAnamnesisPage from '@/pages/PatientAnamnesisPage';
 import PatientTarefas from '@/pages/PatientTarefas';
 import PatientFeedbacks from '@/pages/PatientFeedbacks';
 import PatientReceitas from '@/pages/PatientReceitas';
