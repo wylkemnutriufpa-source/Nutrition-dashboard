@@ -162,6 +162,50 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
     }
   };
 
+  // Carregar dados da anamnese para pré-preencher
+  const loadFromAnamnesis = async () => {
+    try {
+      const { data: anamnesis, error } = await getAnamnesis(patientId);
+      if (error) throw error;
+      
+      if (!anamnesis) {
+        toast.error('Nenhuma anamnese encontrada para este paciente');
+        return;
+      }
+
+      // Mapear campos da anamnese para a avaliação física
+      const updates = {};
+      
+      if (anamnesis.weight) updates.weight = anamnesis.weight;
+      if (anamnesis.height) updates.height = anamnesis.height;
+      if (anamnesis.waist_circumference) updates.waist = anamnesis.waist_circumference;
+      if (anamnesis.hip_circumference) updates.hip = anamnesis.hip_circumference;
+      if (anamnesis.blood_pressure) {
+        // Se tiver formato "120/80", separar
+        const bp = anamnesis.blood_pressure.toString().split('/');
+        if (bp.length === 2) {
+          updates.blood_pressure_systolic = parseInt(bp[0]);
+          updates.blood_pressure_diastolic = parseInt(bp[1]);
+        }
+      }
+      if (anamnesis.heart_rate) updates.heart_rate = anamnesis.heart_rate;
+      
+      // Também buscar do paciente se houver
+      if (patient?.weight && !updates.weight) updates.weight = patient.weight;
+      if (patient?.height && !updates.height) updates.height = patient.height;
+
+      if (Object.keys(updates).length > 0) {
+        setFormData(prev => ({ ...prev, ...updates }));
+        toast.success(`${Object.keys(updates).length} campos carregados da anamnese!`);
+      } else {
+        toast.info('Nenhum dado encontrado para importar');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar anamnese:', error);
+      toast.error('Erro ao carregar dados da anamnese');
+    }
+  };
+
   const toggleSection = (section) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
