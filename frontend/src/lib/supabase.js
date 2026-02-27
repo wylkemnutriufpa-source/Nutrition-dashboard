@@ -417,18 +417,34 @@ export const getAnamnesis = async (patientId) => {
 };
 
 export const createAnamnesis = async (data) => {
-  // Usar upsert para evitar duplicatas
+  // Primeiro verificar se já existe anamnese para esse paciente
+  const { data: existing } = await supabase
+    .from('anamnesis')
+    .select('id')
+    .eq('patient_id', data.patient_id)
+    .maybeSingle();
+  
+  if (existing) {
+    // Se já existe, atualizar
+    console.log('📝 Já existe anamnese, atualizando:', existing.id);
+    return await updateAnamnesis(existing.id, data);
+  }
+  
+  // Se não existe, criar nova
+  console.log('✨ Criando nova anamnese');
   const { data: result, error } = await supabase
     .from('anamnesis')
-    .upsert({
+    .insert({
       ...data,
-      patient_id: data.patient_id,
-      professional_id: data.professional_id
-    }, {
-      onConflict: 'patient_id' // Se já existe, atualiza
+      created_at: new Date().toISOString()
     })
     .select()
-    .single();
+    .maybeSingle();
+  
+  if (error) {
+    console.error('❌ Erro ao criar anamnese:', error);
+  }
+  
   return { data: result, error };
 };
 
