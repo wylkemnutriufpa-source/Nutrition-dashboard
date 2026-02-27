@@ -155,6 +155,71 @@ const ProfessionalDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Planos Alimentares Ativos */}
+        <Card className="border-l-4 border-l-green-500">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center">
+              <Utensils className="mr-2 text-green-600" size={20} />
+              Planos Alimentares Ativos
+            </CardTitle>
+            <Badge className="bg-green-100 text-green-700">
+              {stats.patientsWithActivePlans.length} plano{stats.patientsWithActivePlans.length !== 1 ? 's' : ''}
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            {stats.patientsWithActivePlans.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <FileText className="mx-auto mb-4 text-gray-400" size={48} />
+                <p>Nenhum plano alimentar ativo</p>
+                <p className="text-sm mt-1">Crie planos para seus pacientes</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {stats.patientsWithActivePlans.map((plan) => {
+                  const patient = plan.patient;
+                  if (!patient) return null;
+                  const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(patient.name)}&background=0F766E&color=fff`;
+                  return (
+                    <div 
+                      key={plan.id} 
+                      className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-100 hover:bg-green-100 transition-colors"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <img src={avatar} alt={patient.name} className="w-10 h-10 rounded-full" />
+                        <div>
+                          <p className="font-semibold text-gray-900">{patient.name}</p>
+                          <p className="text-sm text-gray-600">{plan.name}</p>
+                          <p className="text-xs text-gray-500">
+                            Atualizado: {new Date(plan.updated_at).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          onClick={() => navigate(`/professional/patient/${patient.id}?tab=plano`)}
+                        >
+                          <Eye size={16} className="mr-1" /> Ver
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                          onClick={() => navigate(`/professional/meal-plan-editor?patient=${patient.id}&plan=${plan.id}`)}
+                        >
+                          <Edit size={16} className="mr-1" /> Editar
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Ações Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card 
