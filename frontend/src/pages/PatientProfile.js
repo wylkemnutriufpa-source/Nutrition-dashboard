@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Calendar, FileText, Utensils, AlertTriangle, Edit, Loader2, User, Save, Plus,
   ClipboardList, MessageSquare, CheckCircle2, Circle, Trash2, Send, Pin, Settings2,
-  DollarSign, Download, ChefHat
+  DollarSign, Download, ChefHat, Eye
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -1225,7 +1225,7 @@ const PatientProfile = () => {
                         className="flex-1 bg-teal-700 hover:bg-teal-800"
                         onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}`)}
                       >
-                        <Edit className="mr-2" size={18} /> Editar Plano
+                        <Eye className="mr-2" size={18} /> Visualizar / Editar
                       </Button>
                     </div>
                   </div>
