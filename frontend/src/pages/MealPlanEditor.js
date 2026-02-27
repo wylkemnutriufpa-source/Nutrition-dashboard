@@ -660,46 +660,66 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
     try {
       // Limpar dados dos alimentos antes de salvar (remover flags temporárias)
       const cleanedMeals = meals.map(meal => ({
-        ...meal,
+        id: meal.id,
+        name: meal.name,
+        time: meal.time,
+        color: meal.color || '#0F766E',
         foods: meal.foods.map(food => ({
           id: food.id,
-          foodId: food.foodId || food.food_id,
-          food_id: food.foodId || food.food_id,
-          name: food.name,
-          quantity: food.quantity || 100,
+          foodId: food.foodId || food.food_id || null,
+          food_id: food.foodId || food.food_id || null,
+          name: food.name || '',
+          quantity: parseFloat(food.quantity) || 100,
           unit: food.unit || 'g',
           measure: food.measure || ''
         }))
       }));
 
-      const planData = {
-        patient_id: selectedPatient.id,
-        professional_id: user.id,
-        name: planName,
-        plan_data: { meals: cleanedMeals },
-        daily_targets: calculateDayTotals(),
-        is_active: true
+      // Calcular totais com valores numéricos válidos
+      const totals = calculateDayTotals();
+      const dailyTargets = {
+        calorias: parseFloat(totals.calorias) || 0,
+        proteina: parseFloat(totals.proteina) || 0,
+        carboidrato: parseFloat(totals.carboidrato) || 0,
+        gordura: parseFloat(totals.gordura) || 0
       };
+
+      console.log('Salvando plano:', { cleanedMeals, dailyTargets });
 
       if (currentPlan) {
         // Atualizar plano existente
         const { error } = await updateMealPlan(currentPlan.id, {
           name: planName,
           plan_data: { meals: cleanedMeals },
-          daily_targets: calculateDayTotals()
+          daily_targets: dailyTargets
         });
-        if (error) throw error;
+        if (error) {
+          console.error('Erro update:', error);
+          throw new Error(error.message || 'Erro ao atualizar');
+        }
         toast.success('Plano atualizado com sucesso!');
       } else {
         // Criar novo plano
+        const planData = {
+          patient_id: selectedPatient.id,
+          professional_id: user.id,
+          name: planName,
+          plan_data: { meals: cleanedMeals },
+          daily_targets: dailyTargets,
+          is_active: true
+        };
+        
         const { data, error } = await createMealPlan(planData);
-        if (error) throw error;
+        if (error) {
+          console.error('Erro create:', error);
+          throw new Error(error.message || 'Erro ao criar');
+        }
         setCurrentPlan(data);
         toast.success('Plano criado com sucesso!');
       }
     } catch (error) {
       console.error('Error saving plan:', error);
-      toast.error('Erro ao salvar plano: ' + (error.message || 'Verifique os dados'));
+      toast.error('Erro ao salvar: ' + (error.message || 'Verifique os dados'));
     } finally {
       setSaving(false);
     }
