@@ -491,18 +491,54 @@ export const saveAnamnesisDraft = async (patientId, professionalId, updates) => 
  * Visível apenas para profissionais
  */
 export const saveDraftMealPlan = async (patientId, professionalId, draftPlan) => {
-  const { data, error } = await supabase
-    .from('draft_meal_plans')
-    .upsert({
-      patient_id: patientId,
-      professional_id: professionalId,
-      draft_data: draftPlan,
-      generated_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .select()
-    .single();
-  return { data, error };
+  try {
+    // Verificar se já existe um draft para este paciente
+    const { data: existing } = await supabase
+      .from('draft_meal_plans')
+      .select('id')
+      .eq('patient_id', patientId)
+      .maybeSingle();
+    
+    if (existing) {
+      // Atualizar existente
+      const { data, error } = await supabase
+        .from('draft_meal_plans')
+        .update({
+          professional_id: professionalId,
+          draft_data: draftPlan,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Erro ao atualizar draft_meal_plan:', error);
+      }
+      return { data, error };
+    } else {
+      // Criar novo
+      const { data, error } = await supabase
+        .from('draft_meal_plans')
+        .insert({
+          patient_id: patientId,
+          professional_id: professionalId,
+          draft_data: draftPlan,
+          generated_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Erro ao criar draft_meal_plan:', error);
+      }
+      return { data, error };
+    }
+  } catch (err) {
+    console.error('Erro em saveDraftMealPlan:', err);
+    return { data: null, error: err };
+  }
 };
 
 /**
