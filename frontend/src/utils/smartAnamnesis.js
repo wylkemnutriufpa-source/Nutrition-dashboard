@@ -491,4 +491,69 @@ const translateGoal = (goal) => {
   return goals[goal] || goal;
 };
 
+/**
+ * Gera uma dica personalizada especial baseada na anamnese
+ * Esta dica é única para cada paciente e fica destacada no painel
+ */
+const generatePersonalizedTip = (anamnesis, patient, conditions, goal) => {
+  const name = patient?.full_name?.split(' ')[0] || 'Paciente';
+  const goalType = goal?.type || 'health';
+  
+  // Templates de mensagens motivacionais por objetivo
+  const motivationalTemplates = {
+    weight_loss: [
+      `${name}, você está dando o primeiro passo para uma transformação incrível! 🌟 Lembre-se: cada escolha saudável é uma vitória. Seu corpo vai agradecer por cada gole de água, cada legume no prato, cada noite bem dormida.`,
+      `Olá ${name}! 💪 Sua jornada de emagrecimento começa agora, mas não se trata de perder peso - é sobre ganhar saúde, energia e autoconfiança. Confie no processo!`,
+      `${name}, você decidiu cuidar de si e isso é admirável! 🎯 O segredo não está em dietas restritivas, mas em criar hábitos sustentáveis. Estamos juntos nessa!`
+    ],
+    muscle_gain: [
+      `${name}, músculos são construídos com consistência e paciência! 💪 Cada treino conta, cada refeição importa. Seu corpo está pronto para essa transformação!`,
+      `Foco no objetivo, ${name}! 🏋️ Ganhar massa muscular é um processo que exige dedicação, mas os resultados valem cada esforço. Acredite no seu potencial!`,
+      `${name}, seu corpo é uma máquina incrível! 🔥 Com a nutrição certa e treino consistente, você vai alcançar resultados que nem imagina. Vamos juntos!`
+    ],
+    performance: [
+      `${name}, atletas de elite são feitos nos detalhes! 🏆 Sua alimentação é seu combustível - cuide dela como cuida do seu treino!`,
+      `Alta performance começa na cozinha, ${name}! ⚡ Cada nutriente vai te ajudar a ir mais longe, mais rápido, mais forte!`,
+      `${name}, seu corpo é seu instrumento de alta performance! 🎯 Trate-o com o respeito que ele merece e ele vai te levar ao pódio!`
+    ],
+    health: [
+      `${name}, saúde é o maior tesouro que podemos ter! 💚 Cuidar do corpo é um ato de amor próprio. Cada escolha saudável é um investimento no seu futuro!`,
+      `Bem-estar começa de dentro para fora, ${name}! 🌱 Sua decisão de cuidar da saúde vai transformar não só seu corpo, mas sua qualidade de vida!`,
+      `${name}, você está no caminho certo! ✨ Buscar saúde e equilíbrio é a melhor decisão que você pode tomar. Estou aqui para te guiar!`
+    ],
+    maintenance: [
+      `${name}, manter uma alimentação equilibrada é uma conquista diária! 🎯 Você já fez muito por você - agora é hora de sustentar essas vitórias!`,
+      `Parabéns por buscar equilíbrio, ${name}! ⚖️ Manutenção não é monotonia - é sabedoria em saber o que funciona para você!`,
+      `${name}, você entendeu que saúde é um estilo de vida! 🌟 Manter bons hábitos é tão importante quanto criá-los. Continue firme!`
+    ]
+  };
+
+  // Adicionar informações específicas baseadas nas condições
+  let specificAdvice = '';
+  
+  if (conditions.includes('diabetes')) {
+    specificAdvice = ' Lembre-se de manter os horários das refeições regulares para ajudar no controle glicêmico. 🕐';
+  } else if (conditions.includes('hipertensao')) {
+    specificAdvice = ' Diminuir o sal não significa perder sabor - ervas e especiarias são seus novos melhores amigos! 🌿';
+  } else if (conditions.includes('ansiedade') || conditions.includes('estresse')) {
+    specificAdvice = ' Sua alimentação pode ajudar a acalmar a mente - alimentos ricos em magnésio e ômega-3 são aliados poderosos! 🧘';
+  } else if (conditions.includes('insonia')) {
+    specificAdvice = ' Uma ceia leve com alimentos ricos em triptofano pode ser a chave para noites mais tranquilas! 🌙';
+  } else if (conditions.includes('constipacao')) {
+    specificAdvice = ' Fibras + água = intestino feliz! Essa dupla vai transformar seu bem-estar. 💧';
+  }
+
+  // Selecionar template aleatório baseado no objetivo
+  const templates = motivationalTemplates[goalType] || motivationalTemplates.health;
+  const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+
+  return {
+    title: `✨ Mensagem Especial para ${name}`,
+    content: randomTemplate + specificAdvice,
+    isPersonalized: true,
+    category: 'personalized',
+    createdAt: new Date().toISOString()
+  };
+};
+
 export default generateSmartMealPlan;
