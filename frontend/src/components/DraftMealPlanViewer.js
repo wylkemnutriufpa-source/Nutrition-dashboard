@@ -27,10 +27,12 @@ const DraftMealPlanViewer = ({
   const [editing, setEditing] = useState(false);
   const [editedPlan, setEditedPlan] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [currentVariation, setCurrentVariation] = useState(draftPlan?.variation || 1);
 
   useEffect(() => {
     if (draftPlan) {
       setEditedPlan(JSON.parse(JSON.stringify(draftPlan))); // Deep copy
+      setCurrentVariation(draftPlan.variation || 1);
     }
   }, [draftPlan]);
 
