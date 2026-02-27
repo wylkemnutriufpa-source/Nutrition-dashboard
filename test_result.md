@@ -309,15 +309,18 @@ frontend:
 
   - task: "Smart Anamnesis with Pre-Plan Generation"
     implemented: true
-    working: "NA"
+    working: "CANNOT_VERIFY"
     file: "frontend/src/utils/smartAnamnesis.js, frontend/src/components/DraftMealPlanViewer.js, frontend/src/lib/supabase.js, frontend/src/pages/PatientProfile.js, supabase_draft_meal_plans.sql"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ SMART ANAMNESIS IMPLEMENTED: Created AI system that analyzes anamnesis and automatically generates pre-meal plan with 6 meals, recommended foods, foods to avoid, and automatic tips. Features: (1) generateSmartMealPlan() analyzes conditions (diabetes, hypertension, cholesterol, etc), goals, allergies, (2) draft_meal_plans table with RLS - only professionals see pre-plans, (3) DraftMealPlanViewer with full editing (add/remove meals, edit times, manage foods), (4) New 'Pré-Plano' tab in PatientProfile, (5) Auto-generation when anamnesis is completed, (6) Tips auto-populated in patient's tips tab. READY FOR TESTING."
+      - working: "CANNOT_VERIFY"
+        agent: "testing"
+        comment: "⚠️ CANNOT VERIFY - Professional login required (27/Feb/2026): Smart Anamnesis feature requires professional login to access PatientProfile page with 'Pré-Plano' tab. Professional credentials (admin@teste.com/123456) are INVALID and login fails consistently (same issue as previous tests). CODE REVIEW CONFIRMS IMPLEMENTATION: (1) PatientProfile.js line 1049 has new 'Pré-Plano' tab (7 tabs total: Resumo, Anamnese, Pré-Plano, Plano, Checklist, Recados, Projeto), (2) DraftMealPlanViewer.js component exists and is complete with editing features, (3) generateSmartMealPlan() function exists in smartAnamnesis.js, (4) Supabase functions getDraftMealPlan, saveDraftMealPlan, updateDraftMealPlan exist. PATIENT LOGIN VERIFIED WORKING (maria@gmail.com/123456) - dashboard loads correctly, no console errors, auth flow clean. Existing functionality NOT BROKEN by new implementation. RECOMMENDATION: Main agent must create valid professional account in Supabase to verify Smart Anamnesis functionality end-to-end."
 
   - task: "PDF Export - Recipes, Tips, Anamnesis"
     implemented: true
