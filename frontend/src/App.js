@@ -141,6 +141,11 @@ function App() {
                   <FeedbacksList />
                 </ProtectedRoute>
               } />
+              <Route path="/professional/receitas" element={
+                <ProtectedRoute allowedTypes={['professional', 'admin']}>
+                  <RecipesManager />
+                </ProtectedRoute>
+              } />
               
               {/* Patient Routes */}
               <Route path="/patient/dashboard" element={
