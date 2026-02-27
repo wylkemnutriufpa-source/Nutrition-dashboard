@@ -1024,6 +1024,26 @@ const PatientProfile = () => {
     }
   };
 
+  // Salvar pré-plano como rascunho no banco
+  const handleSaveAsDraft = async (planToSave) => {
+    if (!planToSave) {
+      toast.error('Nenhum pré-plano para salvar');
+      return;
+    }
+    
+    try {
+      const { error } = await saveDraftMealPlan(id, profile.id, planToSave);
+      if (error) {
+        throw error;
+      }
+      toast.success('Rascunho salvo no banco!');
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      toast.error('Erro ao salvar rascunho');
+      throw error;
+    }
+  };
+
   // Usar pré-plano como plano oficial
   const handleUseAsOfficialPlan = async (draftPlan) => {
     if (!draftPlan || !patient) {
