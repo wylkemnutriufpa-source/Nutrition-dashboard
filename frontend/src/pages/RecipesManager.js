@@ -536,24 +536,24 @@ const RecipesManager = () => {
           ) : (
             filteredRecipes.map(recipe => (
               <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                {recipe.image && (
+                {recipe.image_url && (
                   <div className="h-40 overflow-hidden">
                     <img 
-                      src={recipe.image} 
-                      alt={recipe.name}
+                      src={recipe.image_url} 
+                      alt={recipe.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
                 )}
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-800 line-clamp-1">{recipe.name}</h3>
+                    <h3 className="font-semibold text-gray-800 line-clamp-1">{recipe.title}</h3>
                     {getVisibilityBadge(recipe)}
                   </div>
                   
                   <div className="flex gap-4 text-sm text-gray-600 mb-3">
                     <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" /> {recipe.time} min
+                      <Clock className="w-4 h-4" /> {recipe.prep_time} min
                     </span>
                     <span className="flex items-center gap-1">
                       <Flame className="w-4 h-4" /> {recipe.calories} kcal
@@ -607,7 +607,7 @@ const RecipesManager = () => {
                   Controle de Visibilidade
                 </CardTitle>
                 <CardDescription>
-                  Selecione quais pacientes podem ver: <strong>{selectedRecipe.name}</strong>
+                  Selecione quais pacientes podem ver: <strong>{selectedRecipe.title}</strong>
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4">
