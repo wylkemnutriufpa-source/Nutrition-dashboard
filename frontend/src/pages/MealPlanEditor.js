@@ -19,7 +19,8 @@ import {
   getMealPlan, 
   createMealPlan, 
   updateMealPlan,
-  getCustomFoods 
+  getCustomFoods,
+  getDraftMealPlan
 } from '@/lib/supabase';
 import { toast } from 'sonner';
 
