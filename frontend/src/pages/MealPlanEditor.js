@@ -730,20 +730,34 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         gordura: parseFloat(totals.gordura) || 0
       };
 
-      console.log('Salvando plano:', { cleanedMeals, dailyTargets });
+      console.log('Salvando plano:', { 
+        cleanedMeals, 
+        dailyTargets,
+        patient_id: selectedPatient.id,
+        professional_id: user.id,
+        currentPlan: currentPlan?.id
+      });
 
       if (currentPlan) {
         // Atualizar plano existente
-        const { error } = await updateMealPlan(currentPlan.id, {
+        const { data, error } = await updateMealPlan(currentPlan.id, {
           name: planName,
           plan_data: { meals: cleanedMeals },
           daily_targets: dailyTargets
         });
+        
         if (error) {
-          console.error('Erro update:', error);
-          throw new Error(error.message || 'Erro ao atualizar');
+          console.error('Erro ao atualizar plano:', error);
+          const errorMsg = error.message || error.hint || 'Erro ao atualizar plano';
+          toast.error(`Erro: ${errorMsg}`);
+          if (error.code === '42501' || errorMsg.includes('permiss')) {
+            toast.error('Você não tem permissão para editar este plano. Verifique se o paciente está vinculado a você.');
+          }
+          return;
         }
+        
         toast.success('Plano atualizado com sucesso!');
+        setCurrentPlan(data);
       } else {
         // Criar novo plano
         const planData = {
@@ -756,16 +770,23 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         };
         
         const { data, error } = await createMealPlan(planData);
+        
         if (error) {
-          console.error('Erro create:', error);
-          throw new Error(error.message || 'Erro ao criar');
+          console.error('Erro ao criar plano:', error);
+          const errorMsg = error.message || error.hint || 'Erro ao criar plano';
+          toast.error(`Erro: ${errorMsg}`);
+          if (error.code === '42501' || errorMsg.includes('permiss') || errorMsg.includes('vinculado')) {
+            toast.error('Sem permissão: Verifique se o paciente está vinculado a você na aba "Pacientes".');
+          }
+          return;
         }
+        
         setCurrentPlan(data);
         toast.success('Plano criado com sucesso!');
       }
     } catch (error) {
-      console.error('Error saving plan:', error);
-      toast.error('Erro ao salvar: ' + (error.message || 'Verifique os dados'));
+      console.error('Erro inesperado ao salvar plano:', error);
+      toast.error('Erro inesperado: ' + (error?.message || 'Contate o suporte'));
     } finally {
       setSaving(false);
     }
