@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Circle, Droplet, Footprints, Dumbbell, AlertTriangle, Loader2, Utensils, Camera } from 'lucide-react';
@@ -6,14 +7,36 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getPatientStats, uploadProfilePhoto } from '@/lib/supabase';
 import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
+import FirstAccessModal, { AnamneseBanner } from '@/components/FirstAccessModal';
 
 const PatientDashboard = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [patientData, setPatientData] = useState(null);
   const [activePlan, setActivePlan] = useState(null);
   const [anamnesis, setAnamnesis] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showFirstAccessModal, setShowFirstAccessModal] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      loadPatientData();
+      checkFirstAccess();
+    }
+  }, [user]);
+
+  const checkFirstAccess = () => {
+    const hasSeenModal = localStorage.getItem(`first_access_modal_${user.id}`);
+    if (!hasSeenModal) {
+      setShowFirstAccessModal(true);
+      localStorage.setItem(`first_access_modal_${user.id}`, 'true');
+    }
+  };
+
+  const handleStartAnamnesis = () => {
+    navigate('/patient/anamnesis');
+  };
 
   useEffect(() => {
     if (user) {
