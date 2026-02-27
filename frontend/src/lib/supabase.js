@@ -1085,16 +1085,22 @@ export const deleteChecklistTask = async (taskId) => {
 
 // ==================== PATIENT MENU CONFIG ====================
 
-// Menu padrão para pacientes
+// Menu COMPLETO padrão para pacientes (inclui todos os itens)
 export const DEFAULT_PATIENT_MENU = [
-  { id: 'meal-plan', name: 'Meu Plano', icon: 'Calendar', route: '/patient/meal-plan', visible: true, order: 1 },
-  { id: 'tarefas', name: 'Minhas Tarefas', icon: 'ClipboardList', route: '/patient/tarefas', visible: true, order: 2 },
-  { id: 'feedbacks', name: 'Meus Feedbacks', icon: 'MessageSquare', route: '/patient/feedbacks', visible: true, order: 3 },
-  { id: 'receitas', name: 'Minhas Receitas', icon: 'ChefHat', route: '/patient/receitas', visible: true, order: 4 },
-  { id: 'lista-compras', name: 'Minha Lista de Compras', icon: 'ShoppingCart', route: '/patient/lista-compras', visible: true, order: 5 },
-  { id: 'suplementos', name: 'Suplementos', icon: 'Pill', route: '/patient/suplementos', visible: true, order: 6 },
-  { id: 'dicas', name: 'Dicas', icon: 'Lightbulb', route: '/patient/dicas', visible: true, order: 7 },
-  { id: 'jornada', name: 'Minha Jornada', icon: 'TrendingUp', route: '/patient/jornada', visible: true, order: 8 }
+  // Itens fixos (sempre no topo)
+  { id: 'dashboard', name: 'Dashboard', icon: 'Home', route: '/patient/dashboard', visible: true, order: 1, fixed: true },
+  { id: 'agenda', name: 'Minha Agenda', icon: 'Bell', route: '/patient/agenda', visible: true, order: 2, fixed: false },
+  // Itens da seção "Meu Projeto"
+  { id: 'meal-plan', name: 'Meu Plano', icon: 'Calendar', route: '/patient/meal-plan', visible: true, order: 3 },
+  { id: 'tarefas', name: 'Minhas Tarefas', icon: 'ClipboardList', route: '/patient/tarefas', visible: true, order: 4 },
+  { id: 'feedbacks', name: 'Meus Feedbacks', icon: 'MessageSquare', route: '/patient/feedbacks', visible: true, order: 5 },
+  { id: 'receitas', name: 'Minhas Receitas', icon: 'ChefHat', route: '/patient/receitas', visible: true, order: 6 },
+  { id: 'lista-compras', name: 'Lista de Compras', icon: 'ShoppingCart', route: '/patient/lista-compras', visible: true, order: 7 },
+  { id: 'suplementos', name: 'Suplementos', icon: 'Pill', route: '/patient/suplementos', visible: true, order: 8 },
+  { id: 'dicas', name: 'Dicas', icon: 'Lightbulb', route: '/patient/dicas', visible: true, order: 9 },
+  { id: 'jornada', name: 'Minha Jornada', icon: 'TrendingUp', route: '/patient/jornada', visible: true, order: 10 },
+  // Calculadoras
+  { id: 'calculadoras', name: 'Calculadoras', icon: 'Calculator', route: '/patient/calculators', visible: true, order: 11 }
 ];
 
 // Buscar configuração do menu do paciente
