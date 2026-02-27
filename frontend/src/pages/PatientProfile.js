@@ -896,6 +896,7 @@ const PatientProfile = () => {
   const [allMealPlans, setAllMealPlans] = useState([]);
   const [anamnesis, setAnamnesis] = useState(null);
   const [adherence, setAdherence] = useState(null);
+  const [draftPlan, setDraftPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'resumo');
 
@@ -919,6 +920,10 @@ const PatientProfile = () => {
 
       const adherenceData = await getChecklistAdherence(id, 7);
       setAdherence(adherenceData);
+
+      // Carregar pré-plano
+      const { data: draftData } = await getDraftMealPlan(id);
+      setDraftPlan(draftData?.draft_data || null);
 
     } catch (error) {
       console.error('Error loading patient:', error);
