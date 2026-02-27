@@ -58,7 +58,8 @@ const PatientSidebar = ({ patientId, onLogout }) => {
 
   // Links fixos (sempre visíveis)
   const fixedLinks = [
-    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' }
+    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' },
+    { to: '/patient/anamnesis', icon: ClipboardList, label: 'Minha Anamnese', badge: 'importante' }
   ];
 
   // Filtrar e ordenar itens visíveis
