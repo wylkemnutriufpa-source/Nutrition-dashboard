@@ -179,20 +179,35 @@ const DraftMealPlanViewer = ({
                 </>
               ) : (
                 <>
+                  {onSaveAsDraft && (
+                    <Button 
+                      variant="outline" 
+                      onClick={handleSaveAsDraft} 
+                      disabled={loading || saving}
+                      className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                    >
+                      {saving ? (
+                        <Loader2 className="mr-2 animate-spin" size={16} />
+                      ) : (
+                        <Download className="mr-2" size={16} />
+                      )}
+                      Salvar Rascunho
+                    </Button>
+                  )}
                   {onRegenerate && (
-                    <Button variant="outline" onClick={onRegenerate} disabled={loading}>
+                    <Button variant="outline" onClick={onRegenerate} disabled={loading || saving}>
                       <RefreshCw className="mr-2" size={16} />
                       Regenerar
                     </Button>
                   )}
-                  <Button onClick={() => setEditing(true)} disabled={loading} variant="outline">
+                  <Button onClick={() => setEditing(true)} disabled={loading || saving} variant="outline">
                     <Edit className="mr-2" size={16} />
                     Editar
                   </Button>
                   {onUseAsOfficial && (
                     <Button 
                       onClick={handleUseAsOfficial} 
-                      disabled={loading}
+                      disabled={loading || saving}
                       className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg"
                     >
                       <ArrowRight className="mr-2" size={16} />
