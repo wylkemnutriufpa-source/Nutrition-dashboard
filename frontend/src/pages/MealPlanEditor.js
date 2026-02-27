@@ -798,6 +798,9 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         }))
       }));
 
+      console.log('🔍 MEALS ORIGINAIS:', meals);
+      console.log('🔍 CLEANED MEALS:', cleanedMeals);
+
       // Calcular totais com valores numéricos válidos
       const totals = calculateDayTotals();
       const dailyTargets = {
