@@ -95,11 +95,11 @@ export const generateSmartMealPlan = (anamnesis, patient, variation = 1) => {
   // Gerar dica personalizada especial (criativa e motivacional)
   plan.personalizedTip = generatePersonalizedTip(anamnesis, patient, conditions, goal);
   
-  // Preencher refeições com sugestões
-  plan.meals = populateMeals(plan.meals, plan.recommendedFoods, goal);
+  // Preencher refeições com sugestões usando variação
+  plan.meals = populateMeals(plan.meals, plan.recommendedFoods, goal, varIndex, restrictions);
   
   // Gerar raciocínio
-  plan.reasoning = generateReasoning(conditions, goal, restrictions);
+  plan.reasoning = generateReasoning(conditions, goal, restrictions, variation);
   
   return plan;
 };
