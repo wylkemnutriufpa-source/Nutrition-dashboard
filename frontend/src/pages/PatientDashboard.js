@@ -242,9 +242,18 @@ const PatientDashboard = () => {
         {activePlan && (
           <Card className="border-l-4 border-l-green-500">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Utensils className="mr-2 text-green-600" size={20} />
-                Plano Alimentar Ativo
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Utensils className="mr-2 text-green-600" size={20} />
+                  Plano Alimentar Ativo
+                </div>
+                <Button 
+                  size="sm"
+                  className="bg-teal-700 hover:bg-teal-800"
+                  onClick={() => setShowPlanModal(true)}
+                >
+                  <Eye size={16} className="mr-2" /> Ver Plano Completo
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -273,8 +282,9 @@ const PatientDashboard = () => {
                   {activePlan.plan_data.meals.slice(0, 3).map((meal) => (
                     <div 
                       key={meal.id} 
-                      className="p-3 bg-gray-50 rounded-lg border-l-4"
+                      className="p-3 bg-gray-50 rounded-lg border-l-4 cursor-pointer hover:bg-gray-100 transition-colors"
                       style={{ borderLeftColor: meal.color || '#0F766E' }}
+                      onClick={() => setShowPlanModal(true)}
                     >
                       <p className="font-medium text-gray-900 text-sm">{meal.name}</p>
                       <p className="text-xs text-gray-600">{meal.time}</p>
@@ -283,6 +293,20 @@ const PatientDashboard = () => {
                       </p>
                     </div>
                   ))}
+                </div>
+              )}
+              
+              {/* Botão para ver mais */}
+              {activePlan.plan_data?.meals && activePlan.plan_data.meals.length > 3 && (
+                <div className="mt-3 text-center">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-teal-700 hover:text-teal-800"
+                    onClick={() => setShowPlanModal(true)}
+                  >
+                    Ver todas as {activePlan.plan_data.meals.length} refeições →
+                  </Button>
                 </div>
               )}
             </CardContent>
