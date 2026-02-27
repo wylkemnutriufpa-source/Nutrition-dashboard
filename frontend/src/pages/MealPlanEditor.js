@@ -608,6 +608,8 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         if (planIdParam && !fromDraft) {
           const { data: planData } = await getMealPlan(planIdParam);
           if (planData) {
+            console.log('📥 PLANO CARREGADO DO BANCO:', planData);
+            console.log('📥 MEALS DO BANCO:', planData.plan_data?.meals);
             setCurrentPlan(planData);
             setPlanName(planData.name);
             if (planData.plan_data && planData.plan_data.meals) {
