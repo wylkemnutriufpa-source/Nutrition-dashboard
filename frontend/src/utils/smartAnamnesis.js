@@ -3,13 +3,61 @@
  * Gera pré-plano alimentar e recomendações baseado nas respostas do paciente
  */
 
+// Arrays de alimentos alternativos para criar variações
+const MEAL_VARIATIONS = {
+  breakfast: [
+    // Variação 1 - Clássico
+    ['Aveia com frutas', 'Ovos mexidos', 'Pão integral', 'Café sem açúcar'],
+    // Variação 2 - Prático
+    ['Tapioca com queijo branco', 'Vitamina de frutas com whey', 'Chá verde'],
+    // Variação 3 - Proteico
+    ['Omelete de claras com legumes', 'Pão de batata doce', 'Iogurte natural', 'Café'],
+    // Variação 4 - Low Carb
+    ['Ovos cozidos', 'Abacate', 'Queijo minas', 'Chá de ervas']
+  ],
+  morning_snack: [
+    ['Frutas frescas', 'Castanhas (porção pequena)'],
+    ['Iogurte grego com granola', 'Água de coco'],
+    ['Banana com pasta de amendoim'],
+    ['Mix de oleaginosas', 'Maçã']
+  ],
+  lunch: [
+    ['Arroz integral', 'Feijão', 'Frango grelhado', 'Salada de folhas', 'Azeite'],
+    ['Quinoa', 'Lentilha', 'Peixe assado', 'Legumes no vapor', 'Azeite'],
+    ['Batata doce', 'Grão de bico', 'Carne magra', 'Salada colorida', 'Azeite'],
+    ['Arroz 7 grãos', 'Feijão preto', 'Salmão grelhado', 'Brócolis', 'Azeite']
+  ],
+  afternoon_snack: [
+    ['Iogurte natural', 'Frutas'],
+    ['Sanduíche integral com peito de peru', 'Suco natural'],
+    ['Crepioca com banana', 'Chá gelado'],
+    ['Smoothie de frutas vermelhas', 'Torrada integral']
+  ],
+  dinner: [
+    ['Proteína magra (frango/peixe)', 'Legumes grelhados', 'Salada verde'],
+    ['Omelete de legumes', 'Salada completa', 'Sopa de legumes'],
+    ['Peixe ao forno', 'Purê de abóbora', 'Aspargos grelhados'],
+    ['Frango desfiado', 'Abobrinha refogada', 'Salada com tomate']
+  ],
+  supper: [
+    ['Chá calmante', 'Frutas leves (maçã, pera)'],
+    ['Leite morno', 'Biscoitos integrais'],
+    ['Iogurte com mel', 'Camomila'],
+    ['Queijo cottage com frutas secas']
+  ]
+};
+
 /**
  * Gera um pré-plano alimentar inteligente baseado na anamnese
  * @param {Object} anamnesis - Dados da anamnese do paciente
  * @param {Object} patient - Dados do paciente (peso, altura, objetivo, etc)
+ * @param {number} variation - Número da variação (1-4), default 1
  * @returns {Object} Pré-plano com refeições, alimentos indicados e a evitar
  */
-export const generateSmartMealPlan = (anamnesis, patient) => {
+export const generateSmartMealPlan = (anamnesis, patient, variation = 1) => {
+  // Garantir que a variação está entre 1 e 4
+  const varIndex = Math.max(0, Math.min(3, (variation - 1)));
+  
   const plan = {
     meals: [
       { id: 1, name: 'Café da Manhã', time: '07:00', foods: [], editable: true },
@@ -22,7 +70,8 @@ export const generateSmartMealPlan = (anamnesis, patient) => {
     recommendedFoods: [],
     foodsToAvoid: [],
     tips: [],
-    reasoning: ''
+    reasoning: '',
+    variation: variation // Guardar qual variação foi usada
   };
 
   // Análise de condições médicas
