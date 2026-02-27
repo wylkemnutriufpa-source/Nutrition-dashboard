@@ -167,10 +167,20 @@ const DraftMealPlanViewer = ({
                       Regenerar
                     </Button>
                   )}
-                  <Button onClick={() => setEditing(true)} disabled={loading}>
+                  <Button onClick={() => setEditing(true)} disabled={loading} variant="outline">
                     <Edit className="mr-2" size={16} />
                     Editar
                   </Button>
+                  {onUseAsOfficial && (
+                    <Button 
+                      onClick={handleUseAsOfficial} 
+                      disabled={loading}
+                      className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg"
+                    >
+                      <ArrowRight className="mr-2" size={16} />
+                      Usar como Plano Oficial
+                    </Button>
+                  )}
                 </>
               )}
             </div>
