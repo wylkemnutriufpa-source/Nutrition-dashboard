@@ -482,8 +482,8 @@ const translateGoal = (goal) => {
     'weight_loss': 'Emagrecimento',
     'muscle_gain': 'Ganho de Massa Muscular',
     'maintenance': 'Manutenção',
-    'health': 'Saúde Geral',
-    'sports': 'Performance Esportiva'
+    'health': 'Saúde e Bem-estar',
+    'performance': 'Performance Esportiva'
   };
   return goals[goal] || goal;
 };
