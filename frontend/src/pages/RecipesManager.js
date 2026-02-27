@@ -36,15 +36,15 @@ const RecipesManager = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
+    description: '',
     category: 'almoco',
-    time: 30,
+    prep_time: 30,
     servings: 2,
     calories: 300,
-    image: '',
-    ingredients: [''],
-    instructions: [''],
-    tips: '',
+    image_url: '',
+    ingredients: '',
+    instructions: '',
     visibility_mode: 'selected',
     is_active: true,
     is_global: false
