@@ -923,10 +923,28 @@ export const createMealPlan = async (planData) => {
       daily_targets: insertData.daily_targets
     });
     
-    const { data: insertedList, error } = await supabase
-      .from('meal_plans')
-      .insert(insertData)
-      .select();
+    // Tentar insert com tratamento especial de erro
+    let insertedList, error;
+    try {
+      const response = await supabase
+        .from('meal_plans')
+        .insert(insertData)
+        .select();
+      
+      insertedList = response.data;
+      error = response.error;
+      
+      // Se tiver erro, tentar ler o body da resposta HTTP
+      if (error && !error.message) {
+        console.error('⚠️ Erro sem mensagem, objeto error:', Object.keys(error));
+      }
+    } catch (insertError) {
+      console.error('❌ Exceção durante insert:', insertError?.message || 'Erro desconhecido');
+      error = {
+        message: insertError?.message || 'Erro ao executar INSERT',
+        code: 'EXCEPTION'
+      };
+    }
     
     if (error) {
       // NÃO logar error object - causa body stream already read
