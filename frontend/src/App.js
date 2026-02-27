@@ -147,6 +147,11 @@ function App() {
                   <PatientDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/patient/anamnesis" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientAnamnesisPage />
+                </ProtectedRoute>
+              } />
               <Route path="/patient/meal-plan" element={
                 <ProtectedRoute allowedTypes={['patient']}>
                   <MealPlanEditor userType="patient" />
