@@ -63,6 +63,12 @@ const DraftMealPlanViewer = ({
     setEditing(false);
   };
 
+  const handleUseAsOfficial = () => {
+    if (onUseAsOfficial) {
+      onUseAsOfficial(draftPlan);
+    }
+  };
+
   const addMeal = () => {
     const newMeal = {
       id: Date.now(),
