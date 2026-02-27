@@ -66,33 +66,51 @@ const AnamneseFormComplete = ({
       const updates = {
         ...data,
         status: markComplete ? 'complete' : 'draft',
-        last_edited_by: isPatientView ? 'patient' : 'professional'
+        last_edited_by: isPatientView ? 'patient' : 'professional',
+        updated_at: new Date().toISOString()
       };
       
+      console.log('💾 Salvando anamnese:', { patientId, updates });
+      
       if (anamnesis?.id) {
-        const { error } = await updateAnamnesis(anamnesis.id, updates);
-        if (error) throw error;
+        console.log('📝 Atualizando anamnese existente:', anamnesis.id);
+        const { data: result, error } = await updateAnamnesis(anamnesis.id, updates);
+        if (error) {
+          console.error('❌ Erro ao atualizar:', error);
+          throw error;
+        }
+        console.log('✅ Atualizada com sucesso:', result);
       } else {
-        // Criar nova anamnese
-        const { error } = await createAnamnesis({
+        console.log('✨ Criando nova anamnese');
+        const { data: result, error } = await createAnamnesis({
           ...updates,
           patient_id: patientId,
           professional_id: professionalId
         });
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro ao criar:', error);
+          throw error;
+        }
+        console.log('✅ Criada com sucesso:', result);
       }
       
       toast.success(markComplete ? 'Anamnese concluída!' : 'Rascunho salvo!');
       setHasChanges(false);
-      if (onUpdate) onUpdate();
+      
+      // Recarregar dados
+      if (onUpdate) {
+        console.log('🔄 Recarregando dados...');
+        await onUpdate();
+      }
       
       // Se marcar como completa, gerar pré-plano automaticamente
       if (markComplete && onComplete) {
+        console.log('🎯 Gerando pré-plano...');
         onComplete();
       }
     } catch (error) {
-      console.error('Error saving anamnesis:', error);
-      toast.error('Erro ao salvar anamnese');
+      console.error('💥 Error saving anamnesis:', error);
+      toast.error(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setSaving(false);
     }
