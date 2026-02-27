@@ -150,10 +150,16 @@ const PatientReceitas = () => {
       // Tentar carregar receitas visíveis para este paciente
       const { data, error } = await getVisibleRecipesForPatient(patientId);
 
-      if (error || !data || data.length === 0) {
-        // Usar receitas padrão se não houver no banco
+      if (error) {
+        console.log('Erro ao buscar receitas:', error);
+        // Usar receitas padrão se houver erro
+        setRecipes(defaultRecipes);
+      } else if (!data || data.length === 0) {
+        // Não há receitas personalizadas - usar padrão
+        console.log('Nenhuma receita personalizada encontrada, usando padrão');
         setRecipes(defaultRecipes);
       } else {
+        // Tem receitas personalizadas
         setRecipes(data);
       }
     } catch (error) {
