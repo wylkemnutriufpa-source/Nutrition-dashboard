@@ -43,6 +43,9 @@ export const generateSmartMealPlan = (anamnesis, patient) => {
   // Gerar dicas automáticas
   plan.tips = generateTips(conditions, goal, restrictions, plan.foodsToAvoid);
   
+  // Gerar dica personalizada especial (criativa e motivacional)
+  plan.personalizedTip = generatePersonalizedTip(anamnesis, patient, conditions, goal);
+  
   // Preencher refeições com sugestões
   plan.meals = populateMeals(plan.meals, plan.recommendedFoods, goal);
   
