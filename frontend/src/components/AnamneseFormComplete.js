@@ -69,18 +69,22 @@ const AnamneseFormComplete = ({
   const handleSave = async (markComplete = false) => {
     setSaving(true);
     try {
-      const updates = {
+      // Garantir que arrays estão no formato correto
+      const cleanData = {
         ...data,
+        medical_conditions: Array.isArray(data.medical_conditions) ? data.medical_conditions : [],
+        allergies: Array.isArray(data.allergies) ? data.allergies : [],
+        food_intolerances: Array.isArray(data.food_intolerances) ? data.food_intolerances : [],
         status: markComplete ? 'complete' : 'draft',
         last_edited_by: isPatientView ? 'patient' : 'professional',
         updated_at: new Date().toISOString()
       };
       
-      console.log('💾 Salvando anamnese:', { patientId, updates });
+      console.log('💾 Salvando anamnese:', { patientId, professionalId, cleanData });
       
       if (anamnesis?.id) {
         console.log('📝 Atualizando anamnese existente:', anamnesis.id);
-        const { data: result, error } = await updateAnamnesis(anamnesis.id, updates);
+        const { data: result, error } = await updateAnamnesis(anamnesis.id, cleanData);
         if (error) {
           console.error('❌ Erro ao atualizar:', error);
           throw error;
@@ -89,7 +93,7 @@ const AnamneseFormComplete = ({
       } else {
         console.log('✨ Criando nova anamnese');
         const { data: result, error } = await createAnamnesis({
-          ...updates,
+          ...cleanData,
           patient_id: patientId,
           professional_id: professionalId
         });
