@@ -658,24 +658,33 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                   </div>
 
                   <div className="pt-4 border-t space-y-3">
-                    <Button 
-                      className="w-full bg-teal-700 hover:bg-teal-800" 
-                      size="lg"
-                      onClick={handleSavePlan}
-                      disabled={saving || !selectedPatient}
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Salvando...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2" size={18} />
-                          {currentPlan ? 'Atualizar Plano' : 'Salvar Plano'}
-                        </>
-                      )}
-                    </Button>
+                    {!isPatientView ? (
+                      <>
+                        <Button 
+                          className="w-full bg-teal-700 hover:bg-teal-800" 
+                          size="lg"
+                          onClick={handleSavePlan}
+                          disabled={saving || !selectedPatient}
+                        >
+                          {saving ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Salvando...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="mr-2" size={18} />
+                              {currentPlan ? 'Atualizar Plano' : 'Salvar Plano'}
+                            </>
+                          )}
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="text-center py-3 bg-teal-50 rounded-lg">
+                        <p className="text-sm text-teal-800 font-medium">🍽️ Seu plano alimentar personalizado</p>
+                        <p className="text-xs text-teal-700 mt-1">Elaborado especialmente para você pelo seu nutricionista</p>
+                      </div>
+                    )}
                     {!isPatientView && !selectedPatient && (
                       <p className="text-xs text-center text-gray-500">
                         Selecione um paciente para salvar
