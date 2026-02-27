@@ -11,7 +11,7 @@ import { Plus, GripVertical, Trash2, Copy, Search, Save, Loader2, User, Check, E
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { mockMeals, householdMeasures, mockFoods } from '@/data/mockData';
+import { mockMeals, householdMeasures, mockFoods, resolveDraftFoods, findFoodByName } from '@/data/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   getProfessionalPatients, 
