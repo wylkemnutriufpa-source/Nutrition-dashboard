@@ -908,6 +908,7 @@ const PatientProfile = () => {
   const [draftPlan, setDraftPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'resumo');
+  const [showMealPlanViewer, setShowMealPlanViewer] = useState(false);
 
   const loadPatientData = useCallback(async () => {
     if (!id || !profile) return;
