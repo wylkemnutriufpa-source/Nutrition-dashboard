@@ -525,6 +525,27 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
   const loadInitialData = async () => {
     setLoading(true);
     try {
+      // Se for visualização do paciente, carregar seu plano
+      if (isPatientView) {
+        console.log('🔵 MODO PACIENTE - Carregando plano do usuário:', user.id);
+        const { data: patientPlanData } = await getPatientMealPlan(user.id);
+        console.log('📥 PLANO DO PACIENTE:', patientPlanData);
+        
+        if (patientPlanData) {
+          setCurrentPlan(patientPlanData);
+          setPlanName(patientPlanData.name);
+          if (patientPlanData.plan_data && patientPlanData.plan_data.meals) {
+            console.log('📥 MEALS DO PACIENTE:', patientPlanData.plan_data.meals);
+            setMeals(patientPlanData.plan_data.meals);
+          }
+        } else {
+          console.log('⚠️ Nenhum plano encontrado para o paciente');
+          toast.info('Nenhum plano alimentar disponível ainda');
+        }
+        setLoading(false);
+        return;
+      }
+      
       // Carregar pacientes do profissional
       const { data: patientsData } = await getProfessionalPatients(user.id);
       const mappedPatients = (patientsData || []).map(item => ({
