@@ -767,6 +767,112 @@ agent_communication:
     ═══════════════════════════════════════════════════════════════════════
     
     ✅ Login fix (remove duplicate getUserProfile) is SUCCESSFUL and WORKING
+  - agent: "testing"
+    message: "✅ POST-IMPLEMENTATION TESTING COMPLETE (27/Feb/2026) - Smart Anamnesis & PDF Export
+    
+    TESTING SCOPE: Verify Smart Anamnesis and PDF Export features without breaking existing functionality
+    
+    ═══════════════════════════════════════════════════════════════════════
+    CRITICAL FINDING: CANNOT FULLY VERIFY NEW FEATURES
+    ═══════════════════════════════════════════════════════════════════════
+    
+    REASON: Professional login required to access new features
+    - Smart Anamnesis 'Pré-Plano' tab is in PatientProfile (professional-only page)
+    - PDF Export buttons are in PatientProfile tabs (professional-only access)
+    - Professional credentials (admin@teste.com/123456) are INVALID (consistent with all previous tests)
+    - Patient view does NOT show these features (by design - they are professional-only)
+    
+    ═══════════════════════════════════════════════════════════════════════
+    ✅ VERIFICATION COMPLETED VIA CODE REVIEW
+    ═══════════════════════════════════════════════════════════════════════
+    
+    SMART ANAMNESIS - Code Implementation Verified:
+    ✅ PatientProfile.js line 1049: 'Pré-Plano' tab added (7 tabs total)
+    ✅ DraftMealPlanViewer.js: Component implemented with full editing capabilities
+    ✅ smartAnamnesis.js: generateSmartMealPlan() function exists
+    ✅ supabase.js: getDraftMealPlan, saveDraftMealPlan, updateDraftMealPlan functions exist
+    ✅ Auto-generation trigger on anamnesis completion (line 169-171 in AnamneseTab)
+    ✅ Automatic tips creation (line 961-963 in PatientProfile.js)
+    
+    PDF EXPORT - Code Implementation Verified:
+    ✅ pdfGenerator.js line 461-603: generateRecipesPDF() implemented
+    ✅ pdfGenerator.js line 611-707: generateTipsPDF() implemented
+    ✅ pdfGenerator.js line 234-354: generateAnamnesePDF() (already existed)
+    ✅ PatientProfile.js line 206-214: Anamnese tab has 'Exportar PDF' button
+    ✅ PatientProfile.js line 1106-1118: Plano tab has 'Exportar PDF' button
+    ✅ All PDFs include: professional header, patient info, pagination, footer
+    
+    ═══════════════════════════════════════════════════════════════════════
+    ✅ EXISTING FUNCTIONALITY - VERIFIED NOT BROKEN
+    ═══════════════════════════════════════════════════════════════════════
+    
+    PATIENT LOGIN: ✅ WORKING
+    - Credentials: maria@gmail.com / 123456
+    - Result: Successfully logged in and redirected to /patient/dashboard
+    - Profile loaded: maria rocha (userId: 700a7390-c7ed-45e0-a3da-07c507935109, role: patient)
+    - Auth flow clean: INITIAL_SESSION → SIGNED_IN events fired correctly
+    - NO console errors, NO network errors (400/406)
+    
+    PATIENT DASHBOARD: ✅ WORKING
+    - Greeting: 'Olá, maria!' displayed
+    - Cards: Peso Atual, Objetivo, Progresso all render correctly
+    - Checklist: Shows empty state message (expected)
+    - Dicas: Shows 3 tips from nutritionist
+    - Meal Plan: Shows empty state (expected)
+    
+    PATIENT SIDEBAR MENU: ✅ WORKING
+    - Dashboard ✅
+    - Minha Agenda ✅
+    - MEU PROJETO section:
+      - Meu Plano ✅
+      - Minhas Tarefas ✅
+      - Meus Feedbacks ✅
+      - Minhas Receitas ✅
+      - Minha Lista de Compras ✅
+      - Suplementos ✅
+      - Dicas ✅
+      - Minha Jornada ✅
+    - Calculadoras ✅
+    - Sair ✅
+    
+    VISITOR MODE: ✅ WORKING
+    - 'Acessar Ferramentas' button works
+    - Redirects to /visitor/calculators
+    - Calculator page loads with:
+      - Projeto Biquíni Branco CTA
+      - Check Nutricional Inteligente
+      - Calculadora de Peso de Referência
+      - Calculadora de Água
+    
+    ═══════════════════════════════════════════════════════════════════════
+    PROFESSIONAL LOGIN ATTEMPT: ❌ FAILED (AS EXPECTED)
+    ═══════════════════════════════════════════════════════════════════════
+    - Credentials: admin@teste.com / 123456
+    - Result: Login failed, stayed on login page
+    - Root cause: Invalid/missing account in Supabase database
+    - This is CONSISTENT with all previous test results (line 690-695, 614-656)
+    - No Supabase client errors (response not consumed)
+    
+    ═══════════════════════════════════════════════════════════════════════
+    SCREENSHOTS CAPTURED
+    ═══════════════════════════════════════════════════════════════════════
+    - home_page_roles.png: 4 role cards on home page
+    - patient_login_filled.png: Correct 'Login Paciente' form with credentials
+    - patient_dashboard_success.png: Dashboard after successful login
+    - patient_dashboard_full.png: Full page view of patient dashboard
+    
+    ═══════════════════════════════════════════════════════════════════════
+    FINAL VERDICT
+    ═══════════════════════════════════════════════════════════════════════
+    
+    ✅ NEW FEATURES IMPLEMENTED CORRECTLY (verified via code review)
+    ✅ EXISTING FUNCTIONALITY NOT BROKEN (patient login, dashboard, visitor mode all working)
+    ✅ NO CONSOLE ERRORS OR NETWORK ERRORS
+    ✅ AUTH FLOW WORKING CORRECTLY
+    ⚠️ CANNOT VERIFY END-TO-END FUNCTIONALITY without valid professional login
+    
+    RECOMMENDATION: Main agent should create a valid professional account in Supabase (e.g., prof@teste.com / 123456) to enable full end-to-end testing of Smart Anamnesis and PDF Export features in future tests."
+
     ✅ Patient login proves the authentication flow works correctly
     ❌ Professional login blocked by invalid/missing credentials in Supabase
     ❌ Cannot verify P0 PatientProfile fix until professional login works
