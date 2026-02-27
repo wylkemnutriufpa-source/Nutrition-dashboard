@@ -796,26 +796,64 @@ export const getPatientMealPlan = async (patientId, professionalId = null) => {
 };
 
 export const createMealPlan = async (planData) => {
-  const { data, error } = await supabase
-    .from('meal_plans')
-    .insert({
-      ...planData,
-      plan_data: planData.plan_data || { meals: [] },
-      daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 }
-    })
-    .select()
-    .single();
-  return { data, error };
+  try {
+    // Verificar se já existe um plano ativo para este paciente
+    const { data: existing } = await supabase
+      .from('meal_plans')
+      .select('id')
+      .eq('patient_id', planData.patient_id)
+      .eq('is_active', true)
+      .maybeSingle();
+    
+    if (existing) {
+      // Atualizar plano existente
+      const { data, error } = await supabase
+        .from('meal_plans')
+        .update({
+          name: planData.name,
+          plan_data: planData.plan_data || { meals: [] },
+          daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 },
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      return { data, error };
+    }
+    
+    // Criar novo plano
+    const { data, error } = await supabase
+      .from('meal_plans')
+      .insert({
+        ...planData,
+        plan_data: planData.plan_data || { meals: [] },
+        daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 }
+      })
+      .select()
+      .single();
+    return { data, error };
+  } catch (err) {
+    console.error('Erro em createMealPlan:', err);
+    return { data: null, error: err };
+  }
 };
 
 export const updateMealPlan = async (planId, updates) => {
-  const { data, error } = await supabase
-    .from('meal_plans')
-    .update(updates)
-    .eq('id', planId)
-    .select()
-    .single();
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from('meal_plans')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', planId)
+      .select()
+      .single();
+    return { data, error };
+  } catch (err) {
+    console.error('Erro em updateMealPlan:', err);
+    return { data: null, error: err };
+  }
 };
 
 export const deleteMealPlan = async (planId) => {
