@@ -746,6 +746,13 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
     ));
   };
 
+  // ✅ NOVA FUNCIONALIDADE: Atualizar qualquer propriedade da refeição
+  const updateMeal = (mealId, field, value) => {
+    setMeals(meals.map(m => 
+      m.id === mealId ? { ...m, [field]: value } : m
+    ));
+  };
+
   const calculateDayTotals = () => {
     return meals.reduce((totals, meal) => {
       meal.foods.forEach(food => {
@@ -985,6 +992,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                 onDuplicateMeal={duplicateMeal}
                 onUpdateMealName={updateMealName}
                 onUpdateMealTime={updateMealTime}
+                onUpdateMeal={updateMeal}
                 onRemoveMeal={removeMeal}
               />
             ))}
