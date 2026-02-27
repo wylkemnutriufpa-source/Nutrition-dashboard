@@ -623,6 +623,17 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
               />
             </div>
 
+            {/* Preview de Dicas em Tempo Real */}
+            <LiveTipsPreview
+              formData={formData}
+              patient={patient}
+              previousAssessment={assessments.length > 0 ? assessments[0] : null}
+              type="assessment"
+              patientId={patientId}
+              professionalId={professionalId}
+              showSendButton={false}
+            />
+
             {/* Ações */}
             <div className="flex gap-3 pt-4 border-t">
               <Button variant="outline" onClick={resetForm}>
