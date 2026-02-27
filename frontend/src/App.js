@@ -34,6 +34,7 @@ import ProjetoBiquiniBranco from '@/pages/ProjetoBiquiniBranco';
 import AgendaPage from '@/pages/AgendaPage';
 import FinanceiroPage from '@/pages/FinanceiroPage';
 import FeedbacksList from '@/pages/FeedbacksList';
+import RecipesManager from '@/pages/RecipesManager';
 
 // Rota protegida com suporte a admin override
 const ProtectedRoute = ({ children, allowedTypes }) => {
