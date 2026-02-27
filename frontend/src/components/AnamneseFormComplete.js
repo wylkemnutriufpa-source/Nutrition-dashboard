@@ -241,15 +241,82 @@ const AnamneseFormComplete = ({
         <div className="space-y-4">
           <Card>
             <CardHeader><CardTitle>Histórico Médico</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              {/* Condições Médicas com Checkboxes */}
               <div>
-                <Label>Condições Médicas Atuais</Label>
-                <Textarea
-                  value={data.medical_conditions_text || ''}
-                  onChange={(e) => handleChange('medical_conditions_text', e.target.value)}
-                  placeholder="Ex: Diabetes tipo 2, Hipertensão controlada com medicamento..."
-                  rows={3}
-                />
+                <Label className="text-base font-semibold mb-3 block">Condições Médicas Atuais</Label>
+                <p className="text-sm text-gray-600 mb-3">Selecione todas que se aplicam (múltipla escolha)</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    'Diabetes Tipo 1',
+                    'Diabetes Tipo 2',
+                    'Hipertensão (Pressão Alta)',
+                    'Colesterol Alto',
+                    'Triglicerídeos Alto',
+                    'Problemas Cardíacos',
+                    'Problemas Renais',
+                    'Problemas Hepáticos',
+                    'Problemas Intestinais',
+                    'Gastrite',
+                    'Refluxo',
+                    'Síndrome do Intestino Irritável',
+                    'Constipação Crônica',
+                    'Hipotireoidismo',
+                    'Hipertireoidismo',
+                    'Ovário Policístico (SOP)',
+                    'Anemia',
+                    'Obesidade',
+                    'Ansiedade',
+                    'Depressão'
+                  ].map((condition) => (
+                    <label key={condition} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                      <input
+                        type="checkbox"
+                        checked={(data.medical_conditions || []).includes(condition)}
+                        onChange={(e) => {
+                          const current = data.medical_conditions || [];
+                          if (e.target.checked) {
+                            handleChange('medical_conditions', [...current, condition]);
+                          } else {
+                            handleChange('medical_conditions', current.filter(c => c !== condition));
+                          }
+                        }}
+                        className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                      />
+                      <span className="text-sm">{condition}</span>
+                    </label>
+                  ))}
+                </div>
+                
+                {/* Opção "Não tenho problemas" */}
+                <label className="flex items-center space-x-2 cursor-pointer hover:bg-green-50 p-3 rounded-lg border border-green-200 mt-3">
+                  <input
+                    type="checkbox"
+                    checked={data.no_medical_conditions === true}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        handleChange('medical_conditions', []);
+                        handleChange('no_medical_conditions', true);
+                      } else {
+                        handleChange('no_medical_conditions', false);
+                      }
+                    }}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <span className="text-sm font-medium text-green-800">✅ Não tenho nenhuma dessas condições</span>
+                </label>
+
+                {/* Outras condições (campo texto) */}
+                <div className="mt-4">
+                  <Label className="text-sm">Outras condições não listadas acima:</Label>
+                  <Textarea
+                    value={data.other_medical_conditions || ''}
+                    onChange={(e) => handleChange('other_medical_conditions', e.target.value)}
+                    placeholder="Descreva outras condições médicas..."
+                    rows={2}
+                    className="mt-2"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -261,6 +328,7 @@ const AnamneseFormComplete = ({
                     placeholder="Liste os medicamentos e dosagens"
                     rows={2}
                   />
+                  <p className="text-xs text-gray-500 mt-1">Ex: Metformina 850mg 2x ao dia</p>
                 </div>
                 <div>
                   <Label>Suplementos</Label>
@@ -270,6 +338,7 @@ const AnamneseFormComplete = ({
                     placeholder="Vitaminas, proteínas, etc"
                     rows={2}
                   />
+                  <p className="text-xs text-gray-500 mt-1">Ex: Vitamina D3, Whey Protein</p>
                 </div>
               </div>
 
@@ -281,6 +350,7 @@ const AnamneseFormComplete = ({
                     onChange={(e) => handleChange('allergies', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                     placeholder="Amendoim, Frutos do mar, Glúten"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Separe por vírgula</p>
                 </div>
                 <div>
                   <Label>Intolerâncias</Label>
@@ -289,6 +359,7 @@ const AnamneseFormComplete = ({
                     onChange={(e) => handleChange('food_intolerances', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                     placeholder="Lactose, Frutose"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Separe por vírgula</p>
                 </div>
               </div>
 
