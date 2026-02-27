@@ -17,7 +17,8 @@ const ProfessionalDashboard = () => {
     activePatients: 0,
     totalPatients: 0,
     activePlans: 0,
-    recentPatients: []
+    recentPatients: [],
+    patientsWithActivePlans: []
   });
 
   useEffect(() => {
