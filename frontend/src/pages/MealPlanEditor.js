@@ -102,13 +102,15 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   );
 };
 
-const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, allFoods }) => {
+const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, onUpdateMealName, onUpdateMealTime, onRemoveMeal, allFoods }) => {
   const [isAddingFood, setIsAddingFood] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFoodId, setSelectedFoodId] = useState(null);
   const [quantity, setQuantity] = useState(100);
   const [unit, setUnit] = useState('g');
   const [sourceFilter, setSourceFilter] = useState('ALL');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(meal.name);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
