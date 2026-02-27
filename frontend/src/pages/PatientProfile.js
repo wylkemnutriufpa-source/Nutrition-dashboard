@@ -991,7 +991,17 @@ const PatientProfile = () => {
       
       console.log('Pré-plano salvo com sucesso:', savedDraft);
       
-      // Criar dicas automáticas
+      // Criar dica personalizada especial (destaque no painel do paciente)
+      if (smartPlan.personalizedTip) {
+        const { error: personalizedError } = await createPersonalizedTip(id, profile.id, smartPlan.personalizedTip);
+        if (personalizedError) {
+          console.warn('Aviso: Dica personalizada não foi criada:', personalizedError);
+        } else {
+          console.log('Dica personalizada criada com sucesso! ✨');
+        }
+      }
+      
+      // Criar dicas automáticas gerais
       if (smartPlan.tips && smartPlan.tips.length > 0) {
         const { error: tipsError } = await createAutomaticTips(id, profile.id, smartPlan.tips);
         if (tipsError) {
@@ -1000,7 +1010,7 @@ const PatientProfile = () => {
       }
       
       setDraftPlan(smartPlan);
-      toast.success('Pré-plano gerado e salvo com sucesso!');
+      toast.success('Pré-plano gerado com dica personalizada! ✨');
     } catch (error) {
       console.error('Error generating draft plan:', error);
       toast.error('Erro ao gerar pré-plano');
