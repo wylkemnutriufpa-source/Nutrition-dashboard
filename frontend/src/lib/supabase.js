@@ -931,11 +931,31 @@ export const updateMealPlan = async (planId, updates) => {
       .eq('id', planId)
       .select();
     
+    if (error) {
+      console.error('Erro ao atualizar plano:', error);
+      return { 
+        data: null, 
+        error: { 
+          message: error.message || 'Sem permissão para atualizar plano',
+          code: error.code,
+          details: error.details,
+          hint: 'Verifique se você tem permissão para editar este plano'
+        } 
+      };
+    }
+    
     const data = updatedList && updatedList.length > 0 ? updatedList[0] : null;
-    return { data, error };
+    return { data, error: null };
   } catch (err) {
-    console.error('Erro em updateMealPlan:', err);
-    return { data: null, error: { message: err.message || 'Erro ao atualizar plano' } };
+    console.error('Erro inesperado em updateMealPlan:', err);
+    return { 
+      data: null, 
+      error: { 
+        message: err?.message || 'Erro inesperado ao atualizar',
+        code: 'UNEXPECTED_ERROR',
+        details: String(err)
+      } 
+    };
   }
 };
 
