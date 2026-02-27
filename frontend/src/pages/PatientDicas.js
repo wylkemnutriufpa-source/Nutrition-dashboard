@@ -287,6 +287,36 @@ const PatientDicas = () => {
           })}
         </div>
 
+        {/* ✨ DICA PERSONALIZADA - DESTAQUE ESPECIAL */}
+        {personalizedTip && (
+          <Card className="bg-gradient-to-br from-purple-600 via-pink-500 to-rose-500 text-white shadow-xl overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
+            <CardContent className="pt-6 relative z-10">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm animate-pulse">
+                  <Star className="h-8 w-8" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-white/25 text-white border-white/30">
+                      ✨ Mensagem Especial para Você
+                    </Badge>
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{personalizedTip.title}</h3>
+                  <p className="text-white/90 leading-relaxed text-lg">
+                    {personalizedTip.content}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-white/70 text-sm">
+                    <Heart className="h-4 w-4" />
+                    <span>Criada especialmente para você pelo seu nutricionista</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Dica em destaque */}
         {filteredTips.length > 0 && filteredTips[0].importance === 'high' && (
           <Card className="bg-gradient-to-br from-teal-500 to-green-500 text-white">
