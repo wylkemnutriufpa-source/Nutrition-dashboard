@@ -14,10 +14,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getPatientAppointments, createAppointment, deleteAppointment } from '@/lib/supabase';
 
 const TYPE_CONFIG = {
-  presencial: { label: 'Presencial', color: 'bg-teal-500', bg: 'bg-teal-100', text: 'text-teal-700' },
-  online: { label: 'Online', color: 'bg-blue-500', bg: 'bg-blue-100', text: 'text-blue-700' },
-  retorno: { label: 'Retorno', color: 'bg-purple-500', bg: 'bg-purple-100', text: 'text-purple-700' },
-  lembrete: { label: 'Lembrete', color: 'bg-orange-500', bg: 'bg-orange-100', text: 'text-orange-700' },
+  presencial: { label: 'Presencial', color: 'bg-teal-500', bg: 'bg-teal-100', text: 'text-teal-700', icon: '🏢' },
+  online: { label: 'Online', color: 'bg-blue-500', bg: 'bg-blue-100', text: 'text-blue-700', icon: '💻' },
+  retorno: { label: 'Retorno', color: 'bg-purple-500', bg: 'bg-purple-100', text: 'text-purple-700', icon: '🔄' },
+  lembrete: { label: 'Lembrete', color: 'bg-orange-500', bg: 'bg-orange-100', text: 'text-orange-700', icon: '🔔' },
+  feedback: { label: 'Feedback', color: 'bg-pink-500', bg: 'bg-pink-100', text: 'text-pink-700', icon: '📝' },
+  vencimento: { label: 'Vencimento Plano', color: 'bg-red-500', bg: 'bg-red-100', text: 'text-red-700', icon: '⚠️' },
 };
 
 const PatientAgenda = () => {
