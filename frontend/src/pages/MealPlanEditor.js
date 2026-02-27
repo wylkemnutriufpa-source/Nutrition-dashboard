@@ -178,7 +178,7 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   );
 };
 
-const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, onUpdateMealName, onUpdateMealTime, onRemoveMeal, allFoods }) => {
+const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, onUpdateMealName, onUpdateMealTime, onUpdateMeal, onRemoveMeal, allFoods }) => {
   const [isAddingFood, setIsAddingFood] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFoodId, setSelectedFoodId] = useState(null);
@@ -357,7 +357,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
           </Label>
           <Textarea
             value={meal.observations || ''}
-            onChange={(e) => onUpdate(meal.id, 'observations', e.target.value)}
+            onChange={(e) => onUpdateMeal(meal.id, 'observations', e.target.value)}
             placeholder="Ex: substituir arroz por batata doce caso paciente prefira, evitar alimentos com glúten..."
             className="mt-2 text-sm"
             rows={2}
