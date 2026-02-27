@@ -1064,6 +1064,34 @@ const PatientProfile = () => {
     }
   };
 
+  // Criar lembrete para o paciente
+  const handleCreateReminder = async () => {
+    if (!reminderForm.date) {
+      toast.error('Selecione uma data');
+      return;
+    }
+    
+    try {
+      let result;
+      if (reminderForm.type === 'feedback') {
+        result = await createFeedbackReminder(id, profile.id, reminderForm.date, reminderForm.notes);
+      } else if (reminderForm.type === 'vencimento') {
+        result = await createPlanExpirationReminder(id, profile.id, reminderForm.date, mealPlan?.name || '');
+      }
+      
+      if (result?.error) {
+        throw result.error;
+      }
+      
+      toast.success('Lembrete criado com sucesso! O paciente será notificado.');
+      setShowReminderModal(false);
+      setReminderForm({ type: 'feedback', date: '', notes: '' });
+    } catch (error) {
+      console.error('Error creating reminder:', error);
+      toast.error('Erro ao criar lembrete');
+    }
+  };
+
   // Usar pré-plano como plano oficial
   const handleUseAsOfficialPlan = async (draftPlan) => {
     if (!draftPlan || !patient) {
