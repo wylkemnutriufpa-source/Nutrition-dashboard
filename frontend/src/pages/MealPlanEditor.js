@@ -168,6 +168,18 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
     }
   };
 
+  const handleSaveName = () => {
+    if (editedName.trim()) {
+      onUpdateMealName(meal.id, editedName);
+      setIsEditingName(false);
+    }
+  };
+
+  const handleCancelEditName = () => {
+    setEditedName(meal.name);
+    setIsEditingName(false);
+  };
+
   return (
     <Card className="border-l-4" style={{ borderLeftColor: meal.color || '#0F766E' }}>
       <CardHeader className="bg-gray-50">
