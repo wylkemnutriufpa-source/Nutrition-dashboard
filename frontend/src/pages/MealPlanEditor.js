@@ -18,6 +18,7 @@ import {
   getProfessionalPatients, 
   getPatientById, 
   getMealPlan, 
+  getPatientMealPlan,
   createMealPlan, 
   updateMealPlan,
   getCustomFoods,
