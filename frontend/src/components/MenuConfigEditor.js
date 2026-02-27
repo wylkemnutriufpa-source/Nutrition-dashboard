@@ -4,16 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { 
   GripVertical, Eye, EyeOff, Edit2, Check, X, Save,
   Calendar, ClipboardList, MessageSquare, ShoppingCart,
-  ChefHat, Pill, Lightbulb, TrendingUp, RotateCcw
+  ChefHat, Pill, Lightbulb, TrendingUp, RotateCcw,
+  Home, Bell, Calculator, Lock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getPatientMenuConfig, upsertPatientMenuConfig, DEFAULT_PATIENT_MENU } from '@/lib/supabase';
 
 // Mapeamento de ícones para display
 const iconMap = {
+  Home,
+  Bell,
   Calendar,
   ClipboardList,
   MessageSquare,
@@ -21,7 +25,8 @@ const iconMap = {
   ChefHat,
   Pill,
   Lightbulb,
-  TrendingUp
+  TrendingUp,
+  Calculator
 };
 
 const MenuConfigEditor = ({ patientId, professionalId, onSave }) => {
