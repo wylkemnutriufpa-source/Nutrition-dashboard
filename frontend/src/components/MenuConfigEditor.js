@@ -165,10 +165,10 @@ const MenuConfigEditor = ({ patientId, professionalId, onSave }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Edit2 size={20} />
-          Configurar Menu do Paciente
+          Configurar Menu Completo do Paciente
         </CardTitle>
         <CardDescription>
-          Personalize o menu "Meu Projeto" do paciente. Arraste para reordenar, clique no nome para editar.
+          Personalize TODO o menu do paciente. Arraste para reordenar, clique no nome para editar, use o switch para mostrar/ocultar.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -177,16 +177,16 @@ const MenuConfigEditor = ({ patientId, professionalId, onSave }) => {
           {menuItems.sort((a, b) => a.order - b.order).map((item) => (
             <div
               key={item.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, item)}
+              draggable={!item.fixed}
+              onDragStart={(e) => !item.fixed && handleDragStart(e, item)}
               onDragOver={(e) => handleDragOver(e, item)}
               onDragEnd={handleDragEnd}
               className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
                 item.visible ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100'
-              } ${draggedItem?.id === item.id ? 'opacity-50' : ''} cursor-move hover:shadow-sm`}
+              } ${draggedItem?.id === item.id ? 'opacity-50' : ''} ${item.fixed ? 'cursor-default' : 'cursor-move'} hover:shadow-sm`}
             >
               {/* Grip para arrastar */}
-              <GripVertical size={18} className="text-gray-400 flex-shrink-0" />
+              <GripVertical size={18} className={`flex-shrink-0 ${item.fixed ? 'text-gray-200' : 'text-gray-400'}`} />
               
               {/* Ícone do item */}
               <div className="flex-shrink-0">
@@ -215,9 +215,21 @@ const MenuConfigEditor = ({ patientId, professionalId, onSave }) => {
                     </Button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => handleStartEdit(item)}
-                    className={`text-left font-medium text-sm hover:text-teal-600 transition-colors ${
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleStartEdit(item)}
+                      className={`text-left font-medium text-sm hover:text-teal-600 transition-colors ${
+                        !item.visible ? 'text-gray-400' : 'text-gray-700'
+                      }`}
+                    >
+                      {item.name}
+                    </button>
+                    {item.fixed && (
+                      <Badge variant="outline" className="text-xs text-gray-400">
+                        <Lock size={10} className="mr-1" /> Fixo
+                      </Badge>
+                    )}
+                  </div>
                       item.visible ? 'text-gray-900' : 'text-gray-400'
                     }`}
                   >
