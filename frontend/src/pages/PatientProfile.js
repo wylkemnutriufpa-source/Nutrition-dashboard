@@ -1105,7 +1105,9 @@ const PatientProfile = () => {
               draftPlan={draftPlan}
               onUpdate={handleUpdateDraftPlan}
               onRegenerate={handleGenerateDraftPlan}
+              onUseAsOfficial={handleUseAsOfficialPlan}
               loading={loading}
+              patientId={id}
             />
           </TabsContent>
 
