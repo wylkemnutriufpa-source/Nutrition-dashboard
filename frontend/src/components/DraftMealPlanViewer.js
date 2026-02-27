@@ -19,12 +19,14 @@ const DraftMealPlanViewer = ({
   draftPlan, 
   onUpdate, 
   onRegenerate, 
-  onUseAsOfficial, 
+  onUseAsOfficial,
+  onSaveAsDraft,
   loading,
   patientId 
 }) => {
   const [editing, setEditing] = useState(false);
   const [editedPlan, setEditedPlan] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (draftPlan) {
