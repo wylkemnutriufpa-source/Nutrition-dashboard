@@ -180,25 +180,19 @@ const RecipesManager = () => {
       is_global: false
     });
   };
-      tips: '',
-      visibility_mode: 'selected',
-      is_active: true,
-      is_global: false
-    });
-  };
 
   const startEditing = (recipe) => {
     setEditingRecipe(recipe);
     setFormData({
-      name: recipe.name || '',
+      title: recipe.title || '',
+      description: recipe.description || '',
       category: recipe.category || 'almoco',
-      time: recipe.time || 30,
+      prep_time: recipe.prep_time || 30,
       servings: recipe.servings || 2,
       calories: recipe.calories || 300,
-      image: recipe.image || '',
-      ingredients: recipe.ingredients || [''],
-      instructions: recipe.instructions || [''],
-      tips: recipe.tips || '',
+      image_url: recipe.image_url || '',
+      ingredients: recipe.ingredients || '',
+      instructions: recipe.instructions || '',
       visibility_mode: recipe.visibility_mode || 'selected',
       is_active: recipe.is_active !== false,
       is_global: recipe.is_global || false
