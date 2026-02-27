@@ -380,6 +380,45 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         setAllFoods([...mockFoods, ...customFoods]);
       }
 
+      // Verificar se está vindo do draft
+      const fromDraft = searchParams.get('fromDraft') === 'true';
+      const draftData = sessionStorage.getItem('draftPlanToLoad');
+      
+      if (fromDraft && draftData) {
+        try {
+          const draft = JSON.parse(draftData);
+          console.log('Loading draft plan:', draft);
+          
+          // Converter meals do draft para formato do editor
+          if (draft.meals && draft.meals.length > 0) {
+            const convertedMeals = draft.meals.map((meal, index) => ({
+              id: meal.id || `meal-${Date.now()}-${index}`,
+              name: meal.name || `Refeição ${index + 1}`,
+              time: meal.time || '08:00',
+              color: meal.color || '#0F766E',
+              foods: (meal.foods || []).map((foodStr, fIndex) => ({
+                id: `f${Date.now()}-${index}-${fIndex}`,
+                foodId: null, // Será resolvido depois
+                food_id: null,
+                name: foodStr, // Armazena o nome do alimento
+                quantity: 100,
+                unit: 'g',
+                measure: ''
+              }))
+            }));
+            setMeals(convertedMeals);
+            setPlanName(draft.planName || 'Plano Alimentar (do Pré-Plano)');
+            toast.success('Pré-plano carregado! Agora você pode editar e salvar como plano oficial.');
+          }
+          
+          // Limpar sessionStorage
+          sessionStorage.removeItem('draftPlanToLoad');
+        } catch (err) {
+          console.error('Error parsing draft:', err);
+          toast.error('Erro ao carregar pré-plano');
+        }
+      }
+
       // Se tiver paciente na URL, carregar dados
       if (patientIdParam) {
         const { data: patientData } = await getPatientById(patientIdParam);
@@ -387,8 +426,8 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
           setSelectedPatient(patientData);
         }
 
-        // Se tiver plano na URL, carregar plano
-        if (planIdParam) {
+        // Se tiver plano na URL, carregar plano (somente se NÃO estiver vindo do draft)
+        if (planIdParam && !fromDraft) {
           const { data: planData } = await getMealPlan(planIdParam);
           if (planData) {
             setCurrentPlan(planData);
