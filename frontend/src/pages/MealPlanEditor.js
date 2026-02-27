@@ -332,13 +332,14 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
   );
 };
 
-const MealPlanEditor = () => {
+const MealPlanEditor = ({ userType = 'professional' }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   
   const patientIdParam = searchParams.get('patient');
   const planIdParam = searchParams.get('plan');
+  const isPatientView = userType === 'patient';
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
