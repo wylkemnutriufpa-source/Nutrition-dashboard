@@ -1149,11 +1149,26 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
   
   const { data: recentPatients } = await recentQuery;
   
+  // Pacientes com planos ativos
+  let activePlansQuery = supabase
+    .from('meal_plans')
+    .select('*, patient:profiles!patient_id(id, name, email)')
+    .eq('is_active', true)
+    .order('updated_at', { ascending: false })
+    .limit(10);
+  
+  if (!isAdmin) {
+    activePlansQuery = activePlansQuery.eq('professional_id', professionalId);
+  }
+  
+  const { data: patientsWithActivePlans } = await activePlansQuery;
+  
   return {
     activePatients: totalPatients || 0,
     totalPatients: totalPatients || 0,
     activePlans: activePlans || 0,
-    recentPatients: recentPatients || []
+    recentPatients: recentPatients || [],
+    patientsWithActivePlans: patientsWithActivePlans || []
   };
 };
 
