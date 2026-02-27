@@ -923,7 +923,7 @@ export const createMealPlan = async (planData) => {
       daily_targets: insertData.daily_targets
     });
     
-    // USAR FETCH DIRETO PARA CAPTURAR ERRO REAL
+    // USAR FETCH DIRETO COM CLONE
     const supabaseUrl = supabase.supabaseUrl;
     const supabaseKey = supabase.supabaseKey;
     
@@ -939,29 +939,53 @@ export const createMealPlan = async (planData) => {
         body: JSON.stringify(insertData)
       });
       
+      // CLONAR RESPONSE ANTES DE LER
+      const clonedResponse = response.clone();
+      
       if (!response.ok) {
-        // LER O ERRO ANTES DE QUALQUER OUTRA COISA
-        const errorText = await response.text();
         console.error('🔴 ERRO HTTP:', response.status);
-        console.error('🔴 RESPOSTA:', errorText);
         
-        let errorData;
+        // Ler do clone para evitar "body stream already read"
         try {
-          errorData = JSON.parse(errorText);
-          console.error('🔴 ERROR PARSED:', errorData);
-        } catch (e) {
-          errorData = { message: errorText };
-        }
-        
-        return {
-          data: null,
-          error: {
-            message: errorData.message || errorData.hint || `HTTP ${response.status}`,
-            code: errorData.code || String(response.status),
-            details: errorData.details || errorText,
-            type: 'http_error'
+          const errorText = await clonedResponse.text();
+          console.error('🔴 RESPOSTA BRUTA:', errorText);
+          
+          try {
+            const errorData = JSON.parse(errorText);
+            console.error('🔴 ERROR PARSED:', JSON.stringify(errorData, null, 2));
+            
+            return {
+              data: null,
+              error: {
+                message: errorData.message || errorData.hint || `HTTP ${response.status}`,
+                code: errorData.code || String(response.status),
+                details: errorData.details || errorText,
+                hint: errorData.hint,
+                type: 'http_error'
+              }
+            };
+          } catch (parseError) {
+            console.error('🔴 Erro ao fazer parse:', parseError);
+            return {
+              data: null,
+              error: {
+                message: errorText || `HTTP ${response.status}`,
+                code: String(response.status),
+                type: 'http_error'
+              }
+            };
           }
-        };
+        } catch (readError) {
+          console.error('🔴 Erro ao ler response:', readError);
+          return {
+            data: null,
+            error: {
+              message: `HTTP ${response.status} - não foi possível ler erro`,
+              code: String(response.status),
+              type: 'http_error'
+            }
+          };
+        }
       }
       
       const data = await response.json();
