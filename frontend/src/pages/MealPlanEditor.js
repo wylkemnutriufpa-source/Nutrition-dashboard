@@ -184,11 +184,59 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
     <Card className="border-l-4" style={{ borderLeftColor: meal.color || '#0F766E' }}>
       <CardHeader className="bg-gray-50">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">{meal.name}</CardTitle>
-            <p className="text-sm text-gray-600 mt-1">{meal.time}</p>
+          <div className="flex-1">
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="max-w-xs"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveName();
+                    if (e.key === 'Escape') handleCancelEditName();
+                  }}
+                  autoFocus
+                />
+                <Button onClick={handleSaveName} size="sm" variant="outline">
+                  <Save size={14} />
+                </Button>
+                <Button onClick={handleCancelEditName} size="sm" variant="ghost">
+                  <Trash2 size={14} />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-lg">{meal.name}</CardTitle>
+                <Button 
+                  onClick={() => setIsEditingName(true)} 
+                  size="sm" 
+                  variant="ghost"
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <Edit size={14} />
+                </Button>
+              </div>
+            )}
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                type="time"
+                value={meal.time}
+                onChange={(e) => onUpdateMealTime(meal.id, e.target.value)}
+                className="w-32 text-sm"
+              />
+            </div>
           </div>
           <div className="flex gap-2">
+            {onRemoveMeal && (
+              <Button
+                onClick={() => onRemoveMeal(meal.id)}
+                variant="ghost"
+                size="sm"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 size={16} />
+              </Button>
+            )}
             <Button
               data-testid={`duplicate-meal-${meal.id}`}
               onClick={() => onDuplicateMeal(meal.id)}
