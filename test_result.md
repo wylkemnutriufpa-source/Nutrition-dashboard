@@ -409,6 +409,42 @@ frontend:
         agent: "main"
         comment: "✅ IMPLEMENTADO: (1) generateMealPlanPDF() atualizada para usar customName quando disponível. (2) Observações individuais de cada alimento agora são exportadas no PDF. (3) Seção 'Observações e Orientações' adicionada no final do PDF com mealPlan.observations e mealPlan.orientations."
 
+  - task: "Dicas Dinâmicas em Tempo Real"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/dynamicTips.js, frontend/src/components/LiveTipsPreview.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) dynamicTips.js com 20+ tipos de dicas baseadas em condições médicas, alergias, estilo de vida, objetivos. (2) LiveTipsPreview.js mostra dicas em tempo real conforme formulário é preenchido. (3) AnamneseFormComplete.js integrado com dicas automáticas ao salvar. (4) PhysicalAssessmentEditor.js integrado com dicas de avaliação física. (5) Dicas personalizadas por nome do paciente."
+
+  - task: "Pré-Plano com 4 Alternativas"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/smartAnamnesis.js, frontend/src/components/DraftMealPlanViewer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) MEAL_VARIATIONS com 4 estilos: Clássico, Prático, Proteico, Low Carb. (2) generateSmartMealPlan() aceita parâmetro variation (1-4). (3) DraftMealPlanViewer exibe cards clicáveis para escolher alternativa. (4) Ao clicar, regenera plano com novo estilo. (5) Badge mostra qual alternativa está selecionada."
+
+  - task: "Agenda/Calendário com Lembretes"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/lib/supabase.js, frontend/src/pages/AgendaPage.js, frontend/src/pages/PatientAgenda.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) Funções createReminder, createFeedbackReminder, createPlanExpirationReminder no supabase.js. (2) TYPE_CONFIG expandido com feedback e vencimento. (3) PatientProfile com modal para agendar lembretes. (4) Botão 'Agendar Lembrete' no header do perfil do paciente. (5) Tipos: Feedback, Vencimento, Retorno, Lembrete Geral."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
