@@ -23,6 +23,7 @@ import PatientSuplementos from '@/pages/PatientSuplementos';
 import PatientDicas from '@/pages/PatientDicas';
 import PatientJornada from '@/pages/PatientJornada';
 import PatientAgenda from '@/pages/PatientAgenda';
+import PatientAvaliacaoFisica from '@/pages/PatientAvaliacaoFisica';
 import CalculatorsList from '@/pages/CalculatorsList';
 import WeightCalculator from '@/pages/WeightCalculator';
 import WaterCalculator from '@/pages/WaterCalculator';
