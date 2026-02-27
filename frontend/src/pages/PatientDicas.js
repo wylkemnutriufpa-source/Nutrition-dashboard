@@ -134,15 +134,54 @@ const PatientDicas = () => {
   const loadTips = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Primeiro, buscar dica personalizada do paciente
+      const { data: personalData } = await supabase
+        .from('tips')
+        .select('*')
+        .eq('patient_id', patientId)
+        .eq('category', 'personalized')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (personalData) {
+        setPersonalizedTip(personalData);
+      }
+
+      // Buscar outras dicas do profissional para este paciente
+      const { data: patientTips } = await supabase
+        .from('tips')
+        .select('*')
+        .eq('patient_id', patientId)
+        .neq('category', 'personalized')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      // Buscar dicas gerais
+      const { data: generalTips, error } = await supabase
         .from('nutrition_tips')
         .select('*')
         .eq('is_active', true);
 
-      if (error || !data || data.length === 0) {
+      // Combinar dicas
+      let allTips = [];
+      
+      if (patientTips && patientTips.length > 0) {
+        allTips = [...allTips, ...patientTips.map(t => ({
+          ...t,
+          isFromProfessional: true
+        }))];
+      }
+
+      if (!error && generalTips && generalTips.length > 0) {
+        allTips = [...allTips, ...generalTips];
+      }
+
+      if (allTips.length === 0) {
         setTips(defaultTips);
       } else {
-        setTips(data);
+        setTips(allTips);
       }
     } catch (error) {
       console.error('Erro:', error);
