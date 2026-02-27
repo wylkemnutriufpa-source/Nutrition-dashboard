@@ -108,17 +108,19 @@ const analyzeConditions = (anamnesis) => {
  * Analisa objetivo do paciente
  */
 const analyzeGoal = (patient) => {
-  if (!patient) return 'maintenance';
+  if (!patient) return { type: 'maintenance', needsWeightLoss: false, needsWeightGain: false };
   
-  const goal = patient.goal || 'maintenance';
+  // Priorizar objetivo esportivo se disponível
+  const sportsGoal = patient.sports_goal || patient.goal;
   const imc = calculateIMC(patient);
   
   return {
-    type: goal,
+    type: sportsGoal || 'maintenance',
     imc: imc,
     needsWeightLoss: imc > 25,
     needsWeightGain: imc < 18.5,
-    targetWeight: patient.goal_weight || patient.current_weight
+    targetWeight: patient.goal_weight || patient.current_weight,
+    isAthlete: patient.training_experience === 'athlete' || patient.training_experience === 'advanced'
   };
 };
 
@@ -189,9 +191,54 @@ const generateRecommendedFoods = (conditions, goal, restrictions) => {
     foods.push('Banana', 'Cacau', 'Chá de camomila', 'Salmão', 'Nozes');
   }
   
-  // Para ganho de peso
+  // OBJETIVOS ESPORTIVOS ESPECÍFICOS
+  
+  // Para emagrecimento
+  if (goal.type === 'weight_loss' || goal.needsWeightLoss) {
+    foods.push(
+      'Chá verde',
+      'Pimenta',
+      'Gengibre',
+      'Vegetais low carb',
+      'Proteínas magras',
+      'Chia (saciedade)'
+    );
+  }
+  
+  // Para ganho de massa muscular
+  if (goal.type === 'muscle_gain' || goal.isAthlete) {
+    foods.push(
+      'Whey protein',
+      'Frango (alta proteína)',
+      'Carne vermelha magra',
+      'Batata doce',
+      'Arroz branco (pós-treino)',
+      'Banana com pasta de amendoim',
+      'Ovos inteiros',
+      'Queijo cottage',
+      'Iogurte grego',
+      'Creatina',
+      'BCAA',
+      'Tapioca (carboidrato rápido)'
+    );
+  }
+  
+  // Para performance esportiva
+  if (goal.type === 'performance' || goal.isAthlete) {
+    foods.push(
+      'Beterraba (óxido nítrico)',
+      'Café (pré-treino)',
+      'Carboidratos complexos',
+      'Proteínas de rápida absorção',
+      'Taurina',
+      'Bebidas isotônicas',
+      'Mel (energia rápida)'
+    );
+  }
+  
+  // Para ganho de peso saudável
   if (goal.needsWeightGain) {
-    foods.push('Abacate', 'Pasta de amendoim', 'Granola', 'Frutas secas', 'Oleaginosas');
+    foods.push('Abacate', 'Pasta de amendoim', 'Granola', 'Frutas secas', 'Oleaginosas', 'Tapioca');
   }
   
   // Remover alimentos com alergias/intolerâncias
