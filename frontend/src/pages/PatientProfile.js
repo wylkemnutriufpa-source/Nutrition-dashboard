@@ -1250,6 +1250,35 @@ const PatientProfile = () => {
             <ChecklistTab patientId={id} />
           </TabsContent>
 
+          <TabsContent value="receitas">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ChefHat className="text-teal-700" />
+                  Receitas do Paciente
+                </CardTitle>
+                <CardDescription>
+                  Configure quais receitas este paciente pode visualizar
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-6">
+                  <ChefHat className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">
+                    Gerencie as receitas e controle a visibilidade para {patient?.full_name || 'este paciente'}
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/professional/receitas')}
+                    className="bg-teal-700 hover:bg-teal-800"
+                  >
+                    <ChefHat className="mr-2" size={18} />
+                    Gerenciar Receitas
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="recados">
             <RecadosTab patientId={id} professionalId={profile?.id} />
           </TabsContent>
