@@ -27,11 +27,29 @@
 ## (B) ARQUIVOS ALTERADOS
 
 ### Frontend:
-- `/app/frontend/src/lib/supabase.js` - Correção tratamento de erro e validação
-- `/app/frontend/src/pages/MealPlanEditor.js` - Melhoria no fluxo de salvamento
+1. **`/app/frontend/src/lib/supabase.js`** (linhas 831-895)
+   - ✅ Corrigido: Função `createMealPlan()` - tratamento de erro detalhado
+   - ✅ Corrigido: Função `updateMealPlan()` - validação de erro do Supabase
+   - ✅ Adicionado: Mensagens de hint específicas para erros RLS
+   - ✅ Corrigido: Eliminado "body stream already read" - não consome response múltiplas vezes
+
+2. **`/app/frontend/src/pages/MealPlanEditor.js`** (linhas 699-772)
+   - ✅ Corrigido: Função `handleSavePlan()` - tratamento correto de error object
+   - ✅ Adicionado: Validação de código de erro 42501 (RLS permission denied)
+   - ✅ Adicionado: Mensagens amigáveis para erro de permissão
+   - ✅ Adicionado: Log detalhado antes de salvar (debug)
+   - ✅ Corrigido: `setCurrentPlan(data)` após CREATE bem-sucedido
 
 ### SQL/Database:
-- `/app/supabase_meal_plans_rls_fix.sql` - NOVO arquivo com correções de RLS
+3. **`/app/supabase_meal_plans_rls_fix.sql`** - NOVO arquivo com correções de RLS
+   - ✅ Política INSERT: Valida vínculo em `patient_profiles` 
+   - ✅ Política UPDATE: Adiciona USING + WITH CHECK com validação de vínculo
+   - ✅ Política SELECT: Valida vínculo ativo professional-patient
+   - ✅ Política DELETE: Valida vínculo antes de permitir exclusão
+   - ✅ Comentários explicativos nas policies
+
+### Documentação:
+4. **`/app/BUG_REPORT_DRAFT_SAVE.md`** - NOVO relatório de análise completa
 
 ---
 
