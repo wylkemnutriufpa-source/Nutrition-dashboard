@@ -293,7 +293,7 @@ const RecipesManager = () => {
   };
 
   const filteredRecipes = recipes.filter(recipe => {
-    const matchesSearch = recipe.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = recipe.title?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
