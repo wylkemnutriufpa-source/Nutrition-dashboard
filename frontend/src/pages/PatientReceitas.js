@@ -147,11 +147,8 @@ const PatientReceitas = () => {
   const loadRecipes = async () => {
     setLoading(true);
     try {
-      // Tentar carregar receitas do banco
-      const { data, error } = await supabase
-        .from('recipes')
-        .select('*')
-        .eq('is_active', true);
+      // Tentar carregar receitas visíveis para este paciente
+      const { data, error } = await getVisibleRecipesForPatient(patientId);
 
       if (error || !data || data.length === 0) {
         // Usar receitas padrão se não houver no banco
