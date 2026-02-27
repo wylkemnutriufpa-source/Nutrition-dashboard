@@ -610,6 +610,20 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
           if (planData) {
             console.log('📥 PLANO CARREGADO DO BANCO:', planData);
             console.log('📥 MEALS DO BANCO:', planData.plan_data?.meals);
+            
+            // Log detalhado da primeira meal
+            if (planData.plan_data?.meals?.[0]) {
+              const firstMeal = planData.plan_data.meals[0];
+              console.log('📥 PRIMEIRA MEAL:', {
+                name: firstMeal.name,
+                observations: firstMeal.observations,
+                foods: firstMeal.foods?.map(f => ({
+                  name: f.name,
+                  customName: f.customName
+                }))
+              });
+            }
+            
             setCurrentPlan(planData);
             setPlanName(planData.name);
             if (planData.plan_data && planData.plan_data.meals) {
