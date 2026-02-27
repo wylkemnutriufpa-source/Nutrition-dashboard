@@ -654,11 +654,25 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
 
     setSaving(true);
     try {
+      // Limpar dados dos alimentos antes de salvar (remover flags temporárias)
+      const cleanedMeals = meals.map(meal => ({
+        ...meal,
+        foods: meal.foods.map(food => ({
+          id: food.id,
+          foodId: food.foodId || food.food_id,
+          food_id: food.foodId || food.food_id,
+          name: food.name,
+          quantity: food.quantity || 100,
+          unit: food.unit || 'g',
+          measure: food.measure || ''
+        }))
+      }));
+
       const planData = {
         patient_id: selectedPatient.id,
         professional_id: user.id,
         name: planName,
-        plan_data: { meals },
+        plan_data: { meals: cleanedMeals },
         daily_targets: calculateDayTotals(),
         is_active: true
       };
@@ -667,7 +681,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         // Atualizar plano existente
         const { error } = await updateMealPlan(currentPlan.id, {
           name: planName,
-          plan_data: { meals },
+          plan_data: { meals: cleanedMeals },
           daily_targets: calculateDayTotals()
         });
         if (error) throw error;
@@ -681,7 +695,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
       }
     } catch (error) {
       console.error('Error saving plan:', error);
-      toast.error('Erro ao salvar plano');
+      toast.error('Erro ao salvar plano: ' + (error.message || 'Verifique os dados'));
     } finally {
       setSaving(false);
     }
