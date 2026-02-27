@@ -26,6 +26,8 @@ import { toast } from 'sonner';
 
 const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: food.id });
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(food.customName || '');
   
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -35,6 +37,9 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
 
   const foodData = allFoods.find(f => f.id === food.foodId || f.id === food.food_id);
   const isNotFound = food.notFound || (!foodData && food.name);
+  
+  // Nome exibido: customName > foodData.name > food.name
+  const displayName = food.customName || foodData?.name || food.name || 'Alimento não encontrado';
   
   const calculateNutrients = () => {
     if (!foodData) return { calorias: 0, proteina: 0, carboidrato: 0, gordura: 0 };
@@ -48,6 +53,16 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   };
 
   const nutrients = calculateNutrients();
+  
+  const handleSaveName = () => {
+    onUpdate(food.id, 'customName', editedName);
+    setIsEditingName(false);
+  };
+  
+  const handleCancelEditName = () => {
+    setEditedName(food.customName || foodData?.name || '');
+    setIsEditingName(false);
+  };
 
   return (
     <div 
@@ -66,16 +81,51 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
         
         <div className="flex-1 grid grid-cols-12 gap-4 items-center">
           <div className="col-span-4">
-            {isNotFound ? (
-              <>
-                <p className="font-medium text-amber-800">{food.name}</p>
-                <p className="text-xs text-amber-600">⚠️ Não encontrado - substitua manualmente</p>
-              </>
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="text-sm"
+                  placeholder="Nome do alimento"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveName();
+                    if (e.key === 'Escape') handleCancelEditName();
+                  }}
+                  autoFocus
+                />
+                <Button onClick={handleSaveName} size="sm" variant="ghost" className="text-green-600">
+                  <Save size={14} />
+                </Button>
+                <Button onClick={handleCancelEditName} size="sm" variant="ghost" className="text-red-600">
+                  <X size={14} />
+                </Button>
+              </div>
             ) : (
-              <>
-                <p className="font-medium text-gray-900">{foodData?.name || 'Alimento não encontrado'}</p>
-                <p className="text-xs text-gray-500">{foodData?.source || ''}</p>
-              </>
+              <div className="flex items-center gap-2 group">
+                {isNotFound ? (
+                  <>
+                    <p className="font-medium text-amber-800">{displayName}</p>
+                    <p className="text-xs text-amber-600">⚠️ Não encontrado</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium text-gray-900">{displayName}</p>
+                    <Button
+                      onClick={() => {
+                        setEditedName(displayName);
+                        setIsEditingName(true);
+                      }}
+                      size="sm"
+                      variant="ghost"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-600 h-6 w-6 p-0"
+                    >
+                      <Edit size={12} />
+                    </Button>
+                  </>
+                )}
+                {foodData?.source && <p className="text-xs text-gray-500">{foodData.source}</p>}
+              </div>
             )}
           </div>
           
