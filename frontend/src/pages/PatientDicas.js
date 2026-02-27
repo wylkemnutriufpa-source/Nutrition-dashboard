@@ -16,6 +16,7 @@ const PatientDicas = () => {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [tips, setTips] = useState([]);
+  const [personalizedTip, setPersonalizedTip] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [likedTips, setLikedTips] = useState(new Set());
 
