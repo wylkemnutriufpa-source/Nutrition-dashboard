@@ -19,9 +19,12 @@ import {
   deletePhysicalAssessment,
   compareAssessments,
   createPersonalizedTip,
+  createAutomaticTips,
   getAnamnesis
 } from '@/lib/supabase';
 import ImageUploader from '@/components/ImageUploader';
+import LiveTipsPreview from '@/components/LiveTipsPreview';
+import { generateAssessmentTips as generateDynamicAssessmentTips } from '@/utils/dynamicTips';
 
 // Função para gerar dica personalizada baseada na avaliação física
 const generateAssessmentTip = (assessment, patient, previousAssessment) => {
