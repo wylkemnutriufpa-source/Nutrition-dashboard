@@ -450,6 +450,77 @@ export const saveAnamnesisDraft = async (patientId, professionalId, updates) => 
   }
 };
 
+// ==================== DRAFT MEAL PLAN (PRÉ-PLANO) ====================
+
+/**
+ * Salva pré-plano gerado pela anamnese inteligente
+ * Visível apenas para profissionais
+ */
+export const saveDraftMealPlan = async (patientId, professionalId, draftPlan) => {
+  const { data, error } = await supabase
+    .from('draft_meal_plans')
+    .upsert({
+      patient_id: patientId,
+      professional_id: professionalId,
+      draft_data: draftPlan,
+      generated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+/**
+ * Busca pré-plano do paciente
+ */
+export const getDraftMealPlan = async (patientId) => {
+  const { data, error } = await supabase
+    .from('draft_meal_plans')
+    .select('*')
+    .eq('patient_id', patientId)
+    .maybeSingle();
+  return { data, error };
+};
+
+/**
+ * Atualiza pré-plano (quando profissional edita)
+ */
+export const updateDraftMealPlan = async (patientId, updates) => {
+  const { data, error } = await supabase
+    .from('draft_meal_plans')
+    .update({
+      draft_data: updates,
+      updated_at: new Date().toISOString()
+    })
+    .eq('patient_id', patientId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+/**
+ * Cria dicas automáticas baseadas no pré-plano
+ */
+export const createAutomaticTips = async (patientId, professionalId, tips) => {
+  const tipsToInsert = tips.map(tip => ({
+    patient_id: patientId,
+    professional_id: professionalId,
+    title: tip.title,
+    content: tip.content,
+    category: 'nutrition',
+    is_active: true,
+    auto_generated: true
+  }));
+
+  const { data, error } = await supabase
+    .from('tips')
+    .insert(tipsToInsert)
+    .select();
+  
+  return { data, error };
+};
+
 // ==================== CHECKLIST / TASKS ====================
 
 export const getChecklistTemplates = async (patientId) => {
