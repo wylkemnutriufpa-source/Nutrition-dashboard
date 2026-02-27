@@ -937,6 +937,51 @@ const PatientProfile = () => {
     loadPatientData();
   }, [loadPatientData]);
 
+  // Gerar pré-plano inteligente
+  const handleGenerateDraftPlan = async () => {
+    if (!anamnesis || !patient) {
+      toast.error('É necessário ter anamnese completa');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Gerar pré-plano usando IA
+      const smartPlan = generateSmartMealPlan(anamnesis, patient);
+      
+      // Salvar no banco
+      await saveDraftMealPlan(id, profile.id, smartPlan);
+      
+      // Criar dicas automáticas
+      if (smartPlan.tips && smartPlan.tips.length > 0) {
+        await createAutomaticTips(id, profile.id, smartPlan.tips);
+      }
+      
+      setDraftPlan(smartPlan);
+      toast.success('Pré-plano gerado com sucesso!');
+    } catch (error) {
+      console.error('Error generating draft plan:', error);
+      toast.error('Erro ao gerar pré-plano');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Atualizar pré-plano editado
+  const handleUpdateDraftPlan = async (updatedPlan) => {
+    setLoading(true);
+    try {
+      await updateDraftMealPlan(id, updatedPlan);
+      setDraftPlan(updatedPlan);
+      toast.success('Pré-plano atualizado!');
+    } catch (error) {
+      console.error('Error updating draft plan:', error);
+      toast.error('Erro ao atualizar pré-plano');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleNavigateTab = (tab) => {
     setActiveTab(tab);
   };
