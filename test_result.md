@@ -349,6 +349,30 @@ frontend:
         agent: "testing"
         comment: "✅ LOGIN FIX VERIFIED - PATIENT LOGIN WORKS PERFECTLY (26/Feb/2026): Comprehensive testing completed. PATIENT LOGIN: ✅ PASS - maria@gmail.com/123456 logs in successfully, redirects to patient dashboard, NO 'body stream already read' error, NO console errors, NO 400/406 network errors. Profile loaded correctly (userId: 700a7390-c7ed-45e0-a3da-07c507935109, role: patient). PROFESSIONAL LOGIN: ❌ FAIL - admin@teste.com/123456 returns 400 error from Supabase auth endpoint. Error 'body stream already read' is a Supabase client library side effect when handling the 400 error. ROOT CAUSE: Professional credentials are INVALID or account doesn't exist in Supabase database. The login fix (removing duplicate getUserProfile, using AuthContext) is WORKING CORRECTLY as proven by successful patient login. Main agent must verify professional account exists in Supabase with correct credentials. Screenshots: 01_login_page_initial.png, 02_professional_login_form.png, 03_professional_credentials_filled.png, 04_after_professional_login.png (shows error), 08_patient_login_form.png, 09_patient_credentials_filled.png, 10_after_patient_login.png (shows success)."
 
+  - task: "Draft Meal Plan Auto-Save + Use as Official Plan"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/DraftMealPlanViewer.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/MealPlanEditor.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) Pré-plano já era salvo automaticamente via saveDraftMealPlan(). (2) Botão 'Usar como Plano Oficial' adicionado no DraftMealPlanViewer com design destacado. (3) Função handleUseAsOfficialPlan() copia draft para sessionStorage e redireciona para MealPlanEditor com flag fromDraft=true. (4) MealPlanEditor detecta flag, carrega draft do sessionStorage, converte meals e limpa storage. (5) Profissional pode editar e salvar como plano oficial."
+
+  - task: "Editable 6-Meal Model in MealPlanEditor"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/MealPlanEditor.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) addNewMeal() - adiciona refeição vazia, (2) removeMeal() - remove refeição (mínimo 1), (3) updateMealName() - edita nome inline com botões Save/Cancel, (4) updateMealTime() - edita horário com input time, (5) MealSection component modificado com controles de edição inline, (6) Botão 'Adicionar Nova Refeição' no final da lista. Profissional pode criar quantas refeições quiser, editar títulos/horários, e gerenciar completamente."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
