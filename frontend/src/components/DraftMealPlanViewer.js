@@ -55,9 +55,25 @@ const DraftMealPlanViewer = ({
   }
 
   const handleSave = () => {
+    setSaving(true);
     onUpdate(editedPlan);
     setEditing(false);
+    setSaving(false);
     toast.success('Pré-plano atualizado!');
+  };
+
+  const handleSaveAsDraft = async () => {
+    if (onSaveAsDraft) {
+      setSaving(true);
+      try {
+        await onSaveAsDraft(draftPlan);
+        toast.success('Rascunho salvo com sucesso!');
+      } catch (error) {
+        toast.error('Erro ao salvar rascunho');
+      } finally {
+        setSaving(false);
+      }
+    }
   };
 
   const handleCancel = () => {
