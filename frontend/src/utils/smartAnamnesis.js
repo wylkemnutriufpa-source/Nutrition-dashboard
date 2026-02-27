@@ -333,18 +333,56 @@ const generateTips = (conditions, goal, restrictions, foodsToAvoid) => {
     });
   }
   
-  // Dicas baseadas em objetivo
-  if (goal.needsWeightLoss) {
+  // DICAS BASEADAS EM OBJETIVOS ESPORTIVOS
+  
+  if (goal.type === 'weight_loss' || goal.needsWeightLoss) {
     tips.push({
-      title: '⚖️ Emagrecimento Saudável',
-      content: 'Coma devagar e mastigue bem. Evite comer assistindo TV. Priorize vegetais no prato.'
+      title: '🔥 Emagrecimento Saudável',
+      content: 'Coma devagar e mastigue bem. Evite comer assistindo TV. Priorize vegetais no prato. Faça cardio 3-5x por semana.'
+    });
+    tips.push({
+      title: '⚖️ Déficit Calórico',
+      content: 'Para emagrecer, consuma menos calorias do que gasta. Mas não faça dietas muito restritivas - o ideal é perder 0,5-1kg por semana.'
+    });
+  }
+  
+  if (goal.type === 'muscle_gain') {
+    tips.push({
+      title: '💪 Ganho de Massa Muscular',
+      content: 'Consuma 1,6-2,2g de proteína por kg de peso corporal. Faça refeições a cada 3-4 horas. Priorize treino de força.'
+    });
+    tips.push({
+      title: '🍗 Proteína Pós-Treino',
+      content: 'Consuma proteína de rápida absorção (whey) + carboidrato até 30min após o treino. Isso maximiza a síntese proteica.'
+    });
+    tips.push({
+      title: '🍚 Carboidratos Estratégicos',
+      content: 'Consuma mais carboidratos nos dias de treino. Batata-doce, arroz branco e tapioca são ótimas opções pós-treino.'
+    });
+  }
+  
+  if (goal.type === 'performance' || goal.isAthlete) {
+    tips.push({
+      title: '⚡ Performance Esportiva',
+      content: 'Timing nutricional é crucial. Carboidratos antes do treino (energia), proteína após (recuperação). Hidrate-se constantemente.'
+    });
+    tips.push({
+      title: '⏰ Janela Anabólica',
+      content: 'Consuma carboidrato + proteína até 2h após o treino. Isso otimiza recuperação e ganho de performance.'
+    });
+  }
+  
+  if (goal.type === 'maintenance') {
+    tips.push({
+      title: '⚖️ Manutenção Saudável',
+      content: 'Mantenha uma alimentação equilibrada com todos os grupos alimentares. Pratique atividade física regular.'
     });
   }
   
   if (goal.needsWeightGain) {
     tips.push({
-      title: '💪 Ganho de Peso',
-      content: 'Aumente a frequência das refeições. Inclua alimentos calóricos saudáveis como abacate, oleaginosas.'
+      title: '📈 Ganho de Peso Saudável',
+      content: 'Aumente a frequência das refeições. Inclua alimentos calóricos saudáveis como abacate, oleaginosas, pastas de amendoim.'
     });
   }
   
