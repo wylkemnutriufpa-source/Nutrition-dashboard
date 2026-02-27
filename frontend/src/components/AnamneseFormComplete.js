@@ -43,15 +43,21 @@ const AnamneseFormComplete = ({
   // Calcular progresso da anamnese
   const calculateProgress = () => {
     const fields = {
-      clinical: ['medical_conditions_text', 'medications', 'allergies', 'food_intolerances'],
+      clinical: ['medical_conditions', 'no_medical_conditions', 'allergies', 'food_intolerances'],
       lifestyle: ['smoking', 'alcohol', 'sleep_hours', 'stress_level', 'water_intake'],
-      nutrition: ['meals_per_day', 'food_preference', 'favorite_foods', 'disliked_foods'],
+      nutrition: ['meals_per_day', 'food_preference', 'favorite_foods'],
       sports: ['exercises_regularly', 'physical_activity_level', 'sports_goal']
     };
 
     const total = Object.values(fields).flat().length;
     const filled = Object.values(fields).flat().filter(field => {
       const value = data[field];
+      if (field === 'medical_conditions' || field === 'allergies' || field === 'food_intolerances') {
+        return Array.isArray(value) ? value.length > 0 : false;
+      }
+      if (field === 'no_medical_conditions') {
+        return value === true || (Array.isArray(data.medical_conditions) && data.medical_conditions.length > 0);
+      }
       return value && value !== '' && (Array.isArray(value) ? value.length > 0 : true);
     }).length;
 
