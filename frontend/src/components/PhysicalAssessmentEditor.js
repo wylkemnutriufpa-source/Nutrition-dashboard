@@ -452,8 +452,8 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
-            {/* Data */}
-            <div className="flex items-center gap-4">
+            {/* Data e Botão Carregar Dados */}
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <Label>Data da Avaliação</Label>
                 <Input
@@ -463,6 +463,17 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
                   className="w-48"
                 />
               </div>
+              {!editingId && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={loadFromAnamnesis}
+                  className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Carregar dados da Anamnese
+                </Button>
+              )}
             </div>
 
             {/* Dados Básicos */}
