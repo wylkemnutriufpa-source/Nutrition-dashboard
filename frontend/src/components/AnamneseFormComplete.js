@@ -40,6 +40,26 @@ const AnamneseFormComplete = ({
     setHasChanges(true);
   };
 
+  // Calcular progresso da anamnese
+  const calculateProgress = () => {
+    const fields = {
+      clinical: ['medical_conditions_text', 'medications', 'allergies', 'food_intolerances'],
+      lifestyle: ['smoking', 'alcohol', 'sleep_hours', 'stress_level', 'water_intake'],
+      nutrition: ['meals_per_day', 'food_preference', 'favorite_foods', 'disliked_foods'],
+      sports: ['exercises_regularly', 'physical_activity_level', 'sports_goal']
+    };
+
+    const total = Object.values(fields).flat().length;
+    const filled = Object.values(fields).flat().filter(field => {
+      const value = data[field];
+      return value && value !== '' && (Array.isArray(value) ? value.length > 0 : true);
+    }).length;
+
+    return Math.round((filled / total) * 100);
+  };
+
+  const progress = calculateProgress();
+
   const handleSave = async (markComplete = false) => {
     setSaving(true);
     try {
