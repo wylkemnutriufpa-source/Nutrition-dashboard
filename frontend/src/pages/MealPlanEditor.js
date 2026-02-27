@@ -785,11 +785,13 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         name: meal.name,
         time: meal.time,
         color: meal.color || '#0F766E',
+        observations: meal.observations || '',
         foods: meal.foods.map(food => ({
           id: food.id,
           foodId: food.foodId || food.food_id || null,
           food_id: food.foodId || food.food_id || null,
           name: food.name || '',
+          customName: food.customName || '',
           quantity: parseFloat(food.quantity) || 100,
           unit: food.unit || 'g',
           measure: food.measure || ''
