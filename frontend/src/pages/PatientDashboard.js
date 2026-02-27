@@ -20,6 +20,7 @@ const PatientDashboard = () => {
   const [anamnesis, setAnamnesis] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showFirstAccessModal, setShowFirstAccessModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
 
   useEffect(() => {
     if (user) {
