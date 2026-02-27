@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
 import MenuConfigEditor from '@/components/MenuConfigEditor';
 import DraftMealPlanViewer from '@/components/DraftMealPlanViewer';
+import AnamneseFormComplete from '@/components/AnamneseFormComplete';
 import { generateAnamnesePDF, generateMealPlanPDF } from '@/utils/pdfGenerator';
 import generateSmartMealPlan from '@/utils/smartAnamnesis';
 
@@ -1064,12 +1065,13 @@ const PatientProfile = () => {
           </TabsContent>
 
           <TabsContent value="anamnese">
-            <AnamneseTab 
+            <AnamneseFormComplete
               anamnesis={anamnesis} 
               patientId={id} 
               professionalId={profile?.id}
               patient={patient}
               professionalInfo={{ name: profile?.name, email: profile?.email }}
+              isPatientView={false}
               onUpdate={loadPatientData}
               onComplete={handleGenerateDraftPlan}
             />
