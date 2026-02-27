@@ -436,6 +436,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [currentPlan, setCurrentPlan] = useState(null);
+  const [draftAvailable, setDraftAvailable] = useState(null);
   const [planName, setPlanName] = useState('Plano Alimentar');
   const [allFoods, setAllFoods] = useState([...mockFoods]);
   const [isSelectingPatient, setIsSelectingPatient] = useState(false);
