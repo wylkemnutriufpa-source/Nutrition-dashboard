@@ -272,6 +272,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
                     if (e.key === 'Enter') handleSaveName();
                     if (e.key === 'Escape') handleCancelEditName();
                   }}
+                  onBlur={handleSaveName}
                   autoFocus
                 />
                 <Button onClick={handleSaveName} size="sm" variant="outline">
