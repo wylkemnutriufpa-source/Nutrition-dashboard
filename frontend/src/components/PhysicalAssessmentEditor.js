@@ -333,14 +333,34 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
       // Gerar dica personalizada se solicitado
       if (generateTip && savedAssessment) {
         const previousAssessment = assessments.length > 0 ? assessments[0] : null;
-        const tip = generateAssessmentTip(savedAssessment, patient, previousAssessment);
         
-        const { error: tipError } = await createPersonalizedTip(patientId, professionalId, tip);
-        if (tipError) {
-          console.warn('Erro ao criar dica:', tipError);
+        // Usar o novo sistema de dicas dinâmicas
+        const tips = generateDynamicAssessmentTips(savedAssessment, patient, previousAssessment);
+        
+        if (tips.length > 0) {
+          const tipsToSend = tips.map(tip => ({
+            title: tip.title,
+            content: tip.content,
+            category: tip.category
+          }));
+          
+          const { error: tipError } = await createAutomaticTips(patientId, professionalId, tipsToSend);
+          if (tipError) {
+            console.warn('Erro ao criar dicas:', tipError);
+          } else {
+            toast.success(`${tips.length} dica(s) personalizada(s) enviada(s)! ✨`);
+            if (onTipCreated) onTipCreated();
+          }
         } else {
-          toast.success('Dica personalizada criada! ✨');
-          if (onTipCreated) onTipCreated();
+          // Fallback para a dica antiga se não houver dicas dinâmicas
+          const tip = generateAssessmentTip(savedAssessment, patient, previousAssessment);
+          const { error: tipError } = await createPersonalizedTip(patientId, professionalId, tip);
+          if (tipError) {
+            console.warn('Erro ao criar dica:', tipError);
+          } else {
+            toast.success('Dica personalizada criada! ✨');
+            if (onTipCreated) onTipCreated();
+          }
         }
       }
 
