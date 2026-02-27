@@ -427,12 +427,32 @@ export const generateMealPlanPDF = (patient, mealPlan, professionalInfo) => {
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
         meal.foods.forEach(food => {
-          if (yPosition > 270) {
+          if (yPosition > 260) {
             doc.addPage();
             yPosition = 20;
           }
-          doc.text(`• ${food.name} - ${food.quantity}`, 18, yPosition);
+          
+          // Usar customName se existir, senão usar name
+          const displayName = food.customName || food.name;
+          doc.text(`• ${displayName} - ${food.quantity}`, 18, yPosition);
           yPosition += 5;
+          
+          // Adicionar observações do alimento se existirem
+          if (food.observations) {
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            const obsLines = doc.splitTextToSize(`  Obs: ${food.observations}`, pageWidth - 40);
+            obsLines.forEach(line => {
+              if (yPosition > 270) {
+                doc.addPage();
+                yPosition = 20;
+              }
+              doc.text(line, 22, yPosition);
+              yPosition += 4;
+            });
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+          }
         });
       }
 
