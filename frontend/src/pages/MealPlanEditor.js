@@ -936,6 +936,18 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                   <div className="pt-4 border-t space-y-3">
                     {!isPatientView ? (
                       <>
+                        {/* Botão Usar Rascunho */}
+                        {draftAvailable && (
+                          <Button 
+                            className="w-full bg-amber-500 hover:bg-amber-600 text-white" 
+                            size="lg"
+                            onClick={handleUseDraft}
+                          >
+                            <FileText className="mr-2" size={18} />
+                            Usar Rascunho (Pré-Plano)
+                          </Button>
+                        )}
+                        
                         <Button 
                           className="w-full bg-teal-700 hover:bg-teal-800" 
                           size="lg"
