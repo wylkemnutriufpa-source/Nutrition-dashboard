@@ -417,9 +417,16 @@ export const getAnamnesis = async (patientId) => {
 };
 
 export const createAnamnesis = async (data) => {
+  // Usar upsert para evitar duplicatas
   const { data: result, error } = await supabase
     .from('anamnesis')
-    .insert(data)
+    .upsert({
+      ...data,
+      patient_id: data.patient_id,
+      professional_id: data.professional_id
+    }, {
+      onConflict: 'patient_id' // Se já existe, atualiza
+    })
     .select()
     .single();
   return { data: result, error };
