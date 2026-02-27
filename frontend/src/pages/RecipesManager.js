@@ -427,11 +427,11 @@ const RecipesManager = () => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <Label>URL da Imagem</Label>
-                  <Input
+                  <ImageUploader
+                    label="Foto do Prato"
                     value={formData.image_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                    placeholder="https://..."
+                    onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                    folder="recipes"
                   />
                 </div>
               </div>
