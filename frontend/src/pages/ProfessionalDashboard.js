@@ -200,7 +200,10 @@ const ProfessionalDashboard = () => {
                           variant="ghost" 
                           size="sm"
                           className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                          onClick={() => navigate(`/professional/patient/${patient.id}?tab=plano`)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/professional/patient/${patient.id}?tab=plano`);
+                          }}
                         >
                           <Eye size={16} className="mr-1" /> Ver
                         </Button>
@@ -208,7 +211,10 @@ const ProfessionalDashboard = () => {
                           variant="ghost" 
                           size="sm"
                           className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
-                          onClick={() => navigate(`/professional/meal-plan-editor?patient=${patient.id}&plan=${plan.id}`)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/professional/meal-plan-editor?patient=${patient.id}&plan=${plan.id}`);
+                          }}
                         >
                           <Edit size={16} className="mr-1" /> Editar
                         </Button>
