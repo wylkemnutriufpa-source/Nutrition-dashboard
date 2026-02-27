@@ -1052,15 +1052,13 @@ const PatientProfile = () => {
     }
 
     try {
-      toast.loading('Copiando pré-plano para plano oficial...');
+      // Armazena o draft no sessionStorage para uso no editor
+      sessionStorage.setItem('draftPlanToLoad', JSON.stringify(draftPlan));
       
       // Redireciona para o editor com o draft como parâmetro
       navigate(`/professional/meal-plan-editor?patient=${id}&fromDraft=true`);
       
-      // Armazena o draft no sessionStorage para uso no editor
-      sessionStorage.setItem('draftPlanToLoad', JSON.stringify(draftPlan));
-      
-      toast.success('Redirecionando para editor...');
+      toast.success('Abrindo editor com pré-plano...');
     } catch (error) {
       console.error('Error using draft as official plan:', error);
       toast.error('Erro ao copiar pré-plano');
