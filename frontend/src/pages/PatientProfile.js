@@ -1168,6 +1168,15 @@ const PatientProfile = () => {
             />
           </TabsContent>
 
+          <TabsContent value="avaliacao">
+            <PhysicalAssessmentEditor
+              patientId={id}
+              professionalId={profile?.id}
+              patient={patient}
+              onTipCreated={() => toast.success('Dica enviada para o paciente!')}
+            />
+          </TabsContent>
+
           <TabsContent value="pre-plano">
             <DraftMealPlanViewer
               draftPlan={draftPlan}
