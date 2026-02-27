@@ -1226,10 +1226,7 @@ const PatientProfile = () => {
                       <Button 
                         variant="outline"
                         className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
-                        onClick={() => {
-                          // Abrir modal de visualização rápida (implementar depois)
-                          navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}&view=true`);
-                        }}
+                        onClick={() => setShowMealPlanViewer(true)}
                       >
                         <Eye className="mr-2" size={18} /> Visualizar
                       </Button>
