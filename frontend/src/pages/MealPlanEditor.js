@@ -33,6 +33,7 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   };
 
   const foodData = allFoods.find(f => f.id === food.foodId || f.id === food.food_id);
+  const isNotFound = food.notFound || (!foodData && food.name);
   
   const calculateNutrients = () => {
     if (!foodData) return { calorias: 0, proteina: 0, carboidrato: 0, gordura: 0 };
@@ -48,7 +49,15 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   const nutrients = calculateNutrients();
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${
+        isNotFound 
+          ? 'bg-amber-50 border-amber-300' 
+          : 'bg-white border-gray-200'
+      }`}
+    >
       <div className="flex items-center gap-4">
         <div {...attributes} {...listeners} className="drag-handle cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
           <GripVertical size={20} />
@@ -56,8 +65,17 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
         
         <div className="flex-1 grid grid-cols-12 gap-4 items-center">
           <div className="col-span-4">
-            <p className="font-medium text-gray-900">{foodData?.name || 'Alimento não encontrado'}</p>
-            <p className="text-xs text-gray-500">{foodData?.source || ''}</p>
+            {isNotFound ? (
+              <>
+                <p className="font-medium text-amber-800">{food.name}</p>
+                <p className="text-xs text-amber-600">⚠️ Não encontrado - substitua manualmente</p>
+              </>
+            ) : (
+              <>
+                <p className="font-medium text-gray-900">{foodData?.name || 'Alimento não encontrado'}</p>
+                <p className="text-xs text-gray-500">{foodData?.source || ''}</p>
+              </>
+            )}
           </div>
           
           <div className="col-span-3 flex gap-2">
@@ -80,10 +98,16 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
           </div>
           
           <div className="col-span-4 flex gap-3 text-xs">
-            <span className="font-semibold text-teal-700">{nutrients.calorias} kcal</span>
-            <span className="text-gray-600">P: {nutrients.proteina}g</span>
-            <span className="text-gray-600">C: {nutrients.carboidrato}g</span>
-            <span className="text-gray-600">G: {nutrients.gordura}g</span>
+            {isNotFound ? (
+              <span className="text-amber-600">Valores não calculados</span>
+            ) : (
+              <>
+                <span className="font-semibold text-teal-700">{nutrients.calorias} kcal</span>
+                <span className="text-gray-600">P: {nutrients.proteina}g</span>
+                <span className="text-gray-600">C: {nutrients.carboidrato}g</span>
+                <span className="text-gray-600">G: {nutrients.gordura}g</span>
+              </>
+            )}
           </div>
           
           <div className="col-span-1 flex justify-end">
