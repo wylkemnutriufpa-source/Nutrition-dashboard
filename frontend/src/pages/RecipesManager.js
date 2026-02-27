@@ -23,6 +23,7 @@ import {
   setRecipeVisibility,
   updateRecipeVisibilityMode
 } from '@/lib/supabase';
+import ImageUploader from '@/components/ImageUploader';
 
 const RecipesManager = () => {
   const { user, profile } = useAuth();
