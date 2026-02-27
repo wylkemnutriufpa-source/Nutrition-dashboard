@@ -229,6 +229,97 @@ export const saveCustomFood = saveCustomFoodLocal;
 export const updateCustomFood = updateCustomFoodLocal;
 export const deleteCustomFood = deleteCustomFoodLocal;
 
+// Função para buscar alimento por nome (busca aproximada)
+export const findFoodByName = (searchName, allFoods = null) => {
+  const foods = allFoods || getAllFoods();
+  const searchLower = searchName.toLowerCase().trim();
+  
+  // 1. Busca exata
+  let found = foods.find(f => f.name.toLowerCase() === searchLower);
+  if (found) return found;
+  
+  // 2. Busca por contém
+  found = foods.find(f => f.name.toLowerCase().includes(searchLower));
+  if (found) return found;
+  
+  // 3. Busca reversa (nome do banco contém no search)
+  found = foods.find(f => searchLower.includes(f.name.toLowerCase()));
+  if (found) return found;
+  
+  // 4. Busca por palavras-chave
+  const keywords = searchLower.split(/[\s,]+/).filter(k => k.length > 2);
+  for (const keyword of keywords) {
+    found = foods.find(f => f.name.toLowerCase().includes(keyword));
+    if (found) return found;
+  }
+  
+  // 5. Mapeamento de sinônimos comuns
+  const synonyms = {
+    'frango': ['peito de frango', 'frango desfiado', 'coxa de frango'],
+    'carne': ['carne moída', 'patinho', 'alcatra', 'filé mignon'],
+    'peixe': ['tilápia', 'salmão', 'atum'],
+    'arroz': ['arroz branco', 'arroz integral'],
+    'feijão': ['feijão preto', 'feijão carioca'],
+    'ovo': ['ovo cozido', 'ovo mexido', 'omelete'],
+    'leite': ['leite desnatado', 'leite integral'],
+    'pão': ['pão integral', 'pão francês', 'pão de forma'],
+    'iogurte': ['iogurte natural', 'iogurte grego'],
+    'queijo': ['queijo minas', 'queijo cottage', 'ricota'],
+    'salada': ['alface', 'rúcula', 'tomate'],
+    'verdura': ['brócolis', 'espinafre', 'couve'],
+    'legume': ['cenoura', 'abobrinha', 'berinjela'],
+    'fruta': ['banana', 'maçã', 'laranja', 'morango'],
+    'castanha': ['castanha do pará', 'castanha de caju', 'amêndoas'],
+    'oleaginosa': ['nozes', 'amêndoas', 'castanha'],
+    'proteína': ['whey protein', 'frango', 'ovo', 'peixe']
+  };
+  
+  for (const [key, values] of Object.entries(synonyms)) {
+    if (searchLower.includes(key)) {
+      for (const val of values) {
+        found = foods.find(f => f.name.toLowerCase().includes(val));
+        if (found) return found;
+      }
+    }
+  }
+  
+  return null;
+};
+
+// Função para resolver alimentos do pré-plano
+export const resolveDraftFoods = (draftFoods, allFoods = null) => {
+  const foods = allFoods || getAllFoods();
+  
+  return draftFoods.map((foodName, index) => {
+    const foundFood = findFoodByName(foodName, foods);
+    
+    if (foundFood) {
+      return {
+        id: `f${Date.now()}-${index}`,
+        foodId: foundFood.id,
+        food_id: foundFood.id,
+        name: foundFood.name,
+        quantity: foundFood.porcao || 100,
+        unit: foundFood.unidade || 'g',
+        measure: ''
+      };
+    }
+    
+    // Se não encontrou, retorna como alimento genérico
+    return {
+      id: `f${Date.now()}-${index}`,
+      foodId: null,
+      food_id: null,
+      name: foodName,
+      quantity: 100,
+      unit: 'g',
+      measure: '',
+      isCustom: true,
+      notFound: true
+    };
+  });
+};
+
 export const mockMeals = [
   { id: 'm1', name: 'Café da Manhã', time: '07:00', color: '#F59E0B' },
   { id: 'm2', name: 'Lanche da Manhã', time: '10:00', color: '#10B981' },
