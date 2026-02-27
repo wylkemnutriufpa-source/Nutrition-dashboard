@@ -1620,3 +1620,237 @@ export const deleteSupplement = async (supplementId) => {
     .eq('id', supplementId);
   return { error };
 };
+
+// ==================== RECIPE VISIBILITY ====================
+
+// Obter receitas visíveis para um paciente específico
+export const getVisibleRecipesForPatient = async (patientId) => {
+  try {
+    // Primeiro, tentar usar a função do banco
+    const { data, error } = await supabase
+      .rpc('get_visible_recipes_for_patient', { p_patient_id: patientId });
+    
+    if (!error && data) {
+      return { data, error: null };
+    }
+    
+    // Fallback: buscar receitas globais ou com visibilidade
+    const { data: recipes, error: recipesError } = await supabase
+      .from('recipes')
+      .select('*')
+      .eq('is_active', true)
+      .or(`is_global.eq.true,visibility_mode.eq.all`);
+    
+    if (recipesError) {
+      // Se falhar, buscar todas receitas ativas (fallback)
+      const { data: allRecipes, error: allError } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('is_active', true);
+      return { data: allRecipes, error: allError };
+    }
+    
+    // Buscar receitas com visibilidade específica para este paciente
+    const { data: visibility } = await supabase
+      .from('recipe_patient_visibility')
+      .select('recipe_id')
+      .eq('patient_id', patientId)
+      .eq('visible', true);
+    
+    const visibleIds = visibility?.map(v => v.recipe_id) || [];
+    
+    // Buscar receitas com visibilidade específica
+    if (visibleIds.length > 0) {
+      const { data: specificRecipes } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('is_active', true)
+        .in('id', visibleIds);
+      
+      // Combinar receitas globais com específicas
+      const allRecipes = [...(recipes || [])];
+      specificRecipes?.forEach(r => {
+        if (!allRecipes.find(ar => ar.id === r.id)) {
+          allRecipes.push(r);
+        }
+      });
+      return { data: allRecipes, error: null };
+    }
+    
+    return { data: recipes, error: null };
+  } catch (err) {
+    console.error('Erro ao buscar receitas visíveis:', err);
+    return { data: null, error: err };
+  }
+};
+
+// Obter configuração de visibilidade de uma receita
+export const getRecipeVisibility = async (recipeId) => {
+  const { data, error } = await supabase
+    .from('recipe_patient_visibility')
+    .select(`
+      *,
+      patient:profiles!recipe_patient_visibility_patient_id_fkey(id, full_name, email)
+    `)
+    .eq('recipe_id', recipeId);
+  return { data, error };
+};
+
+// Obter todas as visibilidades de um profissional
+export const getRecipeVisibilityByProfessional = async (professionalId) => {
+  const { data, error } = await supabase
+    .from('recipe_patient_visibility')
+    .select(`
+      *,
+      recipe:recipes(id, name, category),
+      patient:profiles!recipe_patient_visibility_patient_id_fkey(id, full_name, email)
+    `)
+    .eq('professional_id', professionalId);
+  return { data, error };
+};
+
+// Definir visibilidade de uma receita para um paciente
+export const setRecipeVisibility = async (recipeId, patientId, professionalId, visible = true) => {
+  // Verificar se já existe
+  const { data: existing } = await supabase
+    .from('recipe_patient_visibility')
+    .select('id')
+    .eq('recipe_id', recipeId)
+    .eq('patient_id', patientId)
+    .maybeSingle();
+  
+  if (existing) {
+    // Atualizar
+    const { data, error } = await supabase
+      .from('recipe_patient_visibility')
+      .update({ visible, updated_at: new Date().toISOString() })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    return { data, error };
+  } else {
+    // Criar novo
+    const { data, error } = await supabase
+      .from('recipe_patient_visibility')
+      .insert({
+        recipe_id: recipeId,
+        patient_id: patientId,
+        professional_id: professionalId,
+        visible
+      })
+      .select()
+      .single();
+    return { data, error };
+  }
+};
+
+// Definir visibilidade de uma receita para múltiplos pacientes
+export const setRecipeVisibilityBulk = async (recipeId, patientIds, professionalId, visible = true) => {
+  const results = [];
+  for (const patientId of patientIds) {
+    const result = await setRecipeVisibility(recipeId, patientId, professionalId, visible);
+    results.push(result);
+  }
+  return results;
+};
+
+// Remover visibilidade de uma receita para um paciente
+export const removeRecipeVisibility = async (recipeId, patientId) => {
+  const { error } = await supabase
+    .from('recipe_patient_visibility')
+    .delete()
+    .eq('recipe_id', recipeId)
+    .eq('patient_id', patientId);
+  return { error };
+};
+
+// Atualizar modo de visibilidade da receita
+export const updateRecipeVisibilityMode = async (recipeId, mode) => {
+  // mode: 'all' | 'selected' | 'none'
+  const { data, error } = await supabase
+    .from('recipes')
+    .update({ visibility_mode: mode, updated_at: new Date().toISOString() })
+    .eq('id', recipeId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Obter pacientes que podem ver uma receita
+export const getPatientsWithRecipeAccess = async (recipeId) => {
+  const { data, error } = await supabase
+    .from('recipe_patient_visibility')
+    .select(`
+      patient_id,
+      visible,
+      patient:profiles!recipe_patient_visibility_patient_id_fkey(id, full_name, email)
+    `)
+    .eq('recipe_id', recipeId)
+    .eq('visible', true);
+  return { data, error };
+};
+
+// ==================== AGENDA / CALENDAR EVENTS ====================
+
+export const getCalendarEvents = async (userId, startDate = null, endDate = null) => {
+  let query = supabase
+    .from('calendar_events')
+    .select('*')
+    .or(`patient_id.eq.${userId},professional_id.eq.${userId}`)
+    .order('event_date', { ascending: true });
+  
+  if (startDate) {
+    query = query.gte('event_date', startDate);
+  }
+  if (endDate) {
+    query = query.lte('event_date', endDate);
+  }
+  
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const createCalendarEvent = async (eventData) => {
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .insert(eventData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateCalendarEvent = async (eventId, updates) => {
+  const { data, error } = await supabase
+    .from('calendar_events')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', eventId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteCalendarEvent = async (eventId) => {
+  const { error } = await supabase
+    .from('calendar_events')
+    .delete()
+    .eq('id', eventId);
+  return { error };
+};
+
+export const getCalendarEventsByPatient = async (patientId, startDate = null, endDate = null) => {
+  let query = supabase
+    .from('calendar_events')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('event_date', { ascending: true });
+  
+  if (startDate) {
+    query = query.gte('event_date', startDate);
+  }
+  if (endDate) {
+    query = query.lte('event_date', endDate);
+  }
+  
+  const { data, error } = await query;
+  return { data, error };
+};
