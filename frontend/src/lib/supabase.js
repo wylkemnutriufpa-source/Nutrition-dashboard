@@ -1597,13 +1597,15 @@ export const deleteNotification = async (notificationId) => {
 
 // ==================== RECIPES ====================
 
-export const getRecipes = async (professionalId = null) => {
+export const getRecipes = async (professionalId = null, includeAll = true) => {
   let query = supabase
     .from('recipes')
     .select('*')
     .order('created_at', { ascending: false });
   
-  if (professionalId) {
+  // Se includeAll for false, filtra apenas receitas do profissional
+  // Se includeAll for true (padrão), busca todas as receitas que o profissional pode ver
+  if (professionalId && !includeAll) {
     query = query.eq('professional_id', professionalId);
   }
   
