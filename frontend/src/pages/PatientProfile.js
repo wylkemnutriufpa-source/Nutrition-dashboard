@@ -30,6 +30,7 @@ import DraftMealPlanViewer from '@/components/DraftMealPlanViewer';
 import AnamneseFormComplete from '@/components/AnamneseFormComplete';
 import { generateAnamnesePDF, generateMealPlanPDF } from '@/utils/pdfGenerator';
 import generateSmartMealPlan from '@/utils/smartAnamnesis';
+import PhysicalAssessmentEditor from '@/components/PhysicalAssessmentEditor';
 
 // Componente de Aba Resumo
 const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
