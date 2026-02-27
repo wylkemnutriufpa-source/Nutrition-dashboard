@@ -831,16 +831,18 @@ export const getPatientMealPlan = async (patientId, professionalId = null) => {
 export const createMealPlan = async (planData) => {
   try {
     // Verificar se já existe um plano ativo para este paciente
-    const { data: existing } = await supabase
+    const { data: existingList } = await supabase
       .from('meal_plans')
       .select('id')
       .eq('patient_id', planData.patient_id)
       .eq('is_active', true)
-      .maybeSingle();
+      .limit(1);
+    
+    const existing = existingList && existingList.length > 0 ? existingList[0] : null;
     
     if (existing) {
       // Atualizar plano existente
-      const { data, error } = await supabase
+      const { data: updatedList, error } = await supabase
         .from('meal_plans')
         .update({
           name: planData.name,
@@ -849,25 +851,29 @@ export const createMealPlan = async (planData) => {
           updated_at: new Date().toISOString()
         })
         .eq('id', existing.id)
-        .select()
-        .single();
+        .select();
+      
+      const data = updatedList && updatedList.length > 0 ? updatedList[0] : null;
       return { data, error };
     }
     
     // Criar novo plano
-    const { data, error } = await supabase
+    const { data: insertedList, error } = await supabase
       .from('meal_plans')
       .insert({
         ...planData,
         plan_data: planData.plan_data || { meals: [] },
         daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 }
       })
-      .select()
-      .single();
+      .select();
+    
+    const data = insertedList && insertedList.length > 0 ? insertedList[0] : null;
     return { data, error };
   } catch (err) {
     console.error('Erro em createMealPlan:', err);
-    return { data: null, error: err };
+    return { data: null, error: { message: err.message || 'Erro ao criar plano' } };
+  }
+};
   }
 };
 
