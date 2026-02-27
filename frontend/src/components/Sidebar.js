@@ -231,45 +231,9 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
           );
         })}
 
-        {/* Menu dinâmico do paciente - "Meu Projeto" */}
-        {validUserType === 'patient' && (
-          <>
-            <p className="text-xs font-semibold text-gray-400 uppercase px-4 pt-4 pb-1">Meu Projeto</p>
-            {menuLoading ? (
-              <div className="px-4 py-2 text-sm text-gray-500">Carregando...</div>
-            ) : (
-              patientDynamicLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = location.pathname === link.to;
-                return (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    data-testid={`patient-menu-${link.label.toLowerCase().replace(/ /g, '-')}`}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
-                      isActive ? 'text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                    style={isActive ? { backgroundColor: getPrimaryColor() } : {}}
-                  >
-                    <Icon size={20} />
-                    <span className="font-medium text-sm">{link.label}</span>
-                  </Link>
-                );
-              })
-            )}
-            {/* Calculadoras sempre no final para paciente */}
-            <div className="border-t border-gray-200 my-2"></div>
-            <Link
-              to="/patient/calculators"
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
-                location.pathname === '/patient/calculators' ? 'text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              style={location.pathname === '/patient/calculators' ? { backgroundColor: getPrimaryColor() } : {}}
-            >
-              <Calculator size={20} />
-              <span className="font-medium text-sm">Calculadoras</span>
-            </Link>
-          </>
+        {/* Mensagem de carregamento para paciente */}
+        {validUserType === 'patient' && menuLoading && (
+          <div className="px-4 py-2 text-sm text-gray-500">Carregando menu...</div>
         )}
       </nav>
 
