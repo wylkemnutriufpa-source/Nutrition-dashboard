@@ -1159,6 +1159,13 @@ const PatientProfile = () => {
                 <p className="text-gray-500 text-sm">{patient.phone || 'Sem telefone'}</p>
               </div>
               <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                  onClick={() => setShowReminderModal(true)}
+                >
+                  <Bell size={18} className="mr-2" /> Agendar Lembrete
+                </Button>
                 <Button variant="outline" onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}`)}>
                   <Utensils size={18} className="mr-2" /> Plano Alimentar
                 </Button>
