@@ -194,6 +194,11 @@ function App() {
                   <PatientDicas />
                 </ProtectedRoute>
               } />
+              <Route path="/patient/avaliacao-fisica" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <PatientAvaliacaoFisica />
+                </ProtectedRoute>
+              } />
               <Route path="/patient/jornada" element={
                 <ProtectedRoute allowedTypes={['patient']}>
                   <PatientJornada />
