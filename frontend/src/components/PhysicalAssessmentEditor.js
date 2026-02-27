@@ -565,39 +565,24 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
             {renderSectionHeader('Fotos', <Camera size={18} className="text-pink-600" />, 'photos', 'pink')}
             {expandedSections.photos && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <Label className="text-xs text-gray-600">Foto Frontal (URL)</Label>
-                  <Input
-                    value={formData.photo_front}
-                    onChange={(e) => handleInputChange('photo_front', e.target.value)}
-                    placeholder="https://..."
-                  />
-                  {formData.photo_front && (
-                    <img src={formData.photo_front} alt="Frontal" className="mt-2 w-full h-32 object-cover rounded" />
-                  )}
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Foto Lateral (URL)</Label>
-                  <Input
-                    value={formData.photo_side}
-                    onChange={(e) => handleInputChange('photo_side', e.target.value)}
-                    placeholder="https://..."
-                  />
-                  {formData.photo_side && (
-                    <img src={formData.photo_side} alt="Lateral" className="mt-2 w-full h-32 object-cover rounded" />
-                  )}
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Foto Costas (URL)</Label>
-                  <Input
-                    value={formData.photo_back}
-                    onChange={(e) => handleInputChange('photo_back', e.target.value)}
-                    placeholder="https://..."
-                  />
-                  {formData.photo_back && (
-                    <img src={formData.photo_back} alt="Costas" className="mt-2 w-full h-32 object-cover rounded" />
-                  )}
-                </div>
+                <ImageUploader
+                  label="Foto Frontal"
+                  value={formData.photo_front}
+                  onChange={(url) => handleInputChange('photo_front', url)}
+                  folder="assessments/front"
+                />
+                <ImageUploader
+                  label="Foto Lateral"
+                  value={formData.photo_side}
+                  onChange={(url) => handleInputChange('photo_side', url)}
+                  folder="assessments/side"
+                />
+                <ImageUploader
+                  label="Foto Costas"
+                  value={formData.photo_back}
+                  onChange={(url) => handleInputChange('photo_back', url)}
+                  folder="assessments/back"
+                />
               </div>
             )}
 
