@@ -109,13 +109,20 @@ const PatientSidebar = ({ patientId, onLogout }) => {
             <Link
               key={link.to}
               to={link.to}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
+              className={`flex items-center justify-between space-x-3 px-4 py-3 rounded-lg transition-all ${
                 isActive ? 'text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'
               }`}
               style={isActive ? { backgroundColor: getPrimaryColor() } : {}}
             >
-              <Icon size={20} />
-              <span className="font-medium text-sm">{link.label}</span>
+              <div className="flex items-center space-x-3">
+                <Icon size={20} />
+                <span className="font-medium text-sm">{link.label}</span>
+              </div>
+              {link.badge && !isActive && (
+                <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full font-medium">
+                  {link.badge}
+                </span>
+              )}
             </Link>
           );
         })}
