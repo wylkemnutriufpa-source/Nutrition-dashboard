@@ -15,7 +15,14 @@ import { toast } from 'sonner';
  * DraftMealPlanViewer - Exibe e edita o pré-plano gerado pela anamnese
  * Visível APENAS para profissionais
  */
-const DraftMealPlanViewer = ({ draftPlan, onUpdate, onRegenerate, loading }) => {
+const DraftMealPlanViewer = ({ 
+  draftPlan, 
+  onUpdate, 
+  onRegenerate, 
+  onUseAsOfficial, 
+  loading,
+  patientId 
+}) => {
   const [editing, setEditing] = useState(false);
   const [editedPlan, setEditedPlan] = useState(null);
 
