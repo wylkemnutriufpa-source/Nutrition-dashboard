@@ -831,12 +831,24 @@ export const getPatientMealPlan = async (patientId, professionalId = null) => {
 export const createMealPlan = async (planData) => {
   try {
     // Verificar se já existe um plano ativo para este paciente
-    const { data: existingList } = await supabase
+    const { data: existingList, error: selectError } = await supabase
       .from('meal_plans')
       .select('id')
       .eq('patient_id', planData.patient_id)
       .eq('is_active', true)
       .limit(1);
+    
+    if (selectError) {
+      console.error('Erro ao verificar plano existente:', selectError);
+      return { 
+        data: null, 
+        error: { 
+          message: selectError.message || 'Erro ao verificar plano existente',
+          code: selectError.code,
+          details: selectError.details
+        } 
+      };
+    }
     
     const existing = existingList && existingList.length > 0 ? existingList[0] : null;
     
@@ -853,8 +865,21 @@ export const createMealPlan = async (planData) => {
         .eq('id', existing.id)
         .select();
       
+      if (error) {
+        console.error('Erro ao atualizar plano existente:', error);
+        return { 
+          data: null, 
+          error: { 
+            message: error.message || 'Sem permissão para atualizar este plano',
+            code: error.code,
+            details: error.details,
+            hint: 'Verifique se você tem permissão para editar planos deste paciente'
+          } 
+        };
+      }
+      
       const data = updatedList && updatedList.length > 0 ? updatedList[0] : null;
-      return { data, error };
+      return { data, error: null };
     }
     
     // Criar novo plano
@@ -867,11 +892,31 @@ export const createMealPlan = async (planData) => {
       })
       .select();
     
+    if (error) {
+      console.error('Erro ao criar novo plano:', error);
+      return { 
+        data: null, 
+        error: { 
+          message: error.message || 'Sem permissão para criar plano',
+          code: error.code,
+          details: error.details,
+          hint: 'Verifique se o paciente está vinculado a você'
+        } 
+      };
+    }
+    
     const data = insertedList && insertedList.length > 0 ? insertedList[0] : null;
-    return { data, error };
+    return { data, error: null };
   } catch (err) {
-    console.error('Erro em createMealPlan:', err);
-    return { data: null, error: { message: err.message || 'Erro ao criar plano' } };
+    console.error('Erro inesperado em createMealPlan:', err);
+    return { 
+      data: null, 
+      error: { 
+        message: err?.message || 'Erro inesperado ao salvar plano',
+        code: 'UNEXPECTED_ERROR',
+        details: String(err)
+      } 
+    };
   }
 };
 
