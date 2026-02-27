@@ -210,12 +210,6 @@ const DraftMealPlanViewer = ({
                       Salvar Rascunho
                     </Button>
                   )}
-                  {onRegenerate && (
-                    <Button variant="outline" onClick={onRegenerate} disabled={loading || saving}>
-                      <RefreshCw className="mr-2" size={16} />
-                      Regenerar
-                    </Button>
-                  )}
                   <Button onClick={() => setEditing(true)} disabled={loading || saving} variant="outline">
                     <Edit className="mr-2" size={16} />
                     Editar
