@@ -788,6 +788,8 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
   };
 
   const handleSavePlan = async () => {
+    console.log('🚀 BOTÃO SALVAR CLICADO!');
+    
     if (!selectedPatient) {
       toast.error('Selecione um paciente primeiro');
       return;
