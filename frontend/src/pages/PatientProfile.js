@@ -1038,9 +1038,10 @@ const PatientProfile = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 bg-gray-100">
+          <TabsList className="grid w-full grid-cols-7 bg-gray-100">
             <TabsTrigger value="resumo">Resumo</TabsTrigger>
             <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
+            <TabsTrigger value="pre-plano">Pré-Plano</TabsTrigger>
             <TabsTrigger value="plano">Plano</TabsTrigger>
             <TabsTrigger value="checklist">Checklist</TabsTrigger>
             <TabsTrigger value="recados">Recados</TabsTrigger>
@@ -1065,6 +1066,15 @@ const PatientProfile = () => {
               patient={patient}
               professionalInfo={{ name: profile?.name, email: profile?.email }}
               onUpdate={loadPatientData}
+            />
+          </TabsContent>
+
+          <TabsContent value="pre-plano">
+            <DraftMealPlanViewer
+              draftPlan={draftPlan}
+              onUpdate={handleUpdateDraftPlan}
+              onRegenerate={handleGenerateDraftPlan}
+              loading={loading}
             />
           </TabsContent>
 
