@@ -909,6 +909,12 @@ const PatientProfile = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'resumo');
   const [showMealPlanViewer, setShowMealPlanViewer] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [reminderForm, setReminderForm] = useState({
+    type: 'feedback',
+    date: '',
+    notes: ''
+  });
 
   const loadPatientData = useCallback(async () => {
     if (!id || !profile) return;
