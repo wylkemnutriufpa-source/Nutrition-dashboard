@@ -1561,6 +1561,97 @@ export const deleteAppointment = async (id) => {
   return { error };
 };
 
+// ==================== LEMBRETES E NOTIFICAÇÕES ====================
+
+/**
+ * Cria um lembrete programado (feedback, vencimento de plano, etc)
+ */
+export const createReminder = async (reminderData) => {
+  const { data, error } = await supabase
+    .from('appointments')
+    .insert({
+      ...reminderData,
+      type: reminderData.type || 'lembrete',
+      is_reminder: true
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+/**
+ * Busca lembretes próximos (próximos 7 dias) para exibir notificações
+ */
+export const getUpcomingReminders = async (userId, userRole = 'patient') => {
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
+  
+  const todayStr = today.toISOString().split('T')[0];
+  const nextWeekStr = nextWeek.toISOString().split('T')[0];
+  
+  let query = supabase
+    .from('appointments')
+    .select('*, patient:profiles!patient_id(id, name, email)')
+    .gte('date', todayStr)
+    .lte('date', nextWeekStr)
+    .order('date', { ascending: true });
+  
+  if (userRole === 'patient') {
+    query = query.eq('patient_id', userId);
+  } else {
+    query = query.eq('professional_id', userId);
+  }
+  
+  const { data, error } = await query;
+  return { data: data || [], error };
+};
+
+/**
+ * Cria lembrete de feedback para um paciente
+ */
+export const createFeedbackReminder = async (patientId, professionalId, scheduledDate, notes = '') => {
+  return createReminder({
+    patient_id: patientId,
+    professional_id: professionalId,
+    title: '📝 Feedback do Paciente',
+    date: scheduledDate,
+    type: 'feedback',
+    status: 'scheduled',
+    notes: notes || 'Solicitar feedback sobre o plano alimentar',
+    is_reminder: true
+  });
+};
+
+/**
+ * Cria lembrete de vencimento do plano
+ */
+export const createPlanExpirationReminder = async (patientId, professionalId, expirationDate, planName = '') => {
+  return createReminder({
+    patient_id: patientId,
+    professional_id: professionalId,
+    title: `⚠️ Plano "${planName || 'Alimentar'}" vence em breve`,
+    date: expirationDate,
+    type: 'vencimento',
+    status: 'scheduled',
+    notes: 'Verificar se paciente deseja renovar ou ajustar o plano',
+    is_reminder: true
+  });
+};
+
+/**
+ * Marca notificação como lida
+ */
+export const markReminderAsRead = async (reminderId) => {
+  const { data, error } = await supabase
+    .from('appointments')
+    .update({ is_read: true })
+    .eq('id', reminderId)
+    .select()
+    .single();
+  return { data, error };
+};
+
 // ==================== GESTÃO FINANCEIRA ====================
 
 export const getFinancialRecords = async (professionalId, year = null) => {
