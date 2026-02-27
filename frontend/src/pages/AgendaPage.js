@@ -23,16 +23,19 @@ const MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho'
 const DAYS_PT = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
 
 const TYPE_CONFIG = {
-  presencial: { label: 'Presencial', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-100' },
-  online: { label: 'Online', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-100' },
-  retorno: { label: 'Retorno', color: 'bg-purple-500', text: 'text-purple-700', bg: 'bg-purple-100' },
-  lembrete: { label: 'Lembrete', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-100' },
+  presencial: { label: 'Presencial', color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-100', icon: '🏢' },
+  online: { label: 'Online', color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-100', icon: '💻' },
+  retorno: { label: 'Retorno', color: 'bg-purple-500', text: 'text-purple-700', bg: 'bg-purple-100', icon: '🔄' },
+  lembrete: { label: 'Lembrete', color: 'bg-orange-500', text: 'text-orange-700', bg: 'bg-orange-100', icon: '🔔' },
+  feedback: { label: 'Feedback', color: 'bg-pink-500', text: 'text-pink-700', bg: 'bg-pink-100', icon: '📝' },
+  vencimento: { label: 'Vencimento Plano', color: 'bg-red-500', text: 'text-red-700', bg: 'bg-red-100', icon: '⚠️' },
 };
 
 const STATUS_CONFIG = {
   scheduled: { label: 'Agendado', color: 'bg-blue-100 text-blue-700' },
   completed: { label: 'Realizado', color: 'bg-green-100 text-green-700' },
   cancelled: { label: 'Cancelado', color: 'bg-red-100 text-red-700' },
+  pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700' },
 };
 
 const AgendaPage = () => {
