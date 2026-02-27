@@ -78,21 +78,16 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
     { to: '/admin/dashboard', icon: Shield, label: 'Painel Admin' }
   ];
 
-  // Links fixos do Paciente (Dashboard sempre visível)
-  const patientFixedLinks = [
-    { to: '/patient/dashboard', icon: Home, label: 'Dashboard' },
-    { to: '/patient/agenda', icon: Bell, label: 'Minha Agenda' }
-  ];
-
-  // Links dinâmicos do Paciente (configurados pelo profissional)
-  const getPatientDynamicLinks = () => {
+  // Links do Paciente agora são todos dinâmicos (vindos da configuração)
+  const getPatientLinks = () => {
     return patientMenuItems
       .filter(item => item.visible)
       .sort((a, b) => a.order - b.order)
       .map(item => ({
         to: item.route,
         icon: iconMap[item.icon] || Home,
-        label: item.name
+        label: item.name,
+        isFixed: item.fixed
       }));
   };
 
@@ -113,15 +108,16 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
       case 'professional':
         return professionalLinks;
       case 'patient':
-        // Retorna apenas links fixos, dinâmicos são renderizados separadamente
-        return patientFixedLinks;
+        // Retorna todos os links configurados pelo profissional
+        return getPatientLinks();
       default:
         return visitorLinks;
     }
   };
 
   const links = getLinks();
-  const patientDynamicLinks = validUserType === 'patient' ? getPatientDynamicLinks() : [];
+  // Não precisa mais de patientDynamicLinks separado
+  const patientDynamicLinks = [];
 
   const getUserTypeLabel = () => {
     switch(validUserType) {
