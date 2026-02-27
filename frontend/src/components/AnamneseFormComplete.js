@@ -109,6 +109,25 @@ const AnamneseFormComplete = ({
       toast.success(markComplete ? 'Anamnese concluída!' : 'Rascunho salvo!');
       setHasChanges(false);
       
+      // Se marcar como completa, gerar e enviar dicas automaticamente
+      if (markComplete && !isPatientView && professionalId && patientId) {
+        try {
+          const tips = generateAnamnesisTips(cleanData, patient);
+          if (tips.length > 0) {
+            const tipsToSend = tips.map(tip => ({
+              title: tip.title,
+              content: tip.content,
+              category: tip.category
+            }));
+            await createAutomaticTips(patientId, professionalId, tipsToSend);
+            console.log('✅ Dicas enviadas ao paciente:', tips.length);
+            toast.success(`${tips.length} dica(s) personalizada(s) enviada(s)!`);
+          }
+        } catch (tipError) {
+          console.error('Erro ao enviar dicas:', tipError);
+        }
+      }
+      
       // Recarregar dados
       if (onUpdate) {
         console.log('🔄 Recarregando dados...');
