@@ -451,50 +451,49 @@ const generateTips = (conditions, goal, restrictions, foodsToAvoid) => {
 };
 
 /**
- * Popula refeições com sugestões de alimentos
+ * Popula refeições com sugestões de alimentos baseadas na variação
  */
-const populateMeals = (meals, recommendedFoods, goal) => {
+const populateMeals = (meals, recommendedFoods, goal, varIndex = 0, restrictions = { allergies: [], intolerances: [] }) => {
+  // Função para filtrar alimentos com restrições
+  const filterRestrictions = (foods) => {
+    return foods.filter(food => {
+      const foodLower = food.toLowerCase();
+      const hasAllergy = restrictions.allergies?.some(a => foodLower.includes(a.toLowerCase()));
+      const hasIntolerance = restrictions.intolerances?.some(i => foodLower.includes(i.toLowerCase()));
+      return !hasAllergy && !hasIntolerance;
+    });
+  };
+
   // Café da Manhã
-  meals[0].foods = [
-    'Aveia com frutas',
-    'Ovos mexidos',
-    'Pão integral',
-    'Café sem açúcar'
-  ];
+  meals[0].foods = filterRestrictions(MEAL_VARIATIONS.breakfast[varIndex] || MEAL_VARIATIONS.breakfast[0]);
   
   // Lanche Manhã
-  meals[1].foods = [
-    'Frutas frescas',
-    'Castanhas (porção pequena)'
-  ];
+  meals[1].foods = filterRestrictions(MEAL_VARIATIONS.morning_snack[varIndex] || MEAL_VARIATIONS.morning_snack[0]);
   
   // Almoço
-  meals[2].foods = [
-    'Arroz integral',
-    'Feijão',
-    'Frango grelhado ou peixe',
-    'Salada de folhas e legumes',
-    'Azeite de oliva'
-  ];
+  meals[2].foods = filterRestrictions(MEAL_VARIATIONS.lunch[varIndex] || MEAL_VARIATIONS.lunch[0]);
   
   // Lanche Tarde
-  meals[3].foods = [
-    'Iogurte natural',
-    'Frutas'
-  ];
+  meals[3].foods = filterRestrictions(MEAL_VARIATIONS.afternoon_snack[varIndex] || MEAL_VARIATIONS.afternoon_snack[0]);
   
   // Jantar
-  meals[4].foods = [
-    'Proteína magra (frango/peixe)',
-    'Legumes grelhados',
-    'Salada verde'
-  ];
+  meals[4].foods = filterRestrictions(MEAL_VARIATIONS.dinner[varIndex] || MEAL_VARIATIONS.dinner[0]);
   
   // Ceia
-  meals[5].foods = [
-    'Chá calmante',
-    'Frutas leves (maçã, pera)'
-  ];
+  meals[5].foods = filterRestrictions(MEAL_VARIATIONS.supper[varIndex] || MEAL_VARIATIONS.supper[0]);
+
+  // Ajustes baseados no objetivo
+  if (goal.type === 'weight_loss' || goal.needsWeightLoss) {
+    // Reduzir carboidratos, aumentar proteína
+    meals[0].foods = filterRestrictions(['Ovos mexidos', 'Queijo branco', 'Café sem açúcar', 'Frutas low carb']);
+    meals[5].foods = filterRestrictions(['Chá calmante']); // Ceia mais leve
+  }
+  
+  if (goal.type === 'muscle_gain' || goal.isAthlete) {
+    // Aumentar proteína
+    meals[0].foods.push('Whey protein');
+    meals[3].foods = filterRestrictions(['Shake proteico', 'Banana com pasta de amendoim', 'Batata doce']);
+  }
   
   return meals;
 };
