@@ -230,11 +230,6 @@ const MenuConfigEditor = ({ patientId, professionalId, onSave }) => {
                       </Badge>
                     )}
                   </div>
-                      item.visible ? 'text-gray-900' : 'text-gray-400'
-                    }`}
-                  >
-                    {item.name}
-                  </button>
                 )}
               </div>
               
@@ -247,6 +242,7 @@ const MenuConfigEditor = ({ patientId, professionalId, onSave }) => {
                   id={`visibility-${item.id}`}
                   checked={item.visible}
                   onCheckedChange={() => handleToggleVisibility(item.id)}
+                  disabled={item.fixed}
                 />
               </div>
             </div>
