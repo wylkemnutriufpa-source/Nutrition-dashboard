@@ -1366,6 +1366,64 @@ const PatientProfile = () => {
           navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan?.id}`);
         }}
       />
+
+      {/* Modal de Criar Lembrete */}
+      <Dialog open={showReminderModal} onOpenChange={setShowReminderModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bell className="text-orange-600" size={20} />
+              Agendar Lembrete
+            </DialogTitle>
+            <DialogDescription>
+              Crie um lembrete para você e notifique o paciente
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label>Tipo de Lembrete</Label>
+              <Select value={reminderForm.type} onValueChange={(v) => setReminderForm({ ...reminderForm, type: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="feedback">📝 Solicitar Feedback</SelectItem>
+                  <SelectItem value="vencimento">⚠️ Vencimento de Plano</SelectItem>
+                  <SelectItem value="retorno">🔄 Consulta de Retorno</SelectItem>
+                  <SelectItem value="lembrete">🔔 Lembrete Geral</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Data do Lembrete</Label>
+              <Input
+                type="date"
+                value={reminderForm.date}
+                onChange={(e) => setReminderForm({ ...reminderForm, date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            <div>
+              <Label>Observações (opcional)</Label>
+              <Textarea
+                value={reminderForm.notes}
+                onChange={(e) => setReminderForm({ ...reminderForm, notes: e.target.value })}
+                placeholder="Detalhes adicionais sobre o lembrete..."
+                rows={2}
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" onClick={() => setShowReminderModal(false)} className="flex-1">
+                Cancelar
+              </Button>
+              <Button onClick={handleCreateReminder} className="flex-1 bg-orange-600 hover:bg-orange-700">
+                <Bell size={16} className="mr-2" />
+                Criar Lembrete
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
