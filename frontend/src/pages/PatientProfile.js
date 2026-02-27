@@ -135,7 +135,7 @@ const ResumoTab = ({ patient, mealPlan, anamnesis, adherence, onNavigate }) => {
 };
 
 // Componente de Aba Anamnese
-const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate, patient, professionalInfo }) => {
+const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate, patient, professionalInfo, onComplete }) => {
   const [data, setData] = useState(anamnesis || {});
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -164,6 +164,11 @@ const AnamneseTab = ({ anamnesis, patientId, professionalId, onUpdate, patient, 
       toast.success(markComplete ? 'Anamnese concluída!' : 'Rascunho salvo!');
       setHasChanges(false);
       onUpdate();
+      
+      // Se marcar como completa, gerar pré-plano automaticamente
+      if (markComplete && onComplete) {
+        onComplete();
+      }
     } catch (error) {
       console.error('Error saving anamnesis:', error);
       toast.error('Erro ao salvar');
