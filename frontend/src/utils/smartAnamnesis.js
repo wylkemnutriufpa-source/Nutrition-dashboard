@@ -60,45 +60,45 @@ const analyzeConditions = (anamnesis) => {
   
   if (!anamnesis) return conditions;
   
+  // Suporte ao novo formato (array) e ao antigo (texto)
+  const medicalConditions = anamnesis.medical_conditions || [];
+  const medicalConditionsText = anamnesis.medical_conditions_text || '';
+  
+  // Se for array, usar diretamente
+  const conditionsToCheck = Array.isArray(medicalConditions) 
+    ? medicalConditions.map(c => c.toLowerCase()).join(' ')
+    : medicalConditionsText.toLowerCase();
+  
   // Diabetes
-  if (anamnesis.medical_conditions?.some(c => 
-    c.condition?.toLowerCase().includes('diabetes') || 
-    c.toLowerCase?.().includes('diabetes')
-  )) {
+  if (conditionsToCheck.includes('diabetes')) {
     conditions.push('diabetes');
   }
   
   // Hipertensão
-  if (anamnesis.medical_conditions?.some(c => 
-    c.condition?.toLowerCase().includes('hipertens') || 
-    c.condition?.toLowerCase().includes('pressão') ||
-    c.toLowerCase?.().includes('hipertens') ||
-    c.toLowerCase?.().includes('pressão')
-  )) {
+  if (conditionsToCheck.includes('hipertens') || conditionsToCheck.includes('pressão')) {
     conditions.push('hypertension');
   }
   
   // Colesterol alto
-  if (anamnesis.medical_conditions?.some(c => 
-    c.condition?.toLowerCase().includes('colesterol') ||
-    c.toLowerCase?.().includes('colesterol')
-  )) {
+  if (conditionsToCheck.includes('colesterol')) {
     conditions.push('high_cholesterol');
   }
   
   // Problemas intestinais
-  if (anamnesis.medical_conditions?.some(c => 
-    c.condition?.toLowerCase().includes('intestin') ||
-    c.condition?.toLowerCase().includes('constipa') ||
-    c.condition?.toLowerCase().includes('diarr') ||
-    c.toLowerCase?.().includes('intestin')
-  )) {
+  if (conditionsToCheck.includes('intestin') || conditionsToCheck.includes('constipa') || 
+      conditionsToCheck.includes('gastrite') || conditionsToCheck.includes('refluxo')) {
     conditions.push('intestinal_issues');
   }
   
   // Ansiedade/Estresse
-  if (anamnesis.stress_level === 'high' || anamnesis.mental_health?.includes('ansiedade')) {
+  if (anamnesis.stress_level === 'high' || anamnesis.stress_level === 'very_high' ||
+      conditionsToCheck.includes('ansiedade') || conditionsToCheck.includes('depressão')) {
     conditions.push('anxiety');
+  }
+  
+  // Obesidade
+  if (conditionsToCheck.includes('obesidade')) {
+    conditions.push('obesity');
   }
   
   return conditions;
