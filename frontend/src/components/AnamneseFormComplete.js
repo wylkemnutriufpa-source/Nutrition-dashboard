@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Save, CheckCircle2, Activity, Heart, Utensils, Download } from 'lucide-react';
 import { toast } from 'sonner';
-import { updateAnamnesis, createAnamnesis } from '@/lib/supabase';
+import { updateAnamnesis, createAnamnesis, createAutomaticTips } from '@/lib/supabase';
 import { generateAnamnesePDF } from '@/utils/pdfGenerator';
+import LiveTipsPreview from '@/components/LiveTipsPreview';
+import { generateAnamnesisTips } from '@/utils/dynamicTips';
 
 /**
  * AnamneseFormComplete - Formulário completo de anamnese
