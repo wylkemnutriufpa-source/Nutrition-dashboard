@@ -544,52 +544,54 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                 )}
               </div>
               
-              <Dialog open={isSelectingPatient} onOpenChange={setIsSelectingPatient}>
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    {selectedPatient ? 'Trocar Paciente' : 'Selecionar Paciente'}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Selecionar Paciente</DialogTitle>
-                    <DialogDescription>Escolha o paciente para este plano alimentar</DialogDescription>
-                  </DialogHeader>
-                  <div className="max-h-96 overflow-y-auto space-y-2">
-                    {patients.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        <p>Nenhum paciente cadastrado</p>
-                        <Button 
-                          className="mt-4"
-                          onClick={() => navigate('/professional/patients')}
-                        >
-                          Cadastrar Paciente
-                        </Button>
-                      </div>
-                    ) : (
-                      patients.map((patient) => (
-                        <div
-                          key={patient.id}
-                          onClick={() => handleSelectPatient(patient.id)}
-                          className={`p-4 rounded-lg border cursor-pointer hover:bg-gray-50 ${
-                            selectedPatient?.id === patient.id ? 'border-teal-700 bg-teal-50' : 'border-gray-200'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{patient.name}</p>
-                              <p className="text-sm text-gray-600">{patient.email}</p>
-                            </div>
-                            {selectedPatient?.id === patient.id && (
-                              <Check className="text-teal-700" size={20} />
-                            )}
-                          </div>
+              {!isPatientView && (
+                <Dialog open={isSelectingPatient} onOpenChange={setIsSelectingPatient}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      {selectedPatient ? 'Trocar Paciente' : 'Selecionar Paciente'}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Selecionar Paciente</DialogTitle>
+                      <DialogDescription>Escolha o paciente para este plano alimentar</DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-96 overflow-y-auto space-y-2">
+                      {patients.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <p>Nenhum paciente cadastrado</p>
+                          <Button 
+                            className="mt-4"
+                            onClick={() => navigate('/professional/patients')}
+                          >
+                            Cadastrar Paciente
+                          </Button>
                         </div>
-                      ))
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
+                      ) : (
+                        patients.map((patient) => (
+                          <div
+                            key={patient.id}
+                            onClick={() => handleSelectPatient(patient.id)}
+                            className={`p-4 rounded-lg border cursor-pointer hover:bg-gray-50 ${
+                              selectedPatient?.id === patient.id ? 'border-teal-700 bg-teal-50' : 'border-gray-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium text-gray-900">{patient.name}</p>
+                                <p className="text-sm text-gray-600">{patient.email}</p>
+                              </div>
+                              {selectedPatient?.id === patient.id && (
+                                <Check className="text-teal-700" size={20} />
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </CardContent>
         </Card>
