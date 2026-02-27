@@ -451,26 +451,38 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
           const draft = JSON.parse(draftData);
           console.log('Loading draft plan:', draft);
           
+          // Carregar alimentos customizados primeiro
+          const { data: customFoods } = await getCustomFoods(user?.id);
+          const allFoodsForResolve = [...mockFoods, ...(customFoods || [])];
+          
           // Converter meals do draft para formato do editor
           if (draft.meals && draft.meals.length > 0) {
-            const convertedMeals = draft.meals.map((meal, index) => ({
-              id: meal.id || `meal-${Date.now()}-${index}`,
-              name: meal.name || `Refeição ${index + 1}`,
-              time: meal.time || '08:00',
-              color: meal.color || '#0F766E',
-              foods: (meal.foods || []).map((foodStr, fIndex) => ({
-                id: `f${Date.now()}-${index}-${fIndex}`,
-                foodId: null, // Será resolvido depois
-                food_id: null,
-                name: foodStr, // Armazena o nome do alimento
-                quantity: 100,
-                unit: 'g',
-                measure: ''
-              }))
-            }));
+            let unresolvedCount = 0;
+            
+            const convertedMeals = draft.meals.map((meal, index) => {
+              // Resolver alimentos do pré-plano para IDs reais
+              const resolvedFoods = resolveDraftFoods(meal.foods || [], allFoodsForResolve);
+              
+              // Contar não resolvidos
+              unresolvedCount += resolvedFoods.filter(f => f.notFound).length;
+              
+              return {
+                id: meal.id || `meal-${Date.now()}-${index}`,
+                name: meal.name || `Refeição ${index + 1}`,
+                time: meal.time || '08:00',
+                color: meal.color || '#0F766E',
+                foods: resolvedFoods
+              };
+            });
+            
             setMeals(convertedMeals);
             setPlanName(draft.planName || 'Plano Alimentar (do Pré-Plano)');
-            toast.success('Pré-plano carregado! Agora você pode editar e salvar como plano oficial.');
+            
+            if (unresolvedCount > 0) {
+              toast.warning(`Pré-plano carregado! ${unresolvedCount} alimento(s) não encontrado(s) - você pode substituí-los manualmente.`);
+            } else {
+              toast.success('Pré-plano carregado com sucesso! Todos os alimentos foram identificados.');
+            }
           }
           
           // Limpar sessionStorage
