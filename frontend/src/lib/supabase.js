@@ -591,6 +591,39 @@ export const createAutomaticTips = async (patientId, professionalId, tips) => {
   return { data, error };
 };
 
+// Criar dica personalizada especial (fica destacada no topo)
+export const createPersonalizedTip = async (patientId, professionalId, personalizedTip) => {
+  try {
+    // Primeiro, desativar dicas personalizadas antigas deste paciente
+    await supabase
+      .from('tips')
+      .update({ is_active: false })
+      .eq('patient_id', patientId)
+      .eq('category', 'personalized');
+    
+    // Criar nova dica personalizada
+    const { data, error } = await supabase
+      .from('tips')
+      .insert({
+        patient_id: patientId,
+        professional_id: professionalId,
+        title: personalizedTip.title,
+        content: personalizedTip.content,
+        category: 'personalized',
+        is_active: true,
+        auto_generated: true,
+        is_pinned: true // Fica fixada no topo
+      })
+      .select()
+      .single();
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Erro ao criar dica personalizada:', err);
+    return { data: null, error: err };
+  }
+};
+
 // ==================== CHECKLIST / TASKS ====================
 
 export const getChecklistTemplates = async (patientId) => {
