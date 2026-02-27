@@ -1974,3 +1974,116 @@ export const getCalendarEventsByPatient = async (patientId, startDate = null, en
   const { data, error } = await query;
   return { data, error };
 };
+
+
+// ==================== PHYSICAL ASSESSMENTS ====================
+
+// Buscar todas as avaliações físicas de um paciente
+export const getPhysicalAssessments = async (patientId) => {
+  const { data, error } = await supabase
+    .from('physical_assessments')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('assessment_date', { ascending: false });
+  return { data, error };
+};
+
+// Buscar última avaliação física
+export const getLatestPhysicalAssessment = async (patientId) => {
+  const { data, error } = await supabase
+    .from('physical_assessments')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('assessment_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { data, error };
+};
+
+// Buscar avaliação específica
+export const getPhysicalAssessmentById = async (assessmentId) => {
+  const { data, error } = await supabase
+    .from('physical_assessments')
+    .select('*')
+    .eq('id', assessmentId)
+    .single();
+  return { data, error };
+};
+
+// Criar nova avaliação física
+export const createPhysicalAssessment = async (assessmentData) => {
+  // Calcular IMC se peso e altura foram fornecidos
+  if (assessmentData.weight && assessmentData.height) {
+    const heightInMeters = assessmentData.height / 100;
+    assessmentData.bmi = (assessmentData.weight / (heightInMeters * heightInMeters)).toFixed(2);
+  }
+  
+  // Calcular relação cintura/quadril
+  if (assessmentData.waist && assessmentData.hip) {
+    assessmentData.waist_hip_ratio = (assessmentData.waist / assessmentData.hip).toFixed(3);
+  }
+  
+  const { data, error } = await supabase
+    .from('physical_assessments')
+    .insert(assessmentData)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Atualizar avaliação física
+export const updatePhysicalAssessment = async (assessmentId, updates) => {
+  // Recalcular IMC se peso ou altura mudaram
+  if (updates.weight && updates.height) {
+    const heightInMeters = updates.height / 100;
+    updates.bmi = (updates.weight / (heightInMeters * heightInMeters)).toFixed(2);
+  }
+  
+  // Recalcular relação cintura/quadril
+  if (updates.waist && updates.hip) {
+    updates.waist_hip_ratio = (updates.waist / updates.hip).toFixed(3);
+  }
+  
+  const { data, error } = await supabase
+    .from('physical_assessments')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', assessmentId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Deletar avaliação física
+export const deletePhysicalAssessment = async (assessmentId) => {
+  const { error } = await supabase
+    .from('physical_assessments')
+    .delete()
+    .eq('id', assessmentId);
+  return { error };
+};
+
+// Comparar duas avaliações (calcular diferenças)
+export const compareAssessments = (current, previous) => {
+  if (!current || !previous) return null;
+  
+  const fields = [
+    'weight', 'bmi', 'body_fat_percentage', 'lean_mass', 'fat_mass',
+    'waist', 'hip', 'arm_right', 'arm_left', 'thigh_right', 'thigh_left',
+    'chest', 'abdomen', 'muscle_mass'
+  ];
+  
+  const comparison = {};
+  fields.forEach(field => {
+    if (current[field] && previous[field]) {
+      const diff = current[field] - previous[field];
+      comparison[field] = {
+        current: current[field],
+        previous: previous[field],
+        diff: diff.toFixed(2),
+        percentage: ((diff / previous[field]) * 100).toFixed(1)
+      };
+    }
+  });
+  
+  return comparison;
+};
