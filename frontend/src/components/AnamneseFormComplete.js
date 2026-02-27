@@ -248,6 +248,18 @@ const AnamneseFormComplete = ({
         })}
       </div>
 
+      {/* Preview de Dicas em Tempo Real */}
+      {!isPatientView && (
+        <LiveTipsPreview
+          formData={data}
+          patient={patient}
+          type="anamnese"
+          patientId={patientId}
+          professionalId={professionalId}
+          showSendButton={false}
+        />
+      )}
+
       {/* PARTE CLÍNICA */}
       {currentSection === 'clinical' && (
         <div className="space-y-4">
