@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Activity, Ruler, Scale, Heart, Camera, Plus, Save, Trash2, 
   TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp,
-  Calendar, FileText, Loader2, AlertCircle, Sparkles
+  Calendar, FileText, Loader2, AlertCircle, Sparkles, Download
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -18,8 +18,10 @@ import {
   updatePhysicalAssessment,
   deletePhysicalAssessment,
   compareAssessments,
-  createPersonalizedTip
+  createPersonalizedTip,
+  getAnamnesis
 } from '@/lib/supabase';
+import ImageUploader from '@/components/ImageUploader';
 
 // Função para gerar dica personalizada baseada na avaliação física
 const generateAssessmentTip = (assessment, patient, previousAssessment) => {
