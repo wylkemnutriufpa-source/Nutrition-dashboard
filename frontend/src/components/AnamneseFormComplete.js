@@ -129,51 +129,72 @@ const AnamneseFormComplete = ({
       {/* Header com Status */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Badge variant={data.status === 'complete' ? 'default' : 'secondary'} className="text-sm">
-                {data.status === 'complete' ? '✓ Completa' : data.status === 'draft' ? '📝 Rascunho' : '⚠️ Incompleta'}
-              </Badge>
-              {hasChanges && <span className="text-xs text-amber-600">Alterações não salvas</span>}
-              {isPatientView && (
-                <span className="text-xs text-blue-600">Modo: Paciente</span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              {!isPatientView && professionalInfo && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge variant={data.status === 'complete' ? 'default' : 'secondary'} className="text-sm">
+                  {data.status === 'complete' ? '✓ Completa' : data.status === 'draft' ? '📝 Rascunho' : '⚠️ Incompleta'}
+                </Badge>
+                {hasChanges && <span className="text-xs text-amber-600">Alterações não salvas</span>}
+                {isPatientView && (
+                  <span className="text-xs text-blue-600">Modo: Paciente</span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {!isPatientView && professionalInfo && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      try {
+                        generateAnamnesePDF(patient, anamnesis, professionalInfo);
+                        toast.success('PDF gerado!');
+                      } catch (error) {
+                        toast.error('Erro ao gerar PDF');
+                      }
+                    }}
+                  >
+                    <Download size={14} className="mr-2" /> PDF
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
+                  onClick={() => handleSave(false)} 
+                  disabled={saving || !hasChanges}
                   size="sm"
-                  onClick={() => {
-                    try {
-                      generateAnamnesePDF(patient, anamnesis, professionalInfo);
-                      toast.success('PDF gerado!');
-                    } catch (error) {
-                      toast.error('Erro ao gerar PDF');
-                    }
-                  }}
                 >
-                  <Download size={14} className="mr-2" /> PDF
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save size={14} className="mr-2" />}
+                  Salvar
                 </Button>
-              )}
-              <Button 
-                variant="outline" 
-                onClick={() => handleSave(false)} 
-                disabled={saving || !hasChanges}
-                size="sm"
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save size={14} className="mr-2" />}
-                Salvar
-              </Button>
-              <Button 
-                className="bg-teal-700 hover:bg-teal-800" 
-                onClick={() => handleSave(true)} 
-                disabled={saving}
-                size="sm"
-              >
-                <CheckCircle2 size={14} className="mr-2" />
-                Concluir
-              </Button>
+                <Button 
+                  className="bg-teal-700 hover:bg-teal-800" 
+                  onClick={() => handleSave(true)} 
+                  disabled={saving}
+                  size="sm"
+                >
+                  <CheckCircle2 size={14} className="mr-2" />
+                  Concluir
+                </Button>
+              </div>
+            </div>
+
+            {/* Barra de Progresso */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Progresso da Anamnese</span>
+                <span className="font-semibold text-teal-700">{progress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 h-2.5 rounded-full transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                {progress < 50 ? '📝 Continue preenchendo para desbloquear seu plano personalizado' : 
+                 progress < 100 ? '✨ Quase lá! Complete as informações' : 
+                 '🎉 Anamnese completa! Clique em "Concluir" para gerar seu plano'}
+              </p>
             </div>
           </div>
         </CardContent>
