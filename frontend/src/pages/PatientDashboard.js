@@ -371,6 +371,15 @@ const PatientDashboard = () => {
           </Card>
         )}
       </div>
+
+      {/* Modal de Visualização do Plano */}
+      <MealPlanViewerModal
+        isOpen={showPlanModal}
+        onClose={() => setShowPlanModal(false)}
+        mealPlan={activePlan}
+        patient={{ name: patientName }}
+        readOnly={true}
+      />
     </Layout>
   );
 };
