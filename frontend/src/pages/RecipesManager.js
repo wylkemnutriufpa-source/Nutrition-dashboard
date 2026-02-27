@@ -384,8 +384,8 @@ const RecipesManager = () => {
                 <div className="md:col-span-2">
                   <Label>Nome da Receita *</Label>
                   <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="Ex: Frango Grelhado com Legumes"
                   />
                 </div>
@@ -405,8 +405,8 @@ const RecipesManager = () => {
                   <Label>Tempo de Preparo (min)</Label>
                   <Input
                     type="number"
-                    value={formData.time}
-                    onChange={(e) => setFormData(prev => ({ ...prev, time: parseInt(e.target.value) || 0 }))}
+                    value={formData.prep_time}
+                    onChange={(e) => setFormData(prev => ({ ...prev, prep_time: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
                 <div>
@@ -428,26 +428,33 @@ const RecipesManager = () => {
                 <div className="md:col-span-2">
                   <Label>URL da Imagem</Label>
                   <Input
-                    value={formData.image}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
+                    value={formData.image_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
                     placeholder="https://..."
                   />
                 </div>
               </div>
 
+              {/* Descrição */}
+              <div>
+                <Label>Descrição</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Breve descrição da receita..."
+                  rows={2}
+                />
+              </div>
+
               {/* Ingredientes */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <Label>Ingredientes</Label>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => addArrayItem('ingredients')}>
-                    <Plus className="w-4 h-4 mr-1" /> Adicionar
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  {formData.ingredients.map((ingredient, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={ingredient}
+                <Label>Ingredientes (um por linha)</Label>
+                <Textarea
+                  value={formData.ingredients}
+                  onChange={(e) => setFormData(prev => ({ ...prev, ingredients: e.target.value }))}
+                  placeholder="200g de frango&#10;1 colher de azeite&#10;Sal a gosto"
+                  rows={5}
+                />
                         onChange={(e) => updateArrayItem('ingredients', index, e.target.value)}
                         placeholder="Ex: 200g de frango"
                       />
