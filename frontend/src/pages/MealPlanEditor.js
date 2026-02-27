@@ -495,6 +495,43 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
     }
   };
 
+  // ✅ NOVA FUNCIONALIDADE: Adicionar refeição vazia
+  const addNewMeal = () => {
+    const newMeal = {
+      id: `m${Date.now()}`,
+      name: `Refeição ${meals.length + 1}`,
+      time: '12:00',
+      color: '#0F766E',
+      foods: []
+    };
+    setMeals([...meals, newMeal]);
+    toast.success('Nova refeição adicionada!');
+  };
+
+  // ✅ NOVA FUNCIONALIDADE: Remover refeição
+  const removeMeal = (mealId) => {
+    if (meals.length <= 1) {
+      toast.error('É necessário ter pelo menos 1 refeição');
+      return;
+    }
+    setMeals(meals.filter(m => m.id !== mealId));
+    toast.success('Refeição removida!');
+  };
+
+  // ✅ NOVA FUNCIONALIDADE: Editar nome da refeição
+  const updateMealName = (mealId, newName) => {
+    setMeals(meals.map(m => 
+      m.id === mealId ? { ...m, name: newName } : m
+    ));
+  };
+
+  // ✅ NOVA FUNCIONALIDADE: Editar horário da refeição
+  const updateMealTime = (mealId, newTime) => {
+    setMeals(meals.map(m => 
+      m.id === mealId ? { ...m, time: newTime } : m
+    ));
+  };
+
   const calculateDayTotals = () => {
     return meals.reduce((totals, meal) => {
       meal.foods.forEach(food => {
