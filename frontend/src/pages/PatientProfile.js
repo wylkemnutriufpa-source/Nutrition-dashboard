@@ -988,6 +988,29 @@ const PatientProfile = () => {
     }
   };
 
+  // Usar pré-plano como plano oficial
+  const handleUseAsOfficialPlan = async (draftPlan) => {
+    if (!draftPlan || !patient) {
+      toast.error('Pré-plano inválido');
+      return;
+    }
+
+    try {
+      toast.loading('Copiando pré-plano para plano oficial...');
+      
+      // Redireciona para o editor com o draft como parâmetro
+      navigate(`/professional/meal-plan-editor?patient=${id}&fromDraft=true`);
+      
+      // Armazena o draft no sessionStorage para uso no editor
+      sessionStorage.setItem('draftPlanToLoad', JSON.stringify(draftPlan));
+      
+      toast.success('Redirecionando para editor...');
+    } catch (error) {
+      console.error('Error using draft as official plan:', error);
+      toast.error('Erro ao copiar pré-plano');
+    }
+  };
+
   const handleNavigateTab = (tab) => {
     setActiveTab(tab);
   };
