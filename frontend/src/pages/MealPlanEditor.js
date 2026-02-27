@@ -528,6 +528,12 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         const { data: patientData } = await getPatientById(patientIdParam);
         if (patientData) {
           setSelectedPatient(patientData);
+          
+          // Verificar se existe draft disponível para este paciente
+          const { data: draftData } = await getDraftMealPlan(patientIdParam);
+          if (draftData && draftData.draft_data) {
+            setDraftAvailable(draftData.draft_data);
+          }
         }
 
         // Se tiver plano na URL, carregar plano (somente se NÃO estiver vindo do draft)
@@ -547,6 +553,44 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
       toast.error('Erro ao carregar dados');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Função para carregar draft como plano
+  const handleUseDraft = async () => {
+    if (!draftAvailable || !draftAvailable.meals) {
+      toast.error('Nenhum rascunho disponível');
+      return;
+    }
+
+    try {
+      // Converter meals do draft para formato do editor
+      let unresolvedCount = 0;
+      
+      const convertedMeals = draftAvailable.meals.map((meal, index) => {
+        const resolvedFoods = resolveDraftFoods(meal.foods || [], allFoods);
+        unresolvedCount += resolvedFoods.filter(f => f.notFound).length;
+        
+        return {
+          id: meal.id || `meal-${Date.now()}-${index}`,
+          name: meal.name || `Refeição ${index + 1}`,
+          time: meal.time || '08:00',
+          color: meal.color || '#0F766E',
+          foods: resolvedFoods
+        };
+      });
+      
+      setMeals(convertedMeals);
+      setPlanName('Plano Alimentar (do Pré-Plano)');
+      
+      if (unresolvedCount > 0) {
+        toast.warning(`Rascunho carregado! ${unresolvedCount} alimento(s) não encontrado(s) - substitua manualmente.`);
+      } else {
+        toast.success('Rascunho carregado com sucesso!');
+      }
+    } catch (error) {
+      console.error('Erro ao usar rascunho:', error);
+      toast.error('Erro ao carregar rascunho');
     }
   };
 
