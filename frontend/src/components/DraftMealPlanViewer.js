@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { 
   Sparkles, Plus, Trash2, Edit, Save, X, Clock, Lightbulb, 
-  AlertCircle, CheckCircle2, RefreshCw 
+  AlertCircle, CheckCircle2, RefreshCw, ArrowRight 
 } from 'lucide-react';
 import { toast } from 'sonner';
 
