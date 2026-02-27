@@ -449,12 +449,23 @@ export const createAnamnesis = async (data) => {
 };
 
 export const updateAnamnesis = async (anamnesisId, updates) => {
+  console.log('🔄 Atualizando anamnese:', anamnesisId, updates);
   const { data, error } = await supabase
     .from('anamnesis')
-    .update(updates)
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', anamnesisId)
     .select()
-    .single();
+    .maybeSingle();
+  
+  if (error) {
+    console.error('❌ Erro ao atualizar:', error);
+  } else {
+    console.log('✅ Anamnese atualizada:', data);
+  }
+  
   return { data, error };
 };
 
