@@ -96,7 +96,7 @@ const RecipesManager = () => {
   };
 
   const handleCreateRecipe = async () => {
-    if (!formData.name.trim()) {
+    if (!formData.title.trim()) {
       toast.error('Nome da receita é obrigatório');
       return;
     }
@@ -104,9 +104,7 @@ const RecipesManager = () => {
     try {
       const recipeData = {
         ...formData,
-        professional_id: professionalId,
-        ingredients: formData.ingredients.filter(i => i.trim()),
-        instructions: formData.instructions.filter(i => i.trim())
+        professional_id: professionalId
       };
 
       const { data, error } = await createRecipe(recipeData);
@@ -129,9 +127,7 @@ const RecipesManager = () => {
 
     try {
       const updates = {
-        ...formData,
-        ingredients: formData.ingredients.filter(i => i.trim()),
-        instructions: formData.instructions.filter(i => i.trim())
+        ...formData
       };
 
       const { data, error } = await updateRecipe(editingRecipe.id, updates);
