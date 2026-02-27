@@ -1319,6 +1319,19 @@ const PatientProfile = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modal de Visualização do Plano Alimentar */}
+      <MealPlanViewerModal
+        isOpen={showMealPlanViewer}
+        onClose={() => setShowMealPlanViewer(false)}
+        mealPlan={mealPlan}
+        patient={patient}
+        professionalInfo={{ name: profile?.name, email: profile?.email }}
+        onEdit={() => {
+          setShowMealPlanViewer(false);
+          navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan?.id}`);
+        }}
+      />
     </Layout>
   );
 };
