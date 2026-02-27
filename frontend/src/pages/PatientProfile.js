@@ -1162,6 +1162,7 @@ const PatientProfile = () => {
               onUpdate={handleUpdateDraftPlan}
               onRegenerate={handleGenerateDraftPlan}
               onUseAsOfficial={handleUseAsOfficialPlan}
+              onSaveAsDraft={handleSaveAsDraft}
               loading={loading}
               patientId={id}
             />
