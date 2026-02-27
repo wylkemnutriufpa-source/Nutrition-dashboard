@@ -1222,10 +1222,20 @@ const PatientProfile = () => {
                         <Download className="mr-2" size={18} /> Exportar PDF
                       </Button>
                       <Button 
+                        variant="outline"
+                        className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
+                        onClick={() => {
+                          // Abrir modal de visualização rápida (implementar depois)
+                          navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}&view=true`);
+                        }}
+                      >
+                        <Eye className="mr-2" size={18} /> Visualizar
+                      </Button>
+                      <Button 
                         className="flex-1 bg-teal-700 hover:bg-teal-800"
                         onClick={() => navigate(`/professional/meal-plan-editor?patient=${id}&plan=${mealPlan.id}`)}
                       >
-                        <Eye className="mr-2" size={18} /> Visualizar / Editar
+                        <Edit className="mr-2" size={18} /> Editar
                       </Button>
                     </div>
                   </div>
