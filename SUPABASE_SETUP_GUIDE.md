@@ -64,7 +64,7 @@ sudo supervisorctl restart frontend
 
 ### A) Criar Usuário Profissional:
 
-1. Acesse o preview: https://medical-plan-hub.preview.emergentagent.com
+1. Acesse o preview: https://plan-storage-repair.preview.emergentagent.com
 2. Clique em "Profissional"
 3. Clique em "Não tem conta? Cadastre-se"
 4. Preencha:

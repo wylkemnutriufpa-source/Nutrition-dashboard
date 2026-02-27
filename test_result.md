@@ -118,7 +118,7 @@ backend:
         comment: "Backend básico FastAPI funcionando"
       - working: true
         agent: "testing"
-        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://medical-plan-hub.preview.emergentagent.com with proper MongoDB integration."
+        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://plan-storage-repair.preview.emergentagent.com with proper MongoDB integration."
       - working: true
         agent: "testing"
         comment: "✅ RE-TESTED POST P0 FIXES (26/Feb/2026): Backend API fully verified after P0 supabase.js fixes. All 3 endpoints continue working perfectly: GET /api/ returns 'Hello World' ✅, POST /api/status creates status check with valid UUID & timestamp ✅, GET /api/status returns proper list ✅. Service running stable on supervisor (pid 497, uptime active), MongoDB integration working, logs clean with no errors. Test ID: e25948e9-c05a-4141-a86b-36aa470035c6 created successfully. P0 frontend fixes did not impact backend functionality - system remains stable."
@@ -475,7 +475,7 @@ agent_communication:
     Teste realizado com sucesso seguindo exatamente o roteiro solicitado:
     
     FLUXO TESTADO:
-    1. ✅ Acesso à página inicial (https://medical-plan-hub.preview.emergentagent.com)
+    1. ✅ Acesso à página inicial (https://plan-storage-repair.preview.emergentagent.com)
     2. ✅ Clique em 'Acessar Ferramentas' no card de Visitante
     3. ✅ Navegação para página de Ferramentas (CalculatorsList)
     4. ✅ Clique em 'Calculadora de Peso de Referência'
