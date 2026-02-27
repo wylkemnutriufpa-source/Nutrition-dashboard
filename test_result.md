@@ -373,6 +373,42 @@ frontend:
         agent: "main"
         comment: "✅ IMPLEMENTADO: (1) addNewMeal() - adiciona refeição vazia, (2) removeMeal() - remove refeição (mínimo 1), (3) updateMealName() - edita nome inline com botões Save/Cancel, (4) updateMealTime() - edita horário com input time, (5) MealSection component modificado com controles de edição inline, (6) Botão 'Adicionar Nova Refeição' no final da lista. Profissional pode criar quantas refeições quiser, editar títulos/horários, e gerenciar completamente."
 
+  - task: "Modal Visualizar Plano Alimentar"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/MealPlanViewerModal.js, frontend/src/pages/PatientProfile.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) Criado MealPlanViewerModal.js com visualização completa do plano. (2) Modal exibe: header com resumo nutricional do dia, lista de refeições expansíveis, tab de observações. (3) Cada refeição mostra: nome, horário, alimentos com customName e observations. (4) Botões: Exportar PDF e Editar Plano. (5) PatientProfile atualizado para abrir modal ao clicar em 'Visualizar' ao invés de redirecionar."
+
+  - task: "Botão Acessar Planos no Dashboard Profissional"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/ProfessionalDashboard.js, frontend/src/lib/supabase.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) Seção 'Planos Alimentares Ativos' adicionada no dashboard. (2) Lista pacientes com planos ativos com botões Ver e Editar. (3) getProfessionalStats() atualizada para retornar patientsWithActivePlans. (4) Design com cards verde mostrando nome do paciente, nome do plano e data de atualização."
+
+  - task: "PDF Export com customName e observations"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/pdfGenerator.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: (1) generateMealPlanPDF() atualizada para usar customName quando disponível. (2) Observações individuais de cada alimento agora são exportadas no PDF. (3) Seção 'Observações e Orientações' adicionada no final do PDF com mealPlan.observations e mealPlan.orientations."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
