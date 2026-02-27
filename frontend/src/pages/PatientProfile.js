@@ -970,7 +970,7 @@ const PatientProfile = () => {
   }, [loadPatientData]);
 
   // Gerar pré-plano inteligente
-  const handleGenerateDraftPlan = async () => {
+  const handleGenerateDraftPlan = async (variation = 1) => {
     if (!anamnesis || !patient) {
       toast.error('É necessário ter anamnese completa');
       return;
@@ -978,9 +978,9 @@ const PatientProfile = () => {
 
     setLoading(true);
     try {
-      // Gerar pré-plano usando IA
-      const smartPlan = generateSmartMealPlan(anamnesis, patient);
-      console.log('Pré-plano gerado:', smartPlan);
+      // Gerar pré-plano usando IA com variação
+      const smartPlan = generateSmartMealPlan(anamnesis, patient, variation);
+      console.log('Pré-plano gerado (variação ' + variation + '):', smartPlan);
       
       // Salvar no banco
       const { data: savedDraft, error: saveError } = await saveDraftMealPlan(id, profile.id, smartPlan);
