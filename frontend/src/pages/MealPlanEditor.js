@@ -425,7 +425,11 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
   
   const patientIdParam = searchParams.get('patient');
   const planIdParam = searchParams.get('plan');
+  const fromDraftParam = searchParams.get('fromDraft') === 'true';
   const isPatientView = userType === 'patient';
+  
+  // Esconder seletor se já tem paciente definido (vindo do pré-plano ou URL)
+  const hidePatientSelector = !!patientIdParam || fromDraftParam;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
