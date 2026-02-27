@@ -909,27 +909,49 @@ const PatientProfile = () => {
   const loadPatientData = useCallback(async () => {
     if (!id || !profile) return;
     
+    // Evitar recarregar se já tem dados (cache simples)
+    if (patient && patient.id === id) {
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
-      const { data: patientData, error: patientError } = await getPatientById(id);
-      if (patientError) throw patientError;
-      setPatient(patientData);
-
-      const { data: planData } = await getPatientMealPlan(id, profile.id);
-      setMealPlan(planData);
-
-      const { data: allPlans } = await getMealPlans(profile.id, 'professional');
-      setAllMealPlans((allPlans || []).filter(p => p.patient_id === id));
-
-      const { data: anamnesisData } = await getAnamnesis(id);
-      setAnamnesis(anamnesisData);
-
-      const adherenceData = await getChecklistAdherence(id, 7);
-      setAdherence(adherenceData);
-
-      // Carregar pré-plano
-      const { data: draftData } = await getDraftMealPlan(id);
-      setDraftPlan(draftData?.draft_data || null);
+      // Carregar dados em paralelo para melhor performance
+      const [patientResult, planResult, allPlansResult, anamnesisResult, adherenceResult, draftResult] = await Promise.allSettled([
+        getPatientById(id),
+        getPatientMealPlan(id, profile.id),
+        getMealPlans(profile.id, 'professional'),
+        getAnamnesis(id),
+        getChecklistAdherence(id, 7),
+        getDraftMealPlan(id)
+      ]);
+      
+      if (patientResult.status === 'fulfilled' && patientResult.value.data) {
+        setPatient(patientResult.value.data);
+      } else if (patientResult.status === 'rejected' || patientResult.value.error) {
+        throw patientResult.value?.error || new Error('Erro ao carregar paciente');
+      }
+      
+      if (planResult.status === 'fulfilled') {
+        setMealPlan(planResult.value.data);
+      }
+      
+      if (allPlansResult.status === 'fulfilled') {
+        setAllMealPlans((allPlansResult.value.data || []).filter(p => p.patient_id === id));
+      }
+      
+      if (anamnesisResult.status === 'fulfilled') {
+        setAnamnesis(anamnesisResult.value.data);
+      }
+      
+      if (adherenceResult.status === 'fulfilled') {
+        setAdherence(adherenceResult.value);
+      }
+      
+      if (draftResult.status === 'fulfilled') {
+        setDraftPlan(draftResult.value.data?.draft_data || null);
+      }
 
     } catch (error) {
       console.error('Error loading patient:', error);
@@ -937,7 +959,7 @@ const PatientProfile = () => {
     } finally {
       setLoading(false);
     }
-  }, [id, profile]);
+  }, [id, profile, patient]);
 
   useEffect(() => {
     loadPatientData();
