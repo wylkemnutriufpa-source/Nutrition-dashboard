@@ -231,6 +231,55 @@ const DraftMealPlanViewer = ({
         </CardHeader>
       </Card>
 
+      {/* Alternativas de Cardápio */}
+      {onRegenerate && !editing && (
+        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <RefreshCw className="text-indigo-600" size={20} />
+              <h3 className="font-semibold text-gray-800">Escolha um Estilo de Cardápio</h3>
+              <Badge className="bg-indigo-100 text-indigo-700 ml-2">
+                Atual: {variationLabels.find(v => v.id === currentVariation)?.label || 'Clássico'}
+              </Badge>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Clique em uma alternativa para gerar um novo cardápio com esse estilo
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {variationLabels.map((variation) => (
+                <button
+                  key={variation.id}
+                  onClick={() => handleRegenerateVariation(variation.id)}
+                  disabled={loading || saving}
+                  className={`p-4 rounded-xl border-2 transition-all text-left hover:scale-[1.02] ${
+                    currentVariation === variation.id
+                      ? 'border-indigo-500 bg-indigo-100 shadow-md'
+                      : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">{variation.icon}</span>
+                    <span className={`font-semibold ${currentVariation === variation.id ? 'text-indigo-700' : 'text-gray-800'}`}>
+                      {variation.label}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">{variation.description}</p>
+                  {currentVariation === variation.id && (
+                    <Badge className="mt-2 bg-indigo-500 text-white text-xs">Selecionado</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
+            {loading && (
+              <div className="flex items-center justify-center mt-4 text-indigo-600">
+                <Loader2 className="animate-spin mr-2" size={20} />
+                Gerando nova alternativa...
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Raciocínio */}
       {plan.reasoning && (
         <Card className="bg-purple-50 border-purple-200">
