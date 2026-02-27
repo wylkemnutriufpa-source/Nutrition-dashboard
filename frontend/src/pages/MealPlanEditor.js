@@ -772,12 +772,33 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         const { data, error } = await createMealPlan(planData);
         
         if (error) {
-          console.error('Erro ao criar plano:', error);
-          const errorMsg = error.message || error.hint || 'Erro ao criar plano';
-          toast.error(`Erro: ${errorMsg}`);
-          if (error.code === '42501' || errorMsg.includes('permiss') || errorMsg.includes('vinculado')) {
-            toast.error('Sem permissão: Verifique se o paciente está vinculado a você na aba "Pacientes".');
+          console.error('❌ ERRO AO CRIAR PLANO - DETALHES:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            fullError: error
+          });
+          
+          // Mostrar mensagem principal
+          toast.error(`Erro: ${error.message || 'Erro desconhecido'}`);
+          
+          // Mostrar hint se existir
+          if (error.hint) {
+            toast.error(`💡 ${error.hint}`);
           }
+          
+          // Mostrar details se existir
+          if (error.details) {
+            console.error('📋 Details:', error.details);
+            toast.error(`Detalhes: ${error.details}`);
+          }
+          
+          // Erro específico RLS
+          if (error.code === '42501') {
+            toast.error('🔒 Sem permissão. Verifique se o paciente está vinculado a você.');
+          }
+          
           return;
         }
         
