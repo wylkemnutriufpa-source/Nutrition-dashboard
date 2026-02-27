@@ -830,6 +830,15 @@ export const getPatientMealPlan = async (patientId, professionalId = null) => {
 
 export const createMealPlan = async (planData) => {
   try {
+    console.log('🔍 createMealPlan - Dados recebidos:', {
+      patient_id: planData.patient_id,
+      professional_id: planData.professional_id,
+      name: planData.name,
+      has_plan_data: !!planData.plan_data,
+      meals_count: planData.plan_data?.meals?.length,
+      has_daily_targets: !!planData.daily_targets
+    });
+
     // Verificar se já existe um plano ativo para este paciente
     const { data: existingList, error: selectError } = await supabase
       .from('meal_plans')
@@ -839,7 +848,7 @@ export const createMealPlan = async (planData) => {
       .limit(1);
     
     if (selectError) {
-      console.error('Erro ao verificar plano existente:', selectError);
+      console.error('❌ Erro ao verificar plano existente:', selectError);
       return { 
         data: null, 
         error: { 
@@ -853,62 +862,95 @@ export const createMealPlan = async (planData) => {
     const existing = existingList && existingList.length > 0 ? existingList[0] : null;
     
     if (existing) {
+      console.log('♻️ Plano existente encontrado, atualizando:', existing.id);
       // Atualizar plano existente
+      const updateData = {
+        name: planData.name,
+        plan_data: planData.plan_data || { meals: [] },
+        daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 },
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('📝 Dados do UPDATE:', updateData);
+      
       const { data: updatedList, error } = await supabase
         .from('meal_plans')
-        .update({
-          name: planData.name,
-          plan_data: planData.plan_data || { meals: [] },
-          daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 },
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', existing.id)
         .select();
       
       if (error) {
-        console.error('Erro ao atualizar plano existente:', error);
+        console.error('❌ Erro ao atualizar plano existente:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
         return { 
           data: null, 
           error: { 
             message: error.message || 'Sem permissão para atualizar este plano',
             code: error.code,
             details: error.details,
-            hint: 'Verifique se você tem permissão para editar planos deste paciente'
+            hint: error.hint || 'Verifique se você tem permissão para editar planos deste paciente'
           } 
         };
       }
       
       const data = updatedList && updatedList.length > 0 ? updatedList[0] : null;
+      console.log('✅ Plano atualizado com sucesso:', data?.id);
       return { data, error: null };
     }
     
     // Criar novo plano
+    console.log('➕ Criando novo plano...');
+    const insertData = {
+      patient_id: planData.patient_id,
+      professional_id: planData.professional_id,
+      name: planData.name,
+      plan_data: planData.plan_data || { meals: [] },
+      daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 },
+      is_active: planData.is_active !== undefined ? planData.is_active : true,
+      description: planData.description || null,
+      start_date: planData.start_date || null,
+      end_date: planData.end_date || null
+    };
+    
+    console.log('📝 Dados do INSERT:', {
+      ...insertData,
+      plan_data: `${insertData.plan_data.meals?.length || 0} refeições`,
+      daily_targets: insertData.daily_targets
+    });
+    
     const { data: insertedList, error } = await supabase
       .from('meal_plans')
-      .insert({
-        ...planData,
-        plan_data: planData.plan_data || { meals: [] },
-        daily_targets: planData.daily_targets || { calorias: 2000, proteina: 100, carboidrato: 250, gordura: 70 }
-      })
+      .insert(insertData)
       .select();
     
     if (error) {
-      console.error('Erro ao criar novo plano:', error);
+      console.error('❌ Erro ao criar novo plano:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        fullError: error
+      });
       return { 
         data: null, 
         error: { 
           message: error.message || 'Sem permissão para criar plano',
           code: error.code,
           details: error.details,
-          hint: 'Verifique se o paciente está vinculado a você'
+          hint: error.hint || 'Verifique se o paciente está vinculado a você'
         } 
       };
     }
     
     const data = insertedList && insertedList.length > 0 ? insertedList[0] : null;
+    console.log('✅ Plano criado com sucesso:', data?.id);
     return { data, error: null };
   } catch (err) {
-    console.error('Erro inesperado em createMealPlan:', err);
+    console.error('❌ Erro inesperado em createMealPlan:', err);
     return { 
       data: null, 
       error: { 
