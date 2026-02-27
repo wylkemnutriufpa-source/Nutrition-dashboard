@@ -700,8 +700,25 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                 onRemoveFood={removeFoodFromMeal}
                 onUpdateFood={updateFood}
                 onDuplicateMeal={duplicateMeal}
+                onUpdateMealName={updateMealName}
+                onUpdateMealTime={updateMealTime}
+                onRemoveMeal={removeMeal}
               />
             ))}
+            
+            {/* Botão Adicionar Refeição */}
+            <Card className="border-dashed border-2 border-gray-300 hover:border-teal-500 transition-colors">
+              <CardContent className="py-8">
+                <Button 
+                  onClick={addNewMeal}
+                  variant="outline" 
+                  className="w-full border-dashed"
+                >
+                  <Plus className="mr-2" size={20} />
+                  Adicionar Nova Refeição
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="col-span-4">
