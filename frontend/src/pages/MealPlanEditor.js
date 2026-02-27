@@ -676,10 +676,16 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                         </>
                       )}
                     </Button>
-                    {!selectedPatient && (
+                    {!isPatientView && !selectedPatient && (
                       <p className="text-xs text-center text-gray-500">
                         Selecione um paciente para salvar
                       </p>
+                    )}
+                    {isPatientView && (
+                      <div className="text-center py-2 text-gray-600">
+                        <p className="text-sm">🍽️ Seu plano alimentar personalizado</p>
+                        <p className="text-xs mt-1">Elaborado especialmente para você</p>
+                      </div>
                     )}
                   </div>
                 </div>
