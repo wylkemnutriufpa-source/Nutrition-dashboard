@@ -306,6 +306,30 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "⚠️ CANNOT VERIFY P0 FIX - Professional credentials invalid. Testing blocked because admin@teste.com/123456 returns 400 error from Supabase (invalid credentials). The P0 fix (.single() to .maybeSingle()) looks correct in code but cannot be tested without working professional login. Patient login works perfectly, proving the login flow itself is functional. Main agent must verify/create professional account in Supabase database before P0 fix can be verified."
+
+  - task: "Smart Anamnesis with Pre-Plan Generation"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/smartAnamnesis.js, frontend/src/components/DraftMealPlanViewer.js, frontend/src/lib/supabase.js, frontend/src/pages/PatientProfile.js, supabase_draft_meal_plans.sql"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ SMART ANAMNESIS IMPLEMENTED: Created AI system that analyzes anamnesis and automatically generates pre-meal plan with 6 meals, recommended foods, foods to avoid, and automatic tips. Features: (1) generateSmartMealPlan() analyzes conditions (diabetes, hypertension, cholesterol, etc), goals, allergies, (2) draft_meal_plans table with RLS - only professionals see pre-plans, (3) DraftMealPlanViewer with full editing (add/remove meals, edit times, manage foods), (4) New 'Pré-Plano' tab in PatientProfile, (5) Auto-generation when anamnesis is completed, (6) Tips auto-populated in patient's tips tab. READY FOR TESTING."
+
+  - task: "PDF Export - Recipes, Tips, Anamnesis"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/pdfGenerator.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ PDF EXPORT IMPLEMENTED: Added generateRecipesPDF() and generateTipsPDF() functions. Recipes PDF includes: title, category, prep time, ingredients list, instructions, nutrition info (calories, protein, carbs, fat). Tips PDF includes: title, category, content. Both have professional header, patient info, pagination, and footer. Anamnesis PDF already existed. Meal Plan PDF stays in app only (not exported per requirement). READY FOR TESTING."
   
   - task: "Login Fix - Remove duplicate getUserProfile"
     implemented: true
