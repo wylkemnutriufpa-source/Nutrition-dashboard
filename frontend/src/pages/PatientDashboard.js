@@ -122,7 +122,20 @@ const PatientDashboard = () => {
 
   return (
     <Layout title={`Olá, ${patientName.split(' ')[0]}!`} userType="patient">
+      {/* Modal de Primeiro Acesso */}
+      <FirstAccessModal
+        show={showFirstAccessModal}
+        onClose={() => setShowFirstAccessModal(false)}
+        onStartAnamnesis={handleStartAnamnesis}
+        anamnesisStatus={anamnesis?.status}
+      />
+
       <div data-testid="patient-dashboard" className="space-y-6">
+        {/* Banner de Anamnese Incompleta */}
+        <AnamneseBanner
+          anamnesisStatus={anamnesis?.status}
+          onStartAnamnesis={handleStartAnamnesis}
+        />
         
         {/* Foto de Perfil */}
         <Card className="border-0 bg-gradient-to-r from-teal-50 to-emerald-50 shadow-sm">
