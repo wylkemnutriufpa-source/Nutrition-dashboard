@@ -747,12 +747,15 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         });
         
         if (error) {
-          console.error('Erro ao atualizar plano:', error);
-          const errorMsg = error.message || error.hint || 'Erro ao atualizar plano';
-          toast.error(`Erro: ${errorMsg}`);
-          if (error.code === '42501' || errorMsg.includes('permiss')) {
-            toast.error('Você não tem permissão para editar este plano. Verifique se o paciente está vinculado a você.');
+          console.error('❌ ERRO AO ATUALIZAR PLANO:', error);
+          
+          const errorMsg = error.message || 'Erro ao atualizar plano';
+          toast.error(`❌ ${errorMsg}`);
+          
+          if (error.code === '42501' || error.code === 42501) {
+            toast.error('🔒 Erro de permissão. Verifique se o paciente está vinculado.');
           }
+          
           return;
         }
         
@@ -772,31 +775,20 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
         const { data, error } = await createMealPlan(planData);
         
         if (error) {
-          console.error('❌ ERRO AO CRIAR PLANO - DETALHES:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint,
-            fullError: error
-          });
+          console.error('❌ ERRO AO CRIAR PLANO:', error);
           
-          // Mostrar mensagem principal
-          toast.error(`Erro: ${error.message || 'Erro desconhecido'}`);
+          // Mensagem de erro simples sem tentar acessar propriedades profundas
+          const errorMsg = error.message || 'Erro ao criar plano';
+          toast.error(`❌ ${errorMsg}`);
           
-          // Mostrar hint se existir
-          if (error.hint) {
-            toast.error(`💡 ${error.hint}`);
+          // Verificar código de erro RLS
+          if (error.code === '42501' || error.code === 42501) {
+            toast.error('🔒 Erro de permissão RLS. Verifique se o paciente está vinculado.');
           }
           
-          // Mostrar details se existir
-          if (error.details) {
-            console.error('📋 Details:', error.details);
-            toast.error(`Detalhes: ${error.details}`);
-          }
-          
-          // Erro específico RLS
-          if (error.code === '42501') {
-            toast.error('🔒 Sem permissão. Verifique se o paciente está vinculado a você.');
+          // Se for erro 400, pode ser dados inválidos
+          if (error.code === '400' || errorMsg.includes('400')) {
+            toast.error('⚠️ Dados inválidos enviados ao banco. Veja console.');
           }
           
           return;

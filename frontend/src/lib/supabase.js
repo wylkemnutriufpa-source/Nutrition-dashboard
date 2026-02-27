@@ -852,9 +852,8 @@ export const createMealPlan = async (planData) => {
       return { 
         data: null, 
         error: { 
-          message: selectError.message || 'Erro ao verificar plano existente',
-          code: selectError.code,
-          details: selectError.details
+          message: String(selectError.message || selectError.msg || 'Erro ao verificar plano existente'),
+          code: String(selectError.code || '')
         } 
       };
     }
@@ -880,19 +879,17 @@ export const createMealPlan = async (planData) => {
         .select();
       
       if (error) {
-        console.error('❌ Erro ao atualizar plano existente:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint
-        });
+        console.error('❌ Erro ao atualizar plano existente:', error);
+        
+        const errorMessage = String(error.message || error.msg || 'Sem permissão para atualizar este plano');
+        const errorCode = String(error.code || '');
+        
         return { 
           data: null, 
           error: { 
-            message: error.message || 'Sem permissão para atualizar este plano',
-            code: error.code,
-            details: error.details,
-            hint: error.hint || 'Verifique se você tem permissão para editar planos deste paciente'
+            message: errorMessage,
+            code: errorCode,
+            originalError: 'Supabase error - veja console para detalhes'
           } 
         };
       }
@@ -928,20 +925,18 @@ export const createMealPlan = async (planData) => {
       .select();
     
     if (error) {
-      console.error('❌ Erro ao criar novo plano:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-        fullError: error
-      });
+      console.error('❌ Erro ao criar novo plano:', error);
+      
+      // Capturar apenas message e code sem tentar ler body
+      const errorMessage = String(error.message || error.msg || 'Sem permissão para criar plano');
+      const errorCode = String(error.code || '');
+      
       return { 
         data: null, 
         error: { 
-          message: error.message || 'Sem permissão para criar plano',
-          code: error.code,
-          details: error.details,
-          hint: error.hint || 'Verifique se o paciente está vinculado a você'
+          message: errorMessage,
+          code: errorCode,
+          originalError: 'Supabase error - veja console para detalhes'
         } 
       };
     }
