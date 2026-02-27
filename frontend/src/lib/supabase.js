@@ -923,45 +923,60 @@ export const createMealPlan = async (planData) => {
       daily_targets: insertData.daily_targets
     });
     
-    // Tentar insert com tratamento especial de erro
-    let insertedList, error;
-    try {
-      const response = await supabase
-        .from('meal_plans')
-        .insert(insertData)
-        .select();
-      
-      insertedList = response.data;
-      error = response.error;
-      
-      // Se tiver erro, tentar ler o body da resposta HTTP
-      if (error && !error.message) {
-        console.error('⚠️ Erro sem mensagem, objeto error:', Object.keys(error));
-      }
-    } catch (insertError) {
-      console.error('❌ Exceção durante insert:', insertError?.message || 'Erro desconhecido');
-      error = {
-        message: insertError?.message || 'Erro ao executar INSERT',
-        code: 'EXCEPTION'
-      };
-    }
+    // USAR FETCH DIRETO PARA CAPTURAR ERRO REAL
+    const supabaseUrl = supabase.supabaseUrl;
+    const supabaseKey = supabase.supabaseKey;
     
-    if (error) {
-      // NÃO logar error object - causa body stream already read
-      console.error('❌ Erro ao criar novo plano');
-      console.error('Message:', error?.message || 'Sem mensagem');
-      console.error('Code:', error?.code || 'Sem código');
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/meal_plans?select=*`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(insertData)
+      });
       
-      // Criar novo error object limpo
-      const cleanError = {
-        message: error?.message || error?.msg || 'Erro ao criar plano',
-        code: error?.code || '',
-        type: 'create_error'
-      };
+      if (!response.ok) {
+        // LER O ERRO ANTES DE QUALQUER OUTRA COISA
+        const errorText = await response.text();
+        console.error('🔴 ERRO HTTP:', response.status);
+        console.error('🔴 RESPOSTA:', errorText);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+          console.error('🔴 ERROR PARSED:', errorData);
+        } catch (e) {
+          errorData = { message: errorText };
+        }
+        
+        return {
+          data: null,
+          error: {
+            message: errorData.message || errorData.hint || `HTTP ${response.status}`,
+            code: errorData.code || String(response.status),
+            details: errorData.details || errorText,
+            type: 'http_error'
+          }
+        };
+      }
       
-      return { 
-        data: null, 
-        error: cleanError
+      const data = await response.json();
+      console.log('✅ Plano criado com sucesso:', data[0]?.id);
+      return { data: data[0] || null, error: null };
+      
+    } catch (fetchError) {
+      console.error('❌ Exceção durante fetch:', fetchError?.message);
+      return {
+        data: null,
+        error: {
+          message: fetchError?.message || 'Erro na requisição',
+          code: 'FETCH_ERROR',
+          type: 'exception'
+        }
       };
     }
     
