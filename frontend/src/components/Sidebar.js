@@ -75,8 +75,7 @@ const Sidebar = ({ userType, onLogout, patientId }) => {
 
   // Links exclusivos do Admin
   const adminExtraLinks = [
-    { to: '/admin/dashboard', icon: Shield, label: 'Painel Admin' },
-    { to: '/admin/professionals', icon: UserCog, label: 'Profissionais' }
+    { to: '/admin/dashboard', icon: Shield, label: 'Painel Admin' }
   ];
 
   // Links fixos do Paciente (Dashboard sempre visível)
