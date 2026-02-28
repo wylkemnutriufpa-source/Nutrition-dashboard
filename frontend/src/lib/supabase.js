@@ -1215,13 +1215,54 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
       }));
     }
   }
+
+  // Contar planos por tipo (geral vs especial)
+  let plansByType = { general: 0, special: 0, specialBreakdown: {} };
+  if (activePlansData) {
+    activePlansData.forEach(plan => {
+      const planData = plan.plan_data || {};
+      if (planData.specialPlan || planData.planType === 'special') {
+        plansByType.special++;
+        const specialType = planData.specialPlan || 'other';
+        plansByType.specialBreakdown[specialType] = (plansByType.specialBreakdown[specialType] || 0) + 1;
+      } else {
+        plansByType.general++;
+      }
+    });
+  }
+
+  // Anamneses pendentes (status != complete)
+  let pendingAnamnesisQuery = supabase
+    .from('anamnesis')
+    .select('id', { count: 'exact' })
+    .neq('status', 'complete');
+  if (!isAdmin) {
+    pendingAnamnesisQuery = pendingAnamnesisQuery.eq('professional_id', professionalId);
+  }
+  const { count: pendingAnamneses } = await pendingAnamnesisQuery;
+
+  // Compromissos de hoje
+  const today = new Date().toISOString().split('T')[0];
+  let appointmentsTodayQuery = supabase
+    .from('appointments')
+    .select('id', { count: 'exact' })
+    .eq('date', today);
+  if (!isAdmin) {
+    appointmentsTodayQuery = appointmentsTodayQuery.eq('professional_id', professionalId);
+  }
+  const { count: appointmentsToday } = await appointmentsTodayQuery;
   
   return {
     activePatients: totalPatients || 0,
     totalPatients: totalPatients || 0,
     activePlans: activePlans || 0,
     recentPatients: recentPatients || [],
-    patientsWithActivePlans: patientsWithActivePlans || []
+    patientsWithActivePlans: patientsWithActivePlans || [],
+    plansByType,
+    pendingAnamneses: pendingAnamneses || 0,
+    pendingAssessments: 0,
+    pendingFeedbacks: 0,
+    appointmentsToday: appointmentsToday || 0
   };
 };
 
