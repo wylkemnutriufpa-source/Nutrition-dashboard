@@ -342,11 +342,11 @@ const MealPlanViewerModal = ({
                 </div>
               </TabsContent>
             </div>
-          </ScrollArea>
+          </div>
         </Tabs>
         
-        {/* Footer com ações */}
-        <div className="border-t p-4 bg-gray-50 flex justify-between items-center">
+        {/* Footer com ações - Fixo no rodapé */}
+        <div className="border-t p-4 bg-gray-50 flex justify-between items-center flex-shrink-0">
           <p className="text-sm text-gray-500">
             Atualizado: {mealPlan.updated_at ? new Date(mealPlan.updated_at).toLocaleDateString('pt-BR') : 'N/A'}
           </p>
