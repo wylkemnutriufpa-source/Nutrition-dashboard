@@ -33,6 +33,8 @@ const AnamneseFormComplete = ({
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [currentSection, setCurrentSection] = useState('clinical'); // clinical, lifestyle, nutrition, sports
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     setData(anamnesis || {});
