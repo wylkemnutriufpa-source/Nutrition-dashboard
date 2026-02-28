@@ -1004,4 +1004,14 @@ const generatePersonalizedTip = (anamnesis, patient, conditions, goal) => {
   };
 };
 
+// Exportar funções e configurações
+export { 
+  SPECIAL_PLANS, 
+  SPECIAL_PLANS_ORDER, 
+  getSpecialPlan, 
+  getAllSpecialPlans, 
+  generateSpecialMeals,
+  VARIATION_NAMES
+};
+
 export default generateSmartMealPlan;
