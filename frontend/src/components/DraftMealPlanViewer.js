@@ -351,33 +351,76 @@ const DraftMealPlanViewer = ({
                     </Badge>
                   )}
                 </div>
+
+                {/* ALERTA DE CONDIÇÕES DETECTADAS AUTOMATICAMENTE */}
+                {detectedConditions.length > 0 && (
+                  <div className="mb-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-xl">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertCircle className="text-amber-600" size={20} />
+                      <h4 className="font-semibold text-amber-800">🔍 Condições Detectadas na Anamnese</h4>
+                    </div>
+                    <p className="text-sm text-amber-700 mb-3">
+                      Com base nas informações da anamnese, identificamos as seguintes condições:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {recommendations.map((rec, idx) => {
+                        const plan = specialPlans.find(p => p.id === rec.planId);
+                        if (!plan) return null;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => handleSelectSpecialPlan(plan)}
+                            className="inline-flex items-center gap-2 px-3 py-2 bg-white border-2 border-amber-400 rounded-lg hover:bg-amber-100 transition-all"
+                          >
+                            <span className="text-xl">{plan.icon}</span>
+                            <div className="text-left">
+                              <span className="font-semibold text-amber-900">{plan.name}</span>
+                              <span className="text-xs text-amber-600 block">⚡ Recomendado</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-sm text-gray-600 mb-4">
                   Cardápios específicos para condições médicas com alimentos adequados
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {specialPlans.map((plan) => (
-                    <button
-                      key={plan.id}
-                      onClick={() => handleSelectSpecialPlan(plan)}
-                      disabled={loading || saving}
-                      className={`p-4 rounded-xl border-2 transition-all text-left hover:scale-[1.02] ${
-                        selectedSpecialPlan?.id === plan.id
-                          ? 'border-pink-500 bg-pink-100 shadow-md'
-                          : 'border-gray-200 bg-white hover:border-pink-300 hover:bg-pink-50'
-                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">{plan.icon}</span>
-                        <span className={`font-semibold ${selectedSpecialPlan?.id === plan.id ? 'text-pink-700' : 'text-gray-800'}`}>
-                          {plan.name}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500">{plan.description}</p>
-                      {selectedSpecialPlan?.id === plan.id && (
-                        <Badge className="mt-2 bg-pink-500 text-white text-xs">Selecionado</Badge>
-                      )}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {specialPlans.map((plan) => {
+                    const isRecommended = detectedConditions.includes(plan.id);
+                    return (
+                      <button
+                        key={plan.id}
+                        onClick={() => handleSelectSpecialPlan(plan)}
+                        disabled={loading || saving}
+                        className={`p-4 rounded-xl border-2 transition-all text-left hover:scale-[1.02] relative ${
+                          selectedSpecialPlan?.id === plan.id
+                            ? 'border-pink-500 bg-pink-100 shadow-md'
+                            : isRecommended
+                              ? 'border-amber-400 bg-amber-50 hover:border-amber-500'
+                              : 'border-gray-200 bg-white hover:border-pink-300 hover:bg-pink-50'
+                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        {isRecommended && !selectedSpecialPlan && (
+                          <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">
+                            ⚡ Sugerido
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-2xl">{plan.icon}</span>
+                          <span className={`font-semibold text-sm ${selectedSpecialPlan?.id === plan.id ? 'text-pink-700' : isRecommended ? 'text-amber-800' : 'text-gray-800'}`}>
+                            {plan.name}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 line-clamp-2">{plan.description}</p>
+                        {selectedSpecialPlan?.id === plan.id && (
+                          <Badge className="mt-2 bg-pink-500 text-white text-xs">Selecionado</Badge>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Botão de regenerar variação do plano especial */}
