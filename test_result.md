@@ -500,6 +500,173 @@ test_plan:
 
 agent_communication:
   - agent: "testing"
+    message: "🧪 TESTES DAS CORREÇÕES - FEVEREIRO 28, 2026 (Rodada Final)
+    
+    ═══════════════════════════════════════════════════════════════════
+    📋 TESTES SOLICITADOS
+    ═══════════════════════════════════════════════════════════════════
+    
+    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    
+    TESTE 1: Modal de Plano com Scroll (Paciente kelly@com / 123456)
+    TESTE 2: Dashboard Profissional (wylkem.nutri.ufpa@gmail.com / 654321)
+    TESTE 3: Variações do Pré-Plano (6 estilos)
+    
+    ═══════════════════════════════════════════════════════════════════
+    ✅ TESTE 1 PASSOU - MODAL DE PLANO COM SCROLL (PACIENTE)
+    ═══════════════════════════════════════════════════════════════════
+    
+    Login: kelly@com / 123456 ✅
+    
+    ✅ Checklist de Hábitos:
+       - Card 'Hábitos do Dia' encontrado
+       - Barra de progresso funcionando (0% atualmente)
+       - Exibe mensagem motivacional '✨ Comece seu dia saudável!'
+       - Contador 0/0 (nenhum hábito configurado)
+       - Botão 'Adicionar Hábitos Saudáveis' visível
+    
+    ⚠️ Dicas do Nutricionista (Minor Issue):
+       - Seção encontrada com 13 dicas visíveis
+       - PROBLEMA: Dicas parecem GENÉRICAS, não personalizadas
+       - Não foram encontrados badges 'Personalizada para você' ou 'Baseado na sua avaliação'
+       - Esperado: Dicas de anamnese/avaliação física
+       - Observado: Dicas padrão/fallback
+    
+    ✅ Botão 'Ver Plano Completo':
+       - Botão encontrado e visível
+       - Clique funcionou perfeitamente
+    
+    ✅✅✅ MODAL COM SCROLL - FUNCIONANDO PERFEITAMENTE:
+       - Modal abre com sucesso
+       - Título: 'Plano Alimentar (do Pré-Plano)'
+       - Badge: '6 refeições'
+       - Header nutricional: Calorias 2571, Proteína 107g, Carbs 182g, Gordura 164g
+       - 2 Tabs: 'Refeições' e 'Observações' ✅
+       - SCROLL TESTADO E FUNCIONANDO:
+         * Scroll position 200px ✅
+         * Scroll position 500px ✅
+         * Área scrollável detectada (.overflow-y-auto)
+       - Refeições expandem/contraem corretamente
+       - Alimentos com calorias: Ovo cozido 155 kcal, Abacate 96 kcal, Queijo minas 264 kcal, etc.
+       - Totais por refeição: Café da Manhã 516 kcal P:32g C:10g G:40g
+       - Botão 'Exportar PDF' presente
+    
+    Screenshots: 01_patient_dashboard_kelly.png, 02_checklist_habits.png, 03_tips_section.png,
+    05_modal_opened_top.png, 06_modal_scrolled_middle.png, 07_modal_scrolled_bottom.png
+    
+    ═══════════════════════════════════════════════════════════════════
+    ❌ TESTE 2 FALHOU - DASHBOARD PROFISSIONAL (ISSUE CRÍTICO)
+    ═══════════════════════════════════════════════════════════════════
+    
+    Login: wylkem.nutri.ufpa@gmail.com / 654321
+    
+    🔴 PROBLEMA CRÍTICO: USUÁRIO TEM ROLE 'ADMIN' AO INVÉS DE 'PROFESSIONAL'
+    
+    ❌ Redirecionado para: DASHBOARD DE ADMIN (Painel Administrativo)
+    ❌ Página exibe:
+       - Título: 'Painel Administrativo'
+       - 'Painel do Administrador - Gerencie profissionais e configurações do sistema'
+       - Cards: 'Total de Profissionais: 2', 'Total de Pacientes: 15'
+       - Lista: 'Profissionais Cadastrados' (wyl, Dr Joao silva)
+    
+    ❌ Dashboard Profissional NÃO acessível:
+       - Cards esperados NÃO encontrados (0/4):
+         * Pacientes Ativos ❌
+         * Planos Ativos ❌
+         * Taxa de Adesão ❌
+         * Agenda Hoje ❌
+       - Seção 'Planos Alimentares Ativos' ❌
+       - Seção 'Pacientes Recentes' ❌
+       - 'Ações Rápidas' (4 botões) ❌
+    
+    CAUSA RAIZ: wylkem.nutri.ufpa@gmail.com tem role='admin' no banco de dados Supabase
+    ESPERADO: role='professional'
+    
+    IMPACTO: Não é possível testar funcionalidades de Dashboard Profissional
+    
+    Screenshots: 20_professional_dashboard_loaded.png (mostra Admin dashboard),
+    21_stats_cards_detail.png, 26_patients_list.png
+    
+    ═══════════════════════════════════════════════════════════════════
+    ⚠️ TESTE 3 BLOQUEADO - VARIAÇÕES DO PRÉ-PLANO
+    ═══════════════════════════════════════════════════════════════════
+    
+    STATUS: Não foi possível completar teste end-to-end devido a Issue do Teste 2
+    
+    ✅ CÓDIGO VERIFICADO - 6 Variações IMPLEMENTADAS:
+       - DraftMealPlanViewer.js linhas 66-73 contém as 6 variações:
+         1. 🍽️ Clássico Brasileiro - 'Plano tradicional e equilibrado'
+         2. ⚡ Prático e Rápido - 'Refeições rápidas e simples'
+         3. 💪 Proteico - 'Foco em proteínas e ganho muscular'
+         4. 🥑 Low Carb - 'Baixo carboidrato'
+         5. 🫒 Mediterrâneo - 'Estilo mediterrâneo com azeite'
+         6. 🏋️ Fitness - 'Ideal para treino intenso'
+    
+    ✅ Paciente Gleice kelly encontrado na lista de pacientes
+    ✅ Componente DraftMealPlanViewer implementado com:
+       - Seção 'Escolha um Estilo de Cardápio'
+       - Grid de 6 cards clicáveis
+       - Ícones emoji, labels e descrições
+       - Botões com handleRegenerateVariation()
+       - Badge mostrando variação atual selecionada
+    
+    ⚠️ NÃO TESTADO END-TO-END: Navegação bloqueada por issues de sessão/role
+    
+    RECOMENDAÇÃO: Após correção do role profissional, re-testar:
+       1. Acessar perfil de Gleice kelly
+       2. Clicar na aba 'Pré-Plano'
+       3. Verificar 6 variações visíveis e clicáveis
+       4. Testar regeneração ao clicar em variação diferente
+    
+    ═══════════════════════════════════════════════════════════════════
+    🔴 AÇÕES URGENTES PARA MAIN AGENT
+    ═══════════════════════════════════════════════════════════════════
+    
+    PRIORIDADE CRÍTICA:
+    
+    1. Corrigir Role do Usuário wylkem.nutri.ufpa@gmail.com:
+       - Ação: UPDATE profiles SET role = 'professional' WHERE email = 'wylkem.nutri.ufpa@gmail.com'
+       - Atualmente: role = 'admin'
+       - Esperado: role = 'professional'
+       - Verificar também permissions table se existir
+    
+    2. Após correção de role, RE-TESTAR:
+       - Dashboard Profissional (todos os cards e seções)
+       - Variações do Pré-Plano (6 estilos)
+    
+    PRIORIDADE MÉDIA:
+    
+    3. Investigar Dicas Não Personalizadas:
+       - PatientDashboard.js linha 67: getPatientPersonalizedTips(user.id)
+       - Verificar se kelly@com tem tips na tabela
+       - Verificar se anamnese/assessment geram tips automaticamente
+       - Default tips sendo usadas ao invés de personalizadas
+    
+    ═══════════════════════════════════════════════════════════════════
+    ℹ️ CONFIRMADO FUNCIONANDO
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ Login paciente (kelly@com)
+    ✅ Dashboard paciente carrega
+    ✅ Checklist de Hábitos com barra de progresso
+    ✅ Card de Plano Alimentar Ativo
+    ✅ Botão 'Ver Plano Completo'
+    ✅✅✅ Modal com SCROLL funcionando perfeitamente
+    ✅ Dados nutricionais corretos no modal (calorias preenchidas)
+    ✅ Tabs do modal funcionais
+    ✅ Refeições expansíveis
+    ✅ Botão Exportar PDF
+    
+    ═══════════════════════════════════════════════════════════════════
+    📊 RESUMO FINAL
+    ═══════════════════════════════════════════════════════════════════
+    
+    TESTE 1 (Paciente): ✅ PASSOU (1 minor issue com dicas)
+    TESTE 2 (Profissional): ❌ BLOQUEADO POR ROLE INCORRETA
+    TESTE 3 (Variações): ⚠️ CÓDIGO OK, TESTE END-TO-END BLOQUEADO
+    
+    BLOCKER: wylkem.nutri.ufpa@gmail.com precisa ter role='professional' no database"
+  - agent: "testing"
     message: "🧪 TESTE FINAL DO MODAL DE PLANO ALIMENTAR (28/Fev/2026 - TERCEIRA RODADA)
     
     ═══════════════════════════════════════════════════════════════════
