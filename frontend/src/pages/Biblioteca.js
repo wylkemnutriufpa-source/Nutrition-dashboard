@@ -69,6 +69,16 @@ const Biblioteca = () => {
     <Layout title="Biblioteca" userType="patient">
       <div className="max-w-4xl mx-auto space-y-6">
         
+        {/* Botão Voltar */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="mb-2"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar
+        </Button>
+
         {/* Header */}
         <div className="text-center py-6">
           <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
