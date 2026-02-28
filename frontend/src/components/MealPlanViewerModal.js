@@ -190,9 +190,9 @@ const MealPlanViewerModal = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6">
+      <DialogContent className="max-w-4xl h-[90vh] p-0 flex flex-col">
+        {/* Header - Fixo no topo */}
+        <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 flex-shrink-0">
           <div className="flex items-start justify-between">
             <div>
               <DialogTitle className="text-2xl font-bold text-white mb-1">
@@ -243,9 +243,9 @@ const MealPlanViewerModal = ({
           </div>
         </div>
         
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <div className="border-b px-4">
+        {/* Tabs - Área com scroll */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <div className="border-b px-4 flex-shrink-0">
             <TabsList className="bg-transparent h-12">
               <TabsTrigger value="refeicoes" className="data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700">
                 <Utensils size={16} className="mr-2" /> Refeições
@@ -256,7 +256,8 @@ const MealPlanViewerModal = ({
             </TabsList>
           </div>
           
-          <ScrollArea className="flex-1 min-h-[300px] max-h-[50vh]">
+          {/* Área de conteúdo com scroll */}
+          <div className="flex-1 overflow-y-auto">
             <div className="p-4">
               <TabsContent value="refeicoes" className="mt-0">
                 {meals.length > 0 ? (
