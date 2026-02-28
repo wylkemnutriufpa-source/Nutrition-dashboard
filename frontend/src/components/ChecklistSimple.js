@@ -1,8 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Circle, Loader2, Plus, X, Edit2, Check } from 'lucide-react';
-import { getChecklistTasks, toggleChecklistTask, createChecklistTask, deleteChecklistTask, updateChecklistTask } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { CheckCircle2, Circle, Loader2, Plus, X, Edit2, Check, Sparkles, Flame, Trophy } from 'lucide-react';
+import { getChecklistTasks, toggleChecklistTask, createChecklistTask, deleteChecklistTask, updateChecklistTask, createBulkChecklistTasks } from '@/lib/supabase';
 import { toast } from 'sonner';
+
+// 10 Sugestões de hábitos saudáveis padrão
+const DEFAULT_HEALTH_HABITS = [
+  { title: '💧 Beber 2L de água', icon: '💧', category: 'hidratação' },
+  { title: '😴 Dormir 7-8 horas', icon: '😴', category: 'sono' },
+  { title: '🏃 Exercício físico (30 min)', icon: '🏃', category: 'exercício' },
+  { title: '🥗 Comer 3 porções de vegetais', icon: '🥗', category: 'nutrição' },
+  { title: '🍎 Comer 2 frutas', icon: '🍎', category: 'nutrição' },
+  { title: '🚫 Evitar açúcar refinado', icon: '🚫', category: 'nutrição' },
+  { title: '⏰ Respeitar horário das refeições', icon: '⏰', category: 'rotina' },
+  { title: '🧘 10 min de relaxamento/meditação', icon: '🧘', category: 'mental' },
+  { title: '📝 Registrar peso/medidas', icon: '📝', category: 'monitoramento' },
+  { title: '🚶 Caminhar 10 mil passos', icon: '🚶', category: 'exercício' }
+];
 
 const ChecklistSimple = ({ patientId, isPatientView = true }) => {
   const [tasks, setTasks] = useState([]);
@@ -11,6 +28,7 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     loadTasks();
@@ -40,7 +58,10 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
       setTasks(tasks.map(t => 
         t.id === taskId ? { ...t, completed: !currentCompleted } : t
       ));
-      toast.success(!currentCompleted ? 'Tarefa concluída!' : 'Tarefa desmarcada');
+      
+      if (!currentCompleted) {
+        toast.success('🎉 Ótimo trabalho!');
+      }
     } catch (error) {
       console.error('Erro ao atualizar tarefa:', error);
       toast.error('Erro ao atualizar tarefa');
@@ -58,10 +79,59 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
       
       setTasks([...tasks, data]);
       setNewTaskTitle('');
-      toast.success('Tarefa criada!');
+      toast.success('Hábito adicionado!');
     } catch (error) {
       console.error('Erro ao criar tarefa:', error);
       toast.error('Erro ao criar tarefa');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleAddSuggestion = async (suggestion) => {
+    // Verificar se já existe
+    if (tasks.some(t => t.title === suggestion.title)) {
+      toast.info('Este hábito já está na lista');
+      return;
+    }
+
+    setAdding(true);
+    try {
+      const { data, error } = await createChecklistTask(patientId, suggestion.title);
+      if (error) throw error;
+      
+      setTasks([...tasks, data]);
+      toast.success(`${suggestion.icon} Hábito adicionado!`);
+    } catch (error) {
+      console.error('Erro ao criar tarefa:', error);
+      toast.error('Erro ao criar tarefa');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleAddAllSuggestions = async () => {
+    const newHabits = DEFAULT_HEALTH_HABITS.filter(
+      h => !tasks.some(t => t.title === h.title)
+    );
+
+    if (newHabits.length === 0) {
+      toast.info('Todos os hábitos sugeridos já estão na lista');
+      return;
+    }
+
+    setAdding(true);
+    try {
+      for (const habit of newHabits) {
+        const { data, error } = await createChecklistTask(patientId, habit.title);
+        if (error) throw error;
+        setTasks(prev => [...prev, data]);
+      }
+      toast.success(`🎯 ${newHabits.length} hábitos adicionados!`);
+      setShowSuggestions(false);
+    } catch (error) {
+      console.error('Erro ao criar tarefas:', error);
+      toast.error('Erro ao criar tarefas');
     } finally {
       setAdding(false);
     }
@@ -73,191 +143,251 @@ const ChecklistSimple = ({ patientId, isPatientView = true }) => {
       if (error) throw error;
       
       setTasks(tasks.filter(t => t.id !== taskId));
-      toast.success('Tarefa excluída');
+      toast.success('Removido');
     } catch (error) {
       console.error('Erro ao excluir tarefa:', error);
       toast.error('Erro ao excluir tarefa');
     }
   };
 
-  const handleStartEdit = (task) => {
+  const handleEdit = (task) => {
     setEditingId(task.id);
     setEditTitle(task.title);
   };
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditTitle('');
-  };
-
   const handleSaveEdit = async (taskId) => {
-    if (!editTitle.trim()) {
-      toast.error('Título não pode ser vazio');
-      return;
-    }
-
+    if (!editTitle.trim()) return;
+    
     try {
-      const { data, error } = await updateChecklistTask(taskId, { title: editTitle.trim() });
+      const { error } = await updateChecklistTask(taskId, { title: editTitle.trim() });
       if (error) throw error;
       
-      setTasks(tasks.map(t => t.id === taskId ? data : t));
+      setTasks(tasks.map(t => 
+        t.id === taskId ? { ...t, title: editTitle.trim() } : t
+      ));
       setEditingId(null);
-      setEditTitle('');
-      toast.success('Tarefa atualizada');
+      toast.success('Atualizado!');
     } catch (error) {
       console.error('Erro ao atualizar tarefa:', error);
-      toast.error('Erro ao atualizar tarefa');
+      toast.error('Erro ao atualizar');
     }
   };
 
+  // Calcular progresso
   const completedCount = tasks.filter(t => t.completed).length;
-  const progress = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+  const totalCount = tasks.length;
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+  // Mensagem de motivação baseada no progresso
+  const getMotivationMessage = () => {
+    if (progressPercent === 100) return { text: '🏆 Dia perfeito! Parabéns!', color: 'text-green-600' };
+    if (progressPercent >= 75) return { text: '🔥 Excelente! Quase lá!', color: 'text-orange-500' };
+    if (progressPercent >= 50) return { text: '💪 Bom progresso! Continue!', color: 'text-blue-600' };
+    if (progressPercent >= 25) return { text: '🌱 Bom começo! Você consegue!', color: 'text-teal-600' };
+    return { text: '✨ Comece seu dia saudável!', color: 'text-gray-500' };
+  };
+
+  const motivation = getMotivationMessage();
 
   if (loading) {
     return (
       <Card>
-        <CardContent className="py-12 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
+        <CardContent className="py-8 text-center">
+          <Loader2 className="h-6 w-6 animate-spin mx-auto text-teal-600" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card data-testid="checklist-simple">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Checklist Diário</span>
-          {tasks.length > 0 && (
-            <span className="text-sm font-normal text-gray-600">
-              {completedCount}/{tasks.length} ({progress}%)
-            </span>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Barra de progresso */}
-        {tasks.length > 0 && (
-          <div className="mb-4">
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-teal-700 h-2 rounded-full transition-all" 
-                style={{ width: `${progress}%` }}
-              />
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white pb-6">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Flame className="h-5 w-5" />
+            Hábitos do Dia
+          </CardTitle>
+          {progressPercent === 100 && (
+            <div className="flex items-center gap-1 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold">
+              <Trophy className="h-3 w-3" /> Completo!
             </div>
+          )}
+        </div>
+        
+        {/* Barra de Progresso */}
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className={motivation.color.replace('text-', 'text-white/80 ')}>{motivation.text}</span>
+            <span className="font-bold">{completedCount}/{totalCount}</span>
           </div>
-        )}
-
-        {/* Lista de tarefas */}
-        {tasks.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="mb-2">
-              {isPatientView 
-                ? 'Seu profissional ainda não configurou seu checklist.' 
-                : 'Nenhuma tarefa criada ainda.'}
-            </p>
+          <div className="h-3 bg-white/20 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-yellow-400 to-green-400 rounded-full transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
-        ) : (
-          <div className="space-y-3">
-            {tasks.map((task) => (
-              <div 
-                key={task.id} 
-                className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg group"
-                data-testid={`task-${task.id}`}
+          <p className="text-center text-white/90 text-2xl font-bold">{progressPercent}%</p>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-4">
+        {/* Lista de Tarefas */}
+        <div className="space-y-2 max-h-[400px] overflow-y-auto">
+          {tasks.length === 0 ? (
+            <div className="text-center py-8">
+              <Sparkles className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 mb-4">Nenhum hábito configurado</p>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowSuggestions(true)}
+                className="text-teal-600 border-teal-600 hover:bg-teal-50"
               >
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Hábitos Saudáveis
+              </Button>
+            </div>
+          ) : (
+            tasks.map((task) => (
+              <div
+                key={task.id}
+                className={`
+                  flex items-center gap-3 p-3 rounded-lg border transition-all
+                  ${task.completed 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-white border-gray-200 hover:border-teal-300'
+                  }
+                `}
+              >
+                {/* Checkbox */}
                 <button
                   onClick={() => handleToggle(task.id, task.completed)}
                   className="flex-shrink-0"
-                  data-testid={`task-toggle-${task.id}`}
-                  disabled={!isPatientView}
                 >
                   {task.completed ? (
-                    <CheckCircle2 className="text-green-600" size={24} />
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
                   ) : (
-                    <Circle className="text-gray-400" size={24} />
+                    <Circle className="h-6 w-6 text-gray-300 hover:text-teal-500" />
                   )}
                 </button>
-                
+
+                {/* Título */}
                 {editingId === task.id ? (
-                  <>
-                    <input
-                      type="text"
+                  <div className="flex-1 flex gap-2">
+                    <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="flex-1 px-2 py-1 border border-teal-700 rounded focus:outline-none focus:ring-2 focus:ring-teal-700"
-                      data-testid={`task-edit-input-${task.id}`}
+                      className="flex-1 h-8"
                       autoFocus
+                      onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit(task.id)}
                     />
-                    <button
-                      onClick={() => handleSaveEdit(task.id)}
-                      className="text-green-600 hover:text-green-700"
-                      data-testid={`task-save-${task.id}`}
-                    >
-                      <Check size={20} />
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      className="text-gray-500 hover:text-gray-700"
-                      data-testid={`task-cancel-${task.id}`}
-                    >
-                      <X size={20} />
-                    </button>
-                  </>
+                    <Button size="sm" variant="ghost" onClick={() => handleSaveEdit(task.id)}>
+                      <Check className="h-4 w-4 text-green-600" />
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                      <X className="h-4 w-4 text-gray-400" />
+                    </Button>
+                  </div>
                 ) : (
-                  <>
-                    <span 
-                      className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-900 font-medium'}`}
-                    >
-                      {task.title}
-                    </span>
+                  <span className={`flex-1 ${task.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                    {task.title}
+                  </span>
+                )}
 
-                    {!isPatientView && (
-                      <>
-                        <button
-                          onClick={() => handleStartEdit(task)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-teal-600 hover:text-teal-700"
-                          data-testid={`task-edit-${task.id}`}
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(task.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
-                          data-testid={`task-delete-${task.id}`}
-                        >
-                          <X size={20} />
-                        </button>
-                      </>
-                    )}
-                  </>
+                {/* Ações */}
+                {!editingId && (
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleEdit(task)}
+                      className="p-1 text-gray-400 hover:text-teal-600"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(task.id)}
+                      className="p-1 text-gray-400 hover:text-red-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 )}
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
-        {/* Formulário para adicionar (apenas profissional) */}
-        {!isPatientView && (
+        {/* Form para adicionar */}
+        {tasks.length > 0 && (
           <form onSubmit={handleAdd} className="mt-4 flex gap-2">
-            <input
-              type="text"
+            <Input
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="Nova tarefa..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700"
+              placeholder="Adicionar novo hábito..."
+              className="flex-1"
               disabled={adding}
-              data-testid="new-task-input"
             />
-            <button
-              type="submit"
-              disabled={adding || !newTaskTitle.trim()}
-              className="px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              data-testid="add-task-button"
-            >
-              <Plus size={20} />
-              Adicionar
-            </button>
+            <Button type="submit" disabled={adding || !newTaskTitle.trim()} className="bg-teal-600 hover:bg-teal-700">
+              {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            </Button>
           </form>
+        )}
+
+        {/* Botão de sugestões */}
+        {tasks.length > 0 && tasks.length < 10 && (
+          <Button 
+            variant="ghost" 
+            className="w-full mt-2 text-teal-600"
+            onClick={() => setShowSuggestions(!showSuggestions)}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            {showSuggestions ? 'Ocultar sugestões' : 'Ver sugestões de hábitos'}
+          </Button>
+        )}
+
+        {/* Painel de Sugestões */}
+        {showSuggestions && (
+          <div className="mt-4 p-4 bg-teal-50 rounded-lg border border-teal-200">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-teal-800 flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                Hábitos Saudáveis Sugeridos
+              </h4>
+              <Button 
+                size="sm" 
+                onClick={handleAddAllSuggestions}
+                disabled={adding}
+                className="bg-teal-600 hover:bg-teal-700 text-xs"
+              >
+                Adicionar Todos
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {DEFAULT_HEALTH_HABITS.map((habit, idx) => {
+                const isAdded = tasks.some(t => t.title === habit.title);
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => !isAdded && handleAddSuggestion(habit)}
+                    disabled={isAdded || adding}
+                    className={`
+                      flex items-center gap-2 p-2 rounded-lg text-left text-sm transition-all
+                      ${isAdded 
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        : 'bg-white hover:bg-teal-100 text-gray-700 border border-gray-200 hover:border-teal-400'
+                      }
+                    `}
+                  >
+                    <span className="text-lg">{habit.icon}</span>
+                    <span className="flex-1">{habit.title}</span>
+                    {isAdded ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Plus className="h-4 w-4 text-teal-600" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>
