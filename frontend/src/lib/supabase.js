@@ -3029,13 +3029,3 @@ export const getAllProfessionalFeedbacks = async (professionalId, filters = {}) 
     return { data: [], error };
   }
 };
-
-      checklist_today: 0,
-      last_weight_update: null,
-      responded_feedbacks_7d: 0,
-      days_since_last_feedback: 999,
-      has_upcoming_appointment: false,
-      has_active_plan: false
-    };
-  }
-};
