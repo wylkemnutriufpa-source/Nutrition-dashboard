@@ -388,11 +388,215 @@ const SPECIAL_PLANS = {
     },
     avoid: ['Café junto às refeições', 'Chá preto/verde junto às refeições', 'Refrigerantes', 'Leite junto ao ferro'],
     prefer: ['Carnes vermelhas', 'Fígado', 'Leguminosas', 'Vegetais verde-escuros', 'Vitamina C', 'Beterraba', 'Frutas cítricas']
+  },
+
+  // 🫘 DOENÇA RENAL - Controle de proteínas, sódio, potássio e fósforo
+  renal: {
+    id: 'renal',
+    name: 'Doença Renal',
+    icon: '🫘',
+    category: 'special',
+    description: 'Controle de proteínas, sódio, potássio e fósforo',
+    tags: ['renal', 'rim', 'insuficiência renal', 'diálise'],
+    guidelines: [
+      'Controlar proteínas (conforme estágio)',
+      'Limitar sódio (1.5-2g/dia)',
+      'Controlar potássio e fósforo',
+      'Evitar alimentos ultraprocessados',
+      'Hidratação conforme orientação médica'
+    ],
+    meals: {
+      breakfast: [
+        ['Pão branco sem sal', 'Margarina sem sal', 'Geleia', 'Maçã', 'Chá de ervas'],
+        ['Tapioca', 'Ovo (1 unidade)', 'Suco de maçã diluído'],
+        ['Cuscuz de milho', 'Manteiga sem sal', 'Pera']
+      ],
+      morning_snack: [
+        ['Maçã', 'Biscoito de água sem sal'],
+        ['Pera', 'Gelatina'],
+        ['Melancia (porção pequena)']
+      ],
+      lunch: [
+        ['Arroz branco', 'Frango grelhado (porção controlada)', 'Abobrinha refogada', 'Cenoura cozida'],
+        ['Macarrão', 'Carne moída magra', 'Chuchu', 'Pepino'],
+        ['Arroz', 'Peixe branco', 'Vagem', 'Beterraba cozida (pequena)']
+      ],
+      afternoon_snack: [
+        ['Biscoito de polvilho', 'Suco de maçã'],
+        ['Pão branco', 'Geleia'],
+        ['Gelatina', 'Biscoito sem sal']
+      ],
+      dinner: [
+        ['Sopa de legumes (baixo potássio)', 'Frango desfiado', 'Arroz'],
+        ['Purê de batata (deixar de molho)', 'Ovo', 'Salada de alface'],
+        ['Macarrão', 'Molho branco caseiro', 'Peixe']
+      ],
+      supper: [
+        ['Chá de camomila', 'Biscoito de maisena'],
+        ['Maçã assada', 'Canela'],
+        ['Gelatina']
+      ]
+    },
+    avoid: ['Sal em excesso', 'Embutidos', 'Queijos', 'Chocolate', 'Banana', 'Laranja', 'Tomate em excesso', 'Feijão em excesso', 'Nozes'],
+    prefer: ['Alimentos frescos', 'Ervas para temperar', 'Frutas de baixo potássio (maçã, pera)', 'Vegetais cozidos (reduz potássio)']
+  },
+
+  // 🔥 GASTRITE/REFLUXO - Proteção gástrica
+  gastrite: {
+    id: 'gastrite',
+    name: 'Gastrite/Refluxo',
+    icon: '🔥',
+    category: 'special',
+    description: 'Proteção gástrica, evita irritantes',
+    tags: ['gastrite', 'refluxo', 'azia', 'estômago', 'úlcera'],
+    guidelines: [
+      'Fracionar refeições (5-6x ao dia)',
+      'Evitar jejum prolongado',
+      'Não deitar após comer (esperar 2-3h)',
+      'Mastigar bem os alimentos',
+      'Evitar alimentos ácidos e irritantes'
+    ],
+    meals: {
+      breakfast: [
+        ['Pão branco torrado', 'Queijo branco', 'Mamão', 'Chá de camomila'],
+        ['Aveia cozida', 'Banana amassada', 'Mel', 'Leite desnatado'],
+        ['Tapioca', 'Ovo mexido', 'Melão', 'Água de coco']
+      ],
+      morning_snack: [
+        ['Banana', 'Biscoito de maisena'],
+        ['Mamão', 'Torrada'],
+        ['Maçã sem casca', 'Iogurte natural']
+      ],
+      lunch: [
+        ['Arroz branco', 'Frango grelhado', 'Cenoura cozida', 'Batata', 'Azeite (pouco)'],
+        ['Purê de batata', 'Peixe ao vapor', 'Chuchu', 'Abobrinha'],
+        ['Macarrão', 'Peito de peru', 'Legumes no vapor', 'Azeite']
+      ],
+      afternoon_snack: [
+        ['Banana com aveia'],
+        ['Iogurte natural', 'Mel'],
+        ['Pão branco', 'Ricota']
+      ],
+      dinner: [
+        ['Sopa de legumes batida', 'Frango desfiado', 'Torrada'],
+        ['Purê de abóbora', 'Peixe grelhado', 'Arroz'],
+        ['Omelete simples', 'Salada de alface', 'Cenoura']
+      ],
+      supper: [
+        ['Chá de camomila', 'Biscoito de água'],
+        ['Leite morno desnatado', 'Mel'],
+        ['Maçã cozida com canela']
+      ]
+    },
+    avoid: ['Café', 'Chocolate', 'Refrigerantes', 'Frituras', 'Pimenta', 'Alho cru', 'Cebola crua', 'Frutas cítricas', 'Tomate', 'Álcool', 'Hortelã'],
+    prefer: ['Alimentos cozidos', 'Frutas não ácidas', 'Vegetais macios', 'Carnes magras', 'Chás calmantes', 'Gengibre (com moderação)']
+  },
+
+  // 🫀 COLESTEROL ALTO - Redução de gorduras saturadas
+  colesterol: {
+    id: 'colesterol',
+    name: 'Colesterol Alto',
+    icon: '🫀',
+    category: 'special',
+    description: 'Redução de gorduras saturadas e trans',
+    tags: ['colesterol', 'dislipidemia', 'triglicerídeos', 'coração'],
+    guidelines: [
+      'Reduzir gorduras saturadas e trans',
+      'Aumentar fibras solúveis',
+      'Incluir fitoesteróis',
+      'Preferir gorduras insaturadas',
+      'Aumentar consumo de peixes'
+    ],
+    meals: {
+      breakfast: [
+        ['Aveia com maçã', 'Linhaça', 'Leite desnatado', 'Pão integral'],
+        ['Pão integral', 'Pasta de amendoim', 'Banana', 'Chá verde'],
+        ['Granola sem açúcar', 'Iogurte desnatado', 'Frutas vermelhas']
+      ],
+      morning_snack: [
+        ['Maçã com casca', 'Castanhas (punhado)'],
+        ['Laranja', 'Nozes'],
+        ['Pera', 'Amêndoas']
+      ],
+      lunch: [
+        ['Arroz integral', 'Feijão', 'Salmão grelhado', 'Salada de folhas', 'Azeite'],
+        ['Quinoa', 'Lentilha', 'Sardinha', 'Brócolis', 'Azeite'],
+        ['Arroz integral', 'Grão de bico', 'Atum', 'Espinafre', 'Abacate']
+      ],
+      afternoon_snack: [
+        ['Vitamina de abacate com cacau'],
+        ['Mix de oleaginosas', 'Frutas secas'],
+        ['Iogurte desnatado', 'Aveia', 'Chia']
+      ],
+      dinner: [
+        ['Peixe assado', 'Legumes grelhados', 'Salada verde', 'Azeite'],
+        ['Frango sem pele', 'Berinjela grelhada', 'Arroz integral'],
+        ['Omelete de claras', 'Espinafre', 'Tomate', 'Aveia']
+      ],
+      supper: [
+        ['Chá verde', 'Frutas vermelhas'],
+        ['Iogurte desnatado', 'Linhaça'],
+        ['Maçã', 'Canela']
+      ]
+    },
+    avoid: ['Carnes gordas', 'Pele de frango', 'Embutidos', 'Frituras', 'Manteiga', 'Queijos gordos', 'Biscoitos recheados', 'Fast food'],
+    prefer: ['Peixes (salmão, sardinha, atum)', 'Azeite de oliva', 'Abacate', 'Oleaginosas', 'Aveia', 'Linhaça', 'Chia', 'Frutas', 'Vegetais']
+  },
+
+  // 🦋 HIPOTIREOIDISMO - Suporte à tireoide
+  hipotireoidismo: {
+    id: 'hipotireoidismo',
+    name: 'Hipotireoidismo',
+    icon: '🦋',
+    category: 'special',
+    description: 'Suporte à função da tireoide',
+    tags: ['tireoide', 'hipotireoidismo', 'metabolismo'],
+    guidelines: [
+      'Garantir iodo adequado',
+      'Incluir selênio e zinco',
+      'Moderar alimentos bociogênicos (crus)',
+      'Evitar soja em excesso',
+      'Tomar medicação longe das refeições'
+    ],
+    meals: {
+      breakfast: [
+        ['Ovos mexidos', 'Pão integral', 'Mamão', 'Castanha do Pará (2)'],
+        ['Aveia cozida', 'Banana', 'Mel', 'Leite'],
+        ['Tapioca', 'Queijo', 'Frutas', 'Café (2h após medicação)']
+      ],
+      morning_snack: [
+        ['Frutas variadas', 'Castanha do Pará (1)'],
+        ['Iogurte natural', 'Granola'],
+        ['Banana', 'Pasta de amendoim']
+      ],
+      lunch: [
+        ['Arroz integral', 'Feijão', 'Frango grelhado', 'Legumes cozidos', 'Azeite'],
+        ['Quinoa', 'Lentilha', 'Peixe do mar', 'Brócolis cozido', 'Azeite'],
+        ['Arroz', 'Grão de bico', 'Carne magra', 'Couve refogada', 'Abóbora']
+      ],
+      afternoon_snack: [
+        ['Mix de oleaginosas', 'Frutas'],
+        ['Sanduíche natural de frango'],
+        ['Iogurte', 'Frutas vermelhas']
+      ],
+      dinner: [
+        ['Peixe ao forno', 'Batata doce', 'Salada cozida'],
+        ['Frango', 'Arroz', 'Legumes refogados'],
+        ['Omelete', 'Espinafre cozido', 'Cenoura']
+      ],
+      supper: [
+        ['Chá de ervas', 'Frutas'],
+        ['Leite morno', 'Canela'],
+        ['Iogurte natural']
+      ]
+    },
+    avoid: ['Soja em excesso', 'Crucíferas cruas em excesso (brócolis, couve-flor crus)', 'Glúten (se sensibilidade)', 'Açúcar refinado', 'Ultraprocessados'],
+    prefer: ['Castanha do Pará (selênio)', 'Peixes do mar (iodo)', 'Ovos', 'Carnes', 'Vegetais cozidos', 'Frutas', 'Zinco']
   }
 };
 
 // Lista ordenada dos planos especiais para exibição
-const SPECIAL_PLANS_ORDER = ['diabetico', 'hipertenso', 'intolerancia', 'gestante', 'lactante', 'anemia'];
+const SPECIAL_PLANS_ORDER = ['diabetico', 'hipertenso', 'intolerancia', 'gestante', 'lactante', 'anemia', 'renal', 'gastrite', 'colesterol', 'hipotireoidismo'];
 
 /**
  * Retorna configuração de um plano especial
