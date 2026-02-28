@@ -394,7 +394,7 @@ frontend:
 
   - task: "Modal Visualizar Plano Alimentar"
     implemented: true
-    working: false
+    working: true
     file: "frontend/src/components/MealPlanViewerModal.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/PatientDashboard.js"
     stuck_count: 3
     priority: "high"
@@ -412,6 +412,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ TESTE FINAL (28/Fev/2026 - Re-teste kelly@com/123456): ISSUE CRÍTICA PERSISTE - Modal 'Anamnese Completa!' CONTINUA aparecendo a cada login. LocalStorage check em PatientDashboard.js (linhas 38-58) usa key `anamnesis_complete_modal_${user.id}` mas o modal reaparece toda vez. Possível causa: localStorage sendo limpo, user.id mudando, ou lógica de verificação com race condition. ✅ SUCESSO PARCIAL: Após fechar modal bloqueador, MealPlanViewerModal ABRE PERFEITAMENTE. Modal exibe: Título 'Plano Alimentar (do Pré-Plano)', Badge '6 refeições', Tabs 'Refeições' e 'Observações' funcionais. Refeições visíveis: 'Café da Manhã pos treino (07:00)', 'Lanche da Manhã (10:00)'. Header mostra: Calorias 0 (meta 3159 kcal), Proteína 0g (meta 129g), Carboidratos 0g (meta 225g), Gordura 0g (meta 198g). Todos alimentos individuais mostram '0 kcal, P: 0g'. Total da Refeição mostra '0 kcal, P: 0g, C: 0g, G: 0g'. ⚠️ CALORIAS 0 É ESPERADO conforme nota do usuário - plano criado antes da correção. CONCLUSÃO: Modal funciona corretamente SEM BLOQUEIO após fechar FirstAccessModal. Issue real: FirstAccessModal localStorage fix NÃO está funcionando. Screenshots: modal_blocker_aparecer.png, meal_plan_modal_full_view.png, meal_plan_modal_scrolled.png."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSOU COMPLETAMENTE (28/Fev/2026 - TESTE FINAL kelly@com/123456): Correção do checkFirstAccess() FUNCIONOU PERFEITAMENTE. FLUXO COMPLETO TESTADO: (1) Página inicial carregada ✅, (2) Clicado em 'Paciente' ✅, (3) Login kelly@com/123456 realizado ✅, (4) 🎯 CRÍTICO: Modal 'Anamnese Completa!' NÃO APARECE MAIS (conforme esperado para anamnese completa) ✅, (5) Dashboard carregado sem overlays bloqueadores ✅, (6) Botão 'Ver Plano Completo' encontrado ✅, (7) MealPlanViewerModal ABRE PERFEITAMENTE sem bloqueios ✅. MODAL FUNCIONANDO: Título 'Plano Alimentar (do Pré-Plano)' exibido, Badge '6 refeições' visível, 3 tabs encontradas (Refeições/Observações), Refeições expansíveis: Café da Manhã pos treino (07:00), Lanche da Manhã (10:00), Almoço (12:30), Todos alimentos listados com quantidades, Calorias mostram 0 kcal (ESPERADO - plano antigo). ISSUE RESOLVIDA: PatientDashboard.js linha 38-49 agora verifica corretamente 'if (anamnesis?.status !== complete)' antes de mostrar modal. Modal só aparece para anamnese incompleta. Screenshots: 04_dashboard_loaded.png (sem modal bloqueador), 05_SUCCESS_no_modal.png (confirmação), 08_meal_plan_modal_opened.png, 09_meal_plan_modal_scrolled.png. ✅✅✅ FUNCIONALIDADE 100% OPERACIONAL."
 
   - task: "Botão Acessar Planos no Dashboard Profissional"
     implemented: true
