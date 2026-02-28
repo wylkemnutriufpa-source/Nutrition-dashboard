@@ -490,9 +490,9 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Planos Especiais por Condição (6 planos médicos)"
     - "Dashboard Profissional - Correção de Role (Admin vs Professional)"
     - "Verificar Variações do Pré-Plano (6 estilos)"
-    - "Dicas Personalizadas do Nutricionista"
   stuck_tasks:
     - "Dashboard Profissional - Role/Permission Issue (CRÍTICO)"
   test_all: false
