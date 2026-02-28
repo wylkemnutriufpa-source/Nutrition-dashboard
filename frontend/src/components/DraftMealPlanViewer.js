@@ -285,41 +285,117 @@ const DraftMealPlanViewer = ({
       {onRegenerate && !editing && (
         <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <RefreshCw className="text-indigo-600" size={20} />
-              <h3 className="font-semibold text-gray-800">Escolha um Estilo de Cardápio</h3>
-              <Badge className="bg-indigo-100 text-indigo-700 ml-2">
-                Atual: {variationLabels.find(v => v.id === currentVariation)?.label || 'Clássico'}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">
-              Clique em uma alternativa para gerar um novo cardápio com esse estilo
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {variationLabels.map((variation) => (
-                <button
-                  key={variation.id}
-                  onClick={() => handleRegenerateVariation(variation.id)}
-                  disabled={loading || saving}
-                  className={`p-4 rounded-xl border-2 transition-all text-left hover:scale-[1.02] ${
-                    currentVariation === variation.id
-                      ? 'border-indigo-500 bg-indigo-100 shadow-md'
-                      : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl">{variation.icon}</span>
-                    <span className={`font-semibold ${currentVariation === variation.id ? 'text-indigo-700' : 'text-gray-800'}`}>
-                      {variation.label}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">{variation.description}</p>
-                  {currentVariation === variation.id && (
-                    <Badge className="mt-2 bg-indigo-500 text-white text-xs">Selecionado</Badge>
+            <Tabs defaultValue="general" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="general" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+                  🍽️ Estilos Gerais
+                </TabsTrigger>
+                <TabsTrigger value="special" className="data-[state=active]:bg-pink-600 data-[state=active]:text-white">
+                  <Heart className="mr-1 h-4 w-4" /> Planos Especiais
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Tab: Estilos Gerais */}
+              <TabsContent value="general">
+                <div className="flex items-center gap-2 mb-4">
+                  <RefreshCw className="text-indigo-600" size={20} />
+                  <h3 className="font-semibold text-gray-800">Escolha um Estilo de Cardápio</h3>
+                  {planCategory === 'general' && (
+                    <Badge className="bg-indigo-100 text-indigo-700 ml-2">
+                      Atual: {variationLabels.find(v => v.id === currentVariation)?.label || 'Clássico'}
+                    </Badge>
                   )}
-                </button>
-              ))}
-            </div>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Clique em uma alternativa para gerar um novo cardápio com esse estilo
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {variationLabels.map((variation) => (
+                    <button
+                      key={variation.id}
+                      onClick={() => handleRegenerateVariation(variation.id)}
+                      disabled={loading || saving}
+                      className={`p-4 rounded-xl border-2 transition-all text-left hover:scale-[1.02] ${
+                        planCategory === 'general' && currentVariation === variation.id
+                          ? 'border-indigo-500 bg-indigo-100 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50'
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-2xl">{variation.icon}</span>
+                        <span className={`font-semibold ${planCategory === 'general' && currentVariation === variation.id ? 'text-indigo-700' : 'text-gray-800'}`}>
+                          {variation.label}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">{variation.description}</p>
+                      {planCategory === 'general' && currentVariation === variation.id && (
+                        <Badge className="mt-2 bg-indigo-500 text-white text-xs">Selecionado</Badge>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </TabsContent>
+
+              {/* Tab: Planos Especiais (Baseados em Condição) */}
+              <TabsContent value="special">
+                <div className="flex items-center gap-2 mb-4">
+                  <Heart className="text-pink-600" size={20} />
+                  <h3 className="font-semibold text-gray-800">Planos Especiais por Condição</h3>
+                  {selectedSpecialPlan && (
+                    <Badge className="bg-pink-100 text-pink-700 ml-2">
+                      Atual: {selectedSpecialPlan.name}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Cardápios específicos para condições médicas com alimentos adequados
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {specialPlans.map((plan) => (
+                    <button
+                      key={plan.id}
+                      onClick={() => handleSelectSpecialPlan(plan)}
+                      disabled={loading || saving}
+                      className={`p-4 rounded-xl border-2 transition-all text-left hover:scale-[1.02] ${
+                        selectedSpecialPlan?.id === plan.id
+                          ? 'border-pink-500 bg-pink-100 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-pink-300 hover:bg-pink-50'
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-2xl">{plan.icon}</span>
+                        <span className={`font-semibold ${selectedSpecialPlan?.id === plan.id ? 'text-pink-700' : 'text-gray-800'}`}>
+                          {plan.name}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">{plan.description}</p>
+                      {selectedSpecialPlan?.id === plan.id && (
+                        <Badge className="mt-2 bg-pink-500 text-white text-xs">Selecionado</Badge>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Botão de regenerar variação do plano especial */}
+                {selectedSpecialPlan && (
+                  <div className="mt-4 pt-4 border-t border-pink-200">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleRegenerateSpecialVariation}
+                      disabled={loading}
+                      className="border-pink-300 text-pink-700 hover:bg-pink-50"
+                    >
+                      <RefreshCw className="mr-2" size={16} />
+                      Gerar Nova Variação ({specialVariation + 1}/3)
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Cada plano especial tem 3 variações de cardápio
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+
             {loading && (
               <div className="flex items-center justify-center mt-4 text-indigo-600">
                 <Loader2 className="animate-spin mr-2" size={20} />
