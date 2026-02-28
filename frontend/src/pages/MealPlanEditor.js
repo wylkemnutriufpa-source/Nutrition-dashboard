@@ -674,7 +674,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
     } finally {
       setLoading(false);
     }
-  }, [user, isPatientView, patientIdParam, planIdParam]); // useCallback dependencies
+  }, [user, isPatientView, patientIdParam, planIdParam, searchParams]); // useCallback dependencies
 
   // useEffect para carregar dados (CORRIGIDO)
   useEffect(() => {
