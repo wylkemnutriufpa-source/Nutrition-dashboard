@@ -503,6 +503,42 @@ frontend:
         agent: "testing"
         comment: "✅ PASSOU (28/Fev/2026 - kelly@com): Página 'Minha Agenda' carrega perfeitamente. Link 'Minha Agenda' encontrado no menu lateral e funciona. Página exibe título 'Minha Agenda', subtítulo 'Consultas e lembretes', e card 'Próximos Compromissos' com mensagem 'Nenhum compromisso futuro' (correto para conta sem lembretes). Botão 'Adicionar Lembrete' ENCONTRADO, VISÍVEL e HABILITADO. Screenshots: 30_agenda_page.png, 31_add_reminder_button.png. Funcionalidade completa e pronta para uso."
 
+  - task: "Menu Simplificado do Paciente (5 itens)"
+    implemented: false
+    working: false
+    file: "frontend/src/lib/supabase.js (DEFAULT_PATIENT_MENU), frontend/src/components/Sidebar.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ FALHOU (28/Fev/2026 - kelly@com): Menu simplificado NÃO está implementado para este paciente. ESPERADO: 5 itens (Dashboard, Minha Jornada, Minha Agenda, Meu Plano, Biblioteca). ENCONTRADO: 11 itens expandidos (Dashboard, Minha Jornada, Dicas, Minha Agenda, Meu Plano, Minhas Tarefas, Meus Feedbacks, Minhas Receitas, Lista de Compras, Suplementos, Calculadoras). Item 'Biblioteca' AUSENTE do menu. PROBLEMA: Configuração patient_menu_config não está usando DEFAULT_PATIENT_MENU. Itens secundários (Receitas, Lista, Suplementos, Calculadoras) deveriam estar ocultos e acessíveis apenas via Biblioteca. Código do menu simplificado existe em supabase.js (linhas 1402-1421), mas não está sendo aplicado ao paciente kelly@com. Screenshots: 03_dashboard_sidebar.png mostra menu expandido incorretamente."
+  
+  - task: "Página Minha Jornada"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/MinhaJornada.js (ou componente alternativo)"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSOU (28/Fev/2026 - kelly@com): Página 'Minha Jornada' acessível e funcional. Link encontrado no menu lateral e funciona perfeitamente. Página carrega com título 'Gleice Jornada de Transformação'. ELEMENTOS ENCONTRADOS: ✅ Progresso circular 0% exibido, ✅ Cards de métricas (Peso Inicial, Peso Atual, Meta, Perdido), ✅ Progresso para a Meta com barra visual, ✅ Abas (Evolução, Fotos, Tarefas), ✅ Histórico de Peso, ✅ Dica motivacional. OBSERVAÇÃO: Página implementada é diferente do código revisado em MinhaJornada.js. Elementos 'Checklist de Hábitos' e 'Próximo Compromisso' não encontrados com nomes exatos, mas funcionalidade de jornada está presente. Página funciona corretamente para tracking de progresso do paciente. Screenshots: 04_minha_jornada.png, 05_minha_jornada_scrolled.png."
+  
+  - task: "Página Biblioteca com 4 Cards"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/Biblioteca.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSOU COMPLETAMENTE (28/Fev/2026 - kelly@com): Página Biblioteca implementada e 100% funcional. Acessível via navegação direta (link não estava no menu devido a issue de configuração). TODOS OS 4 CARDS ENCONTRADOS E FUNCIONAIS: ✅ Minhas Receitas ('Receitas saudáveis personalizadas para você'), ✅ Lista de Compras ('Organize suas compras de forma inteligente'), ✅ Suplementos ('Acompanhe seus suplementos recomendados'), ✅ Calculadoras com badge 'Novo' ('IMC, TMB, necessidades calóricas e mais'). Interface perfeita: Título 'Biblioteca', subtítulo 'Todas as suas ferramentas em um só lugar', ícone de livro, grid de 4 cards coloridos com ícones, seção 'Ferramentas Rápidas' com 3 atalhos (Calcular IMC, Calorias, Freq. Cardíaca), dica sobre lista de compras. Código em Biblioteca.js linhas 1-163 implementado perfeitamente. Screenshots: 06_biblioteca.png, 07_biblioteca_scrolled.png. Componente pronto para produção."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
