@@ -77,6 +77,374 @@ const VARIATION_NAMES = [
   'Fitness'
 ];
 
+// ==================== PLANOS ESPECIAIS (BASEADOS EM CONDIÇÃO) ====================
+
+/**
+ * Configurações de planos especiais para condições médicas
+ * Sistema modular para fácil adição de novos protocolos
+ */
+const SPECIAL_PLANS = {
+  // 🩸 DIABÉTICO - Baixo índice glicêmico, controle de carboidratos
+  diabetico: {
+    id: 'diabetico',
+    name: 'Diabético',
+    icon: '🩸',
+    category: 'special',
+    description: 'Baixo índice glicêmico, controle de carboidratos',
+    tags: ['diabetes', 'glicemia', 'insulina'],
+    guidelines: [
+      'Priorizar carboidratos complexos e de baixo IG',
+      'Fracionar refeições (5-6x ao dia)',
+      'Incluir fibras em todas as refeições',
+      'Evitar açúcares simples e refinados',
+      'Combinar carboidratos com proteínas/gorduras boas'
+    ],
+    meals: {
+      breakfast: [
+        ['Pão integral com abacate', 'Ovo cozido', 'Chá verde sem açúcar'],
+        ['Aveia em flocos com canela', 'Iogurte natural', 'Nozes'],
+        ['Tapioca com queijo branco', 'Omelete de claras', 'Café sem açúcar']
+      ],
+      morning_snack: [
+        ['Maçã com casca', 'Castanhas (5 unidades)'],
+        ['Iogurte natural sem açúcar', 'Sementes de chia'],
+        ['Pera', 'Amêndoas (8 unidades)']
+      ],
+      lunch: [
+        ['Arroz integral (porção controlada)', 'Feijão', 'Frango grelhado', 'Salada de folhas verdes', 'Azeite'],
+        ['Quinoa', 'Lentilha', 'Peixe assado', 'Legumes no vapor', 'Azeite'],
+        ['Batata doce (pequena porção)', 'Grão de bico', 'Carne magra', 'Brócolis', 'Azeite']
+      ],
+      afternoon_snack: [
+        ['Cenoura baby', 'Homus caseiro'],
+        ['Pepino com queijo cottage'],
+        ['Tomate cereja', 'Queijo minas']
+      ],
+      dinner: [
+        ['Frango grelhado', 'Abobrinha refogada', 'Salada verde'],
+        ['Peixe ao forno', 'Couve-flor gratinada', 'Salada de folhas'],
+        ['Omelete de legumes', 'Espinafre refogado', 'Tomate']
+      ],
+      supper: [
+        ['Chá de camomila', 'Queijo cottage (2 col sopa)'],
+        ['Leite desnatado morno', 'Canela'],
+        ['Chá de ervas', 'Castanha do Pará (2 unidades)']
+      ]
+    },
+    avoid: ['Açúcar refinado', 'Mel em excesso', 'Pão branco', 'Arroz branco', 'Sucos de caixa', 'Refrigerantes', 'Doces', 'Massas refinadas'],
+    prefer: ['Fibras', 'Proteínas magras', 'Gorduras boas', 'Vegetais folhosos', 'Grãos integrais']
+  },
+
+  // ❤️ HIPERTENSO - Dieta DASH, baixo sódio
+  hipertenso: {
+    id: 'hipertenso',
+    name: 'Hipertenso (DASH)',
+    icon: '❤️',
+    category: 'special',
+    description: 'Baixo sódio, estratégia DASH para pressão arterial',
+    tags: ['hipertensão', 'pressão alta', 'DASH', 'sódio'],
+    guidelines: [
+      'Reduzir sódio (máx 2g/dia)',
+      'Aumentar potássio, magnésio e cálcio',
+      'Priorizar frutas, vegetais e grãos integrais',
+      'Limitar gorduras saturadas',
+      'Evitar alimentos ultraprocessados'
+    ],
+    meals: {
+      breakfast: [
+        ['Aveia com banana', 'Leite desnatado', 'Mel (pouco)'],
+        ['Pão integral sem sal', 'Queijo sem sal', 'Mamão', 'Chá'],
+        ['Tapioca', 'Ovo mexido sem sal', 'Melão', 'Café']
+      ],
+      morning_snack: [
+        ['Banana', 'Iogurte natural desnatado'],
+        ['Laranja', 'Castanhas sem sal'],
+        ['Mamão', 'Aveia']
+      ],
+      lunch: [
+        ['Arroz integral', 'Feijão sem sal', 'Frango grelhado com ervas', 'Salada colorida', 'Azeite'],
+        ['Quinoa', 'Lentilha', 'Peixe com limão', 'Legumes no vapor', 'Ervas frescas'],
+        ['Batata doce assada', 'Grão de bico', 'Carne magra', 'Brócolis', 'Alho e cebola']
+      ],
+      afternoon_snack: [
+        ['Melancia', 'Sementes de girassol sem sal'],
+        ['Abacate (pequena porção)', 'Limão'],
+        ['Salada de frutas natural']
+      ],
+      dinner: [
+        ['Salmão grelhado', 'Espinafre refogado', 'Tomate', 'Azeite'],
+        ['Frango desfiado', 'Abobrinha', 'Cenoura', 'Ervas'],
+        ['Omelete de claras', 'Salada verde', 'Beterraba cozida']
+      ],
+      supper: [
+        ['Chá de hibisco', 'Maçã'],
+        ['Leite desnatado', 'Canela'],
+        ['Água de coco natural', 'Kiwi']
+      ]
+    },
+    avoid: ['Sal em excesso', 'Embutidos', 'Enlatados', 'Temperos prontos', 'Queijos amarelos', 'Fast food', 'Salgadinhos', 'Molho shoyu'],
+    prefer: ['Ervas frescas', 'Limão', 'Alho', 'Cebola', 'Frutas ricas em potássio', 'Vegetais folhosos', 'Laticínios desnatados']
+  },
+
+  // 🚫 INTOLERÂNCIAS - Sem lactose e/ou sem glúten
+  intolerancia: {
+    id: 'intolerancia',
+    name: 'Sem Lactose/Glúten',
+    icon: '🚫',
+    category: 'special',
+    description: 'Opções sem lactose e sem glúten',
+    tags: ['intolerância', 'lactose', 'glúten', 'celíaco'],
+    guidelines: [
+      'Substituir leite por versões vegetais ou sem lactose',
+      'Usar farinhas sem glúten (arroz, amêndoa, coco)',
+      'Verificar rótulos de produtos industrializados',
+      'Preferir alimentos naturalmente sem glúten',
+      'Garantir cálcio de outras fontes'
+    ],
+    meals: {
+      breakfast: [
+        ['Tapioca com ovo', 'Leite de amêndoas', 'Frutas'],
+        ['Pão sem glúten', 'Pasta de amendoim', 'Banana', 'Café'],
+        ['Cuscuz de milho', 'Ovo mexido', 'Mamão', 'Chá']
+      ],
+      morning_snack: [
+        ['Frutas frescas', 'Castanhas'],
+        ['Iogurte de coco', 'Granola sem glúten'],
+        ['Banana', 'Pasta de amendoim']
+      ],
+      lunch: [
+        ['Arroz', 'Feijão', 'Frango grelhado', 'Salada', 'Azeite'],
+        ['Quinoa', 'Lentilha', 'Peixe assado', 'Legumes', 'Azeite'],
+        ['Batata doce', 'Grão de bico', 'Carne magra', 'Brócolis']
+      ],
+      afternoon_snack: [
+        ['Smoothie de frutas com leite de coco'],
+        ['Chips de batata doce assada', 'Guacamole'],
+        ['Frutas com coco ralado']
+      ],
+      dinner: [
+        ['Peixe grelhado', 'Purê de abóbora', 'Salada verde'],
+        ['Frango desfiado', 'Arroz', 'Legumes refogados'],
+        ['Omelete de legumes', 'Salada completa']
+      ],
+      supper: [
+        ['Chá de camomila', 'Frutas'],
+        ['Leite de amêndoas morno', 'Canela'],
+        ['Smoothie de banana com leite de coco']
+      ]
+    },
+    avoid: ['Leite de vaca', 'Queijos comuns', 'Iogurte tradicional', 'Trigo', 'Centeio', 'Cevada', 'Aveia contaminada', 'Pães tradicionais', 'Massas de trigo'],
+    prefer: ['Leites vegetais', 'Queijos sem lactose', 'Tapioca', 'Arroz', 'Milho', 'Quinoa', 'Frutas', 'Vegetais', 'Carnes naturais']
+  },
+
+  // 🤰 GESTANTE - Ácido fólico, ferro, fracionamento
+  gestante: {
+    id: 'gestante',
+    name: 'Gestante',
+    icon: '🤰',
+    category: 'special',
+    description: 'Rico em ácido fólico, ferro e nutrientes essenciais',
+    tags: ['gravidez', 'gestação', 'pré-natal'],
+    guidelines: [
+      'Aumentar ácido fólico (vegetais verde-escuros)',
+      'Garantir ferro adequado (carnes, leguminosas)',
+      'Fracionar refeições (6x ao dia para evitar enjoos)',
+      'Aumentar cálcio (ossos do bebê)',
+      'Hidratação abundante'
+    ],
+    meals: {
+      breakfast: [
+        ['Aveia com frutas vermelhas', 'Ovo cozido', 'Suco de laranja natural'],
+        ['Pão integral', 'Queijo branco', 'Mamão', 'Leite'],
+        ['Tapioca com queijo', 'Vitamina de banana', 'Castanhas']
+      ],
+      morning_snack: [
+        ['Iogurte natural', 'Granola', 'Mel'],
+        ['Frutas variadas', 'Castanhas'],
+        ['Sanduíche natural pequeno']
+      ],
+      lunch: [
+        ['Arroz integral', 'Feijão', 'Bife de fígado acebolado', 'Espinafre refogado', 'Beterraba'],
+        ['Quinoa', 'Lentilha', 'Frango grelhado', 'Brócolis', 'Cenoura'],
+        ['Arroz', 'Feijão preto', 'Peixe assado', 'Couve refogada', 'Abóbora']
+      ],
+      afternoon_snack: [
+        ['Vitamina de abacate com leite'],
+        ['Pão integral', 'Pasta de grão de bico'],
+        ['Frutas com iogurte']
+      ],
+      dinner: [
+        ['Sopa de legumes com frango', 'Torrada integral'],
+        ['Omelete de espinafre', 'Salada colorida', 'Arroz'],
+        ['Peixe grelhado', 'Purê de batata', 'Legumes']
+      ],
+      supper: [
+        ['Leite morno', 'Biscoito integral'],
+        ['Iogurte com frutas'],
+        ['Chá de erva-doce', 'Torrada']
+      ]
+    },
+    avoid: ['Álcool', 'Cafeína em excesso', 'Peixes crus', 'Carnes mal passadas', 'Queijos não pasteurizados', 'Adoçantes artificiais'],
+    prefer: ['Ácido fólico', 'Ferro', 'Cálcio', 'Ômega-3', 'Fibras', 'Proteínas de qualidade', 'Vitamina D']
+  },
+
+  // 🤱 LACTANTE - Maior densidade calórica, cálcio, ferro, hidratação
+  lactante: {
+    id: 'lactante',
+    name: 'Lactante',
+    icon: '🤱',
+    category: 'special',
+    description: 'Maior densidade calórica para produção de leite',
+    tags: ['amamentação', 'lactação', 'pós-parto'],
+    guidelines: [
+      'Aumentar calorias (+500 kcal/dia)',
+      'Garantir hidratação abundante (3L água/dia)',
+      'Manter ferro e cálcio elevados',
+      'Incluir gorduras boas para o leite',
+      'Evitar alimentos que causem cólicas no bebê'
+    ],
+    meals: {
+      breakfast: [
+        ['Aveia com banana e mel', 'Ovos mexidos', 'Leite integral', 'Pão integral'],
+        ['Panqueca de banana', 'Iogurte natural', 'Frutas', 'Castanhas'],
+        ['Tapioca com queijo e ovo', 'Vitamina de mamão', 'Granola']
+      ],
+      morning_snack: [
+        ['Mix de castanhas', 'Frutas', 'Água de coco'],
+        ['Iogurte com granola', 'Banana'],
+        ['Sanduíche natural', 'Suco natural']
+      ],
+      lunch: [
+        ['Arroz integral', 'Feijão', 'Carne magra', 'Legumes variados', 'Salada', 'Azeite'],
+        ['Macarrão integral', 'Molho de tomate caseiro', 'Frango desfiado', 'Salada'],
+        ['Arroz', 'Lentilha', 'Peixe assado', 'Legumes', 'Abacate']
+      ],
+      afternoon_snack: [
+        ['Vitamina de abacate com leite'],
+        ['Pão com pasta de amendoim', 'Banana'],
+        ['Smoothie de frutas com aveia']
+      ],
+      dinner: [
+        ['Sopa cremosa de legumes', 'Frango desfiado', 'Torradas'],
+        ['Risoto de legumes', 'Salada verde'],
+        ['Peixe grelhado', 'Purê de batata', 'Legumes']
+      ],
+      supper: [
+        ['Leite morno com mel', 'Biscoitos integrais'],
+        ['Iogurte natural', 'Frutas', 'Granola'],
+        ['Mingau de aveia']
+      ]
+    },
+    avoid: ['Álcool', 'Cafeína em excesso', 'Alimentos muito condimentados', 'Chocolate em excesso', 'Refrigerantes'],
+    prefer: ['Água', 'Leite', 'Proteínas', 'Carboidratos complexos', 'Gorduras boas', 'Frutas', 'Vegetais']
+  },
+
+  // 🩺 ANEMIA - Rico em ferro + vitamina C
+  anemia: {
+    id: 'anemia',
+    name: 'Anemia (Rico em Ferro)',
+    icon: '🩺',
+    category: 'special',
+    description: 'Rico em ferro com vitamina C para absorção',
+    tags: ['anemia', 'ferro', 'hemoglobina'],
+    guidelines: [
+      'Priorizar ferro heme (carnes vermelhas)',
+      'Combinar ferro não-heme com vitamina C',
+      'Evitar café/chá junto às refeições',
+      'Incluir vegetais verde-escuros',
+      'Leguminosas em todas as refeições'
+    ],
+    meals: {
+      breakfast: [
+        ['Pão integral', 'Ovo cozido', 'Suco de laranja natural', 'Mamão'],
+        ['Aveia com morango', 'Vitamina de acerola', 'Castanhas'],
+        ['Tapioca', 'Omelete de espinafre', 'Suco de limão com água']
+      ],
+      morning_snack: [
+        ['Acerola', 'Castanha de caju'],
+        ['Laranja', 'Amêndoas'],
+        ['Kiwi', 'Mix de oleaginosas']
+      ],
+      lunch: [
+        ['Arroz', 'Feijão preto', 'Bife de fígado', 'Couve refogada', 'Beterraba', 'Limão'],
+        ['Arroz integral', 'Lentilha', 'Carne vermelha magra', 'Espinafre', 'Tomate'],
+        ['Quinoa', 'Feijão', 'Frango', 'Brócolis', 'Pimentão']
+      ],
+      afternoon_snack: [
+        ['Suco verde (couve, laranja, limão)'],
+        ['Salada de frutas cítricas'],
+        ['Vitamina de beterraba com laranja']
+      ],
+      dinner: [
+        ['Carne vermelha grelhada', 'Espinafre refogado', 'Arroz', 'Salada com tomate'],
+        ['Fígado acebolado', 'Couve', 'Feijão', 'Arroz'],
+        ['Peixe grelhado', 'Legumes verdes', 'Limão']
+      ],
+      supper: [
+        ['Suco de acerola', 'Frutas'],
+        ['Vitamina de morango'],
+        ['Iogurte com frutas vermelhas']
+      ]
+    },
+    avoid: ['Café junto às refeições', 'Chá preto/verde junto às refeições', 'Refrigerantes', 'Leite junto ao ferro'],
+    prefer: ['Carnes vermelhas', 'Fígado', 'Leguminosas', 'Vegetais verde-escuros', 'Vitamina C', 'Beterraba', 'Frutas cítricas']
+  }
+};
+
+// Lista ordenada dos planos especiais para exibição
+const SPECIAL_PLANS_ORDER = ['diabetico', 'hipertenso', 'intolerancia', 'gestante', 'lactante', 'anemia'];
+
+/**
+ * Retorna configuração de um plano especial
+ */
+const getSpecialPlan = (planId) => SPECIAL_PLANS[planId] || null;
+
+/**
+ * Retorna todos os planos especiais disponíveis
+ */
+const getAllSpecialPlans = () => SPECIAL_PLANS_ORDER.map(id => SPECIAL_PLANS[id]);
+
+/**
+ * Gera refeições para um plano especial com variação
+ */
+const generateSpecialMeals = (planId, variationIndex = 0) => {
+  const plan = SPECIAL_PLANS[planId];
+  if (!plan) return null;
+
+  const meals = [];
+  const mealTypes = [
+    { id: 'breakfast', name: 'Café da Manhã', time: '07:00', color: '#F59E0B' },
+    { id: 'morning_snack', name: 'Lanche da Manhã', time: '10:00', color: '#10B981' },
+    { id: 'lunch', name: 'Almoço', time: '12:30', color: '#EF4444' },
+    { id: 'afternoon_snack', name: 'Lanche da Tarde', time: '15:30', color: '#8B5CF6' },
+    { id: 'dinner', name: 'Jantar', time: '19:00', color: '#3B82F6' },
+    { id: 'supper', name: 'Ceia', time: '21:00', color: '#6366F1' }
+  ];
+
+  mealTypes.forEach((mealType, idx) => {
+    const mealOptions = plan.meals[mealType.id];
+    if (mealOptions && mealOptions.length > 0) {
+      // Seleciona variação baseada no índice
+      const selectedVariation = mealOptions[variationIndex % mealOptions.length];
+      meals.push({
+        id: `${planId}_meal_${idx}`,
+        name: mealType.name,
+        time: mealType.time,
+        color: mealType.color,
+        foods: selectedVariation.map((food, foodIdx) => ({
+          id: `${planId}_food_${idx}_${foodIdx}`,
+          name: food,
+          quantity: 1,
+          unit: 'porção'
+        }))
+      });
+    }
+  });
+
+  return meals;
+};
+
+
 /**
  * Gera um pré-plano alimentar inteligente baseado na anamnese
  * @param {Object} anamnesis - Dados da anamnese do paciente
