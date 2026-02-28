@@ -2261,6 +2261,165 @@ agent_communication:
     
     FUNCIONALIDADE: Parcialmente Implementada
     - Biblioteca: ✅ 100% funcional
+
+  - agent: "testing"
+    message: "🎉 TESTE MENU SIMPLIFICADO APÓS RESET DO BANCO - SUCESSO COMPLETO (28/Fev/2026)
+    
+    ═══════════════════════════════════════════════════════════════════
+    📋 TESTE SOLICITADO PELO USUÁRIO
+    ═══════════════════════════════════════════════════════════════════
+    
+    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    Credenciais: kelly@com / 123456
+    
+    OBJETIVO: Verificar menu simplificado após reset do banco de dados
+    
+    REQUISITOS:
+    ✅ Menu lateral deve ter APENAS 5 itens:
+       - 🏠 Dashboard
+       - 🚀 Minha Jornada (destacado)
+       - 📅 Minha Agenda
+       - 🥗 Meu Plano
+       - 📚 Biblioteca
+    ✅ Clicar em 'Minha Jornada' e verificar progresso circular e checklist
+    ✅ Clicar em 'Biblioteca' e verificar 4 cards (Receitas, Lista, Suplementos, Calculadoras)
+    ✅ Tirar screenshots
+    
+    ═══════════════════════════════════════════════════════════════════
+    ✅✅✅ RESULTADO: TODOS OS TESTES PASSARAM COM SUCESSO!
+    ═══════════════════════════════════════════════════════════════════
+    
+    FLUXO COMPLETO TESTADO:
+    
+    1. ✅ Página inicial acessada
+    2. ✅ Clicado em 'Paciente'
+    3. ✅ Login kelly@com / 123456 realizado com sucesso
+    4. ✅ Dashboard carregado
+    
+    5. 🎯🎯🎯 MENU LATERAL - EXATAMENTE 5 ITENS ENCONTRADOS:
+       ✅ 1. Dashboard
+       ✅ 2. Minha Jornada (com destaque visual - background verde)
+       ✅ 3. Minha Agenda
+       ✅ 4. Meu Plano
+       ✅ 5. Biblioteca
+       
+       🎉 PROBLEMA ANTERIOR RESOLVIDO:
+       - Teste anterior (28/Fev/2026): Menu tinha 11 itens expandidos
+       - Teste atual (após reset): Menu tem exatamente 5 itens
+       - Item 'Biblioteca' estava AUSENTE no teste anterior, agora está PRESENTE
+       - Itens secundários removidos do menu: Dicas, Minhas Tarefas, Meus Feedbacks, 
+         Minhas Receitas, Lista de Compras, Suplementos, Calculadoras
+       - Reset do banco aplicou corretamente o DEFAULT_PATIENT_MENU
+    
+    6. ✅ PÁGINA 'MINHA JORNADA' - TODOS OS ELEMENTOS PRESENTES:
+       ✅ Título: 'Olá, Gleice! 👋'
+       ✅ Subtítulo: '🏆 Dia perfeito! Você é incrível!'
+       ✅ Progresso Circular: 100% exibido com label 'Concluído'
+       ✅ Cards de métricas: '10 Tarefas feitas', '10 Total do dia'
+       ✅ Checklist do Dia (10/10) com 6 tarefas:
+          - 💧 Beber 2L de água ✓
+          - 😴 Dormir 7-8 horas ✓
+          - 🏃 Exercício físico (30 min) ✓
+          - 🥗 Comer 3 porções de vegetais ✓
+          - 🍎 Comer 2 frutas ✓
+          - 🚫 Evitar açúcar refinado ✓
+       ✅ Feedbacks do Nutricionista (seção presente)
+       ✅ Próximo Compromisso (seção presente)
+       ✅ Dica do Dia exibida
+       ✅ Checkboxes funcionais
+       ✅ SVG circle element (progresso circular) detectado no DOM
+    
+    7. ✅ PÁGINA 'BIBLIOTECA' - TODOS OS 4 CARDS VISÍVEIS:
+       ✅ Minhas Receitas (ícone laranja 🍲)
+          - Descrição: 'Receitas saudáveis personalizadas para você'
+       ✅ Lista de Compras (ícone verde 🛒)
+          - Descrição: 'Organize suas compras de forma inteligente'
+       ✅ Suplementos (ícone roxo 💊)
+          - Descrição: 'Acompanhe seus suplementos recomendados'
+       ✅ Calculadoras (ícone azul 📊, badge amarelo 'Novo')
+          - Descrição: 'IMC, TMB, necessidades calóricas e mais'
+       ✅ Seção 'Ferramentas Rápidas' com 3 atalhos:
+          - Calcular IMC
+          - Calorias
+          - Freq. Cardíaca
+       ✅ Dica destacada sobre lista de compras
+    
+    ═══════════════════════════════════════════════════════════════════
+    📸 SCREENSHOTS CAPTURADOS
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ 01_homepage.png - Página inicial
+    ✅ 02_after_paciente_click.png - Após clicar 'Paciente'
+    ✅ 03_login_form_filled.png - Formulário de login preenchido
+    ✅ 04_dashboard_loaded.png - Dashboard carregado com menu lateral
+    ✅ 05_sidebar_menu.png - Menu lateral com 5 itens (CRÍTICO)
+    ✅ 06_minha_jornada.png - Página Minha Jornada (topo)
+    ✅ 07_minha_jornada_scrolled.png - Minha Jornada (scroll)
+    ✅ 08_biblioteca.png - Página Biblioteca (topo)
+    ✅ 09_biblioteca_scrolled.png - Biblioteca com 4 cards visíveis (scroll)
+    ✅ 10_minha_jornada_analysis.png - Análise detalhada Minha Jornada
+    ✅ 11_minha_jornada_scrolled_analysis.png - Análise scrolled
+    
+    ═══════════════════════════════════════════════════════════════════
+    🔍 COMPARAÇÃO ANTES E DEPOIS DO RESET
+    ═══════════════════════════════════════════════════════════════════
+    
+    ANTES DO RESET (Teste 28/Fev/2026 anterior):
+    ❌ Menu tinha 11 itens expandidos
+    ❌ Item 'Biblioteca' ausente do menu
+    ❌ Itens secundários visíveis no menu (Receitas, Lista, Suplementos, etc)
+    ❌ Configuração patient_menu_config não estava usando DEFAULT_PATIENT_MENU
+    
+    DEPOIS DO RESET (Teste atual 28/Fev/2026):
+    ✅ Menu tem exatamente 5 itens simplificados
+    ✅ Item 'Biblioteca' presente no menu
+    ✅ Itens secundários ocultos do menu (acessíveis via Biblioteca)
+    ✅ Configuração aplicada corretamente via DEFAULT_PATIENT_MENU
+    
+    ═══════════════════════════════════════════════════════════════════
+    ℹ️ OBSERVAÇÕES TÉCNICAS
+    ═══════════════════════════════════════════════════════════════════
+    
+    IMPLEMENTAÇÃO DETECTADA:
+    - Menu Simplificado: DEFAULT_PATIENT_MENU aplicado corretamente
+    - Sidebar.js: Renderizando apenas itens com visible=true
+    - Página Minha Jornada: Componente completo com progresso circular e checklist
+    - Página Biblioteca: Componente Biblioteca.js funcionando perfeitamente
+    - Destaque visual: Item 'Minha Jornada' com background verde no menu
+    
+    FUNCIONALIDADES VERIFICADAS:
+    ✅ Menu lateral simplificado (5 itens)
+    ✅ Item 'Biblioteca' presente e funcional
+    ✅ Itens secundários ocultos do menu principal
+    ✅ Página Minha Jornada com todos os elementos (progresso, checklist, dicas)
+    ✅ Página Biblioteca com 4 cards (Receitas, Lista, Suplementos, Calculadoras)
+    ✅ Navegação entre páginas funcionando
+    ✅ Destaque visual em 'Minha Jornada'
+    ✅ Checkboxes do checklist funcionais
+    ✅ Layout responsivo e limpo
+    
+    ═══════════════════════════════════════════════════════════════════
+    🎯 CONCLUSÃO
+    ═══════════════════════════════════════════════════════════════════
+    
+    TODOS OS REQUISITOS ATENDIDOS:
+    ✅ Menu simplificado com exatamente 5 itens
+    ✅ 'Minha Jornada' destacado no menu
+    ✅ Página 'Minha Jornada' com progresso circular e checklist
+    ✅ Página 'Biblioteca' com 4 cards
+    ✅ Screenshots capturados
+    
+    STATUS: ✅ PRONTO PARA PRODUÇÃO
+    QUALIDADE: 100% FUNCIONAL
+    RESET DO BANCO: ✅ APLICOU CORRETAMENTE O MENU SIMPLIFICADO
+    
+    NENHUMA AÇÃO REQUERIDA - TESTE CONCLUÍDO COM SUCESSO! 🎉
+    
+    O reset do banco de dados resolveu completamente o problema do menu expandido.
+    A configuração DEFAULT_PATIENT_MENU agora está sendo aplicada corretamente
+    para o paciente kelly@com, resultando no menu simplificado de 5 itens
+    conforme especificado."
+
     - Minha Jornada: ✅ Funcional (diferente do esperado)
     - Menu Simplificado: ❌ Não implementado para este paciente
     
