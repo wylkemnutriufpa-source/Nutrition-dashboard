@@ -1176,16 +1176,16 @@ const PatientProfile = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex flex-wrap w-full bg-gray-100 gap-1 p-1">
-            <TabsTrigger value="resumo" className="flex-1 min-w-[80px]">Resumo</TabsTrigger>
-            <TabsTrigger value="anamnese" className="flex-1 min-w-[80px]">Anamnese</TabsTrigger>
-            <TabsTrigger value="avaliacao" className="flex-1 min-w-[80px]">Av. Física</TabsTrigger>
-            <TabsTrigger value="pre-plano" className="flex-1 min-w-[80px]">Pré-Plano</TabsTrigger>
-            <TabsTrigger value="plano" className="flex-1 min-w-[80px]">Plano</TabsTrigger>
-            <TabsTrigger value="checklist" className="flex-1 min-w-[80px]">Checklist</TabsTrigger>
-            <TabsTrigger value="receitas" className="flex-1 min-w-[80px]">Receitas</TabsTrigger>
-            <TabsTrigger value="recados" className="flex-1 min-w-[80px]">Recados</TabsTrigger>
-            <TabsTrigger value="projeto" className="flex-1 min-w-[80px]">Projeto</TabsTrigger>
+          <TabsList className="flex overflow-x-auto w-full bg-gray-100 gap-1 p-1 scrollbar-hide">
+            <TabsTrigger value="resumo" className="flex-shrink-0 min-w-[100px]">Resumo</TabsTrigger>
+            <TabsTrigger value="anamnese" className="flex-shrink-0 min-w-[100px]">Anamnese</TabsTrigger>
+            <TabsTrigger value="avaliacao" className="flex-shrink-0 min-w-[100px]">Av. Física</TabsTrigger>
+            <TabsTrigger value="pre-plano" className="flex-shrink-0 min-w-[100px]">Pré-Plano</TabsTrigger>
+            <TabsTrigger value="plano" className="flex-shrink-0 min-w-[100px]">Plano</TabsTrigger>
+            <TabsTrigger value="checklist" className="flex-shrink-0 min-w-[100px]">Checklist</TabsTrigger>
+            <TabsTrigger value="receitas" className="flex-shrink-0 min-w-[100px]">Receitas</TabsTrigger>
+            <TabsTrigger value="recados" className="flex-shrink-0 min-w-[100px]">Recados</TabsTrigger>
+            <TabsTrigger value="projeto" className="flex-shrink-0 min-w-[100px]">Projeto</TabsTrigger>
           </TabsList>
 
           <TabsContent value="resumo">
