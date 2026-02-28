@@ -214,6 +214,56 @@ const ProfessionalDashboard = () => {
           </Card>
         )}
 
+        {/* Métricas de Planos por Tipo */}
+        {stats.plansByType && stats.activePlans > 0 && (
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Target className="h-5 w-5 text-purple-600" />
+                Distribuição de Planos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                  <p className="text-3xl font-bold text-indigo-600">{stats.plansByType.general || 0}</p>
+                  <p className="text-sm text-gray-600">Planos Gerais</p>
+                  <p className="text-xs text-gray-400">Clássico, Fitness, etc</p>
+                </div>
+                <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                  <p className="text-3xl font-bold text-pink-600">{stats.plansByType.special || 0}</p>
+                  <p className="text-sm text-gray-600">Planos Especiais</p>
+                  <p className="text-xs text-gray-400">Por condição médica</p>
+                </div>
+                {stats.plansByType.specialBreakdown && Object.keys(stats.plansByType.specialBreakdown).length > 0 && (
+                  <>
+                    {Object.entries(stats.plansByType.specialBreakdown).slice(0, 2).map(([type, count]) => {
+                      const typeLabels = {
+                        diabetico: '🩸 Diabético',
+                        hipertenso: '❤️ Hipertenso',
+                        intolerancia: '🚫 Intolerância',
+                        gestante: '🤰 Gestante',
+                        lactante: '🤱 Lactante',
+                        anemia: '🩺 Anemia',
+                        renal: '🫘 Renal',
+                        gastrite: '🔥 Gastrite',
+                        colesterol: '🫀 Colesterol',
+                        hipotireoidismo: '🦋 Tireoide'
+                      };
+                      return (
+                        <div key={type} className="text-center p-4 bg-white rounded-xl shadow-sm">
+                          <p className="text-2xl font-bold text-amber-600">{count}</p>
+                          <p className="text-sm text-gray-600">{typeLabels[type] || type}</p>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Planos Alimentares Ativos */}
           <Card>
