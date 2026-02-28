@@ -102,10 +102,13 @@ export const useProfessionalDashboard = (professionalId) => {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  // Carregar dados na montagem
+  // Carregar dados na montagem (APENAS UMA VEZ)
   useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+    if (professionalId) {
+      loadDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [professionalId]); // Apenas quando professionalId mudar
 
   return {
     loading,
