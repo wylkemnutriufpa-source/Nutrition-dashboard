@@ -45,6 +45,8 @@ const DEFAULT_HABITS = [
 
 const MinhaJornada = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [tips, setTips] = useState([]);
@@ -55,6 +57,14 @@ const MinhaJornada = () => {
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
+
+  // Estados para Painel Inteligente
+  const [intelligenceData, setIntelligenceData] = useState({
+    score: null,
+    alerts: [],
+    nextAction: null,
+    dailyTip: null
+  });
 
   useEffect(() => {
     if (user?.id) loadAllData();
