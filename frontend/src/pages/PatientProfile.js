@@ -1217,6 +1217,7 @@ const PatientProfile = () => {
               professionalId={profile?.id}
               patient={patient}
               onTipCreated={() => toast.success('Dica enviada para o paciente!')}
+              onRefreshPatient={() => loadPatientData(true)}
             />
           </TabsContent>
 
