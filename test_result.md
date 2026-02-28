@@ -455,6 +455,18 @@ frontend:
         agent: "main"
         comment: "✅ IMPLEMENTADO: (1) dynamicTips.js com 20+ tipos de dicas baseadas em condições médicas, alergias, estilo de vida, objetivos. (2) LiveTipsPreview.js mostra dicas em tempo real conforme formulário é preenchido. (3) AnamneseFormComplete.js integrado com dicas automáticas ao salvar. (4) PhysicalAssessmentEditor.js integrado com dicas de avaliação física. (5) Dicas personalizadas por nome do paciente."
 
+  - task: "Planos Especiais por Condição Médica (6 planos)"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/smartAnamnesis.js, frontend/src/components/DraftMealPlanViewer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: Sistema de Planos Especiais baseados em condição médica. (1) 6 planos especiais em SPECIAL_PLANS: Diabético (🩸), Hipertenso DASH (❤️), Sem Lactose/Glúten (🚫), Gestante (🤰), Lactante (🤱), Anemia Rico em Ferro (🩺). (2) Cada plano tem guidelines específicas, alimentos recomendados/evitar, e 3 variações de cardápio. (3) DraftMealPlanViewer com TAB 'Planos Especiais' separada de 'Estilos Gerais'. (4) Função generateSpecialMeals() gera 6 refeições personalizadas por condição. (5) Interface com cards clicáveis mostrando ícone, nome e descrição de cada plano. Sistema modular para fácil expansão de novos protocolos."
+
   - task: "Pré-Plano com 4 Alternativas"
     implemented: true
     working: "NA"
