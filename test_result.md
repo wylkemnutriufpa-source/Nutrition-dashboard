@@ -494,7 +494,94 @@ test_plan:
 
 agent_communication:
   - agent: "testing"
-    message: "🧪 TESTES DAS CORREÇÕES COMPLETADOS (28/Fev/2026)
+    message: "🧪 TESTES DAS CORREÇÕES COMPLETADOS (28/Fev/2026 - SEGUNDA RODADA)
+    
+    ═══════════════════════════════════════════════════════════════════
+    📊 RESUMO DOS RESULTADOS - Paciente kelly@com/123456
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ TESTE 1 FALHOU - Modal Visualização de Plano (2 Issues):
+    
+    ISSUE 1: Modal 'Anamnese Completa!' aparece TODA VEZ no dashboard
+    - Modal bloqueador 'Anamnese Completa!' exibido no dashboard (screenshot: 02_modal_blocker_visible.png)
+    - Paciente precisa clicar 'Entendi' toda vez que faz login
+    - LocalStorage check em PatientDashboard.js (linha 34) deveria prevenir isso
+    - Causa: Modal aparece quando anamnesisStatus === 'complete' (FirstAccessModal.js linha 22-36)
+    - A lógica atual: se nunca viu = mostra modal. Mas deveria: se nunca viu E anamnese incompleta = mostra modal
+    - Quando anamnese está completa, modal não deveria aparecer novamente após primeira vez
+    
+    ISSUE 2: Calorias mostram '0 kcal' no modal (DADOS FALTANDO)
+    - Modal abre com sucesso após fechar bloqueador ✅
+    - MAS todas as calorias = 0 (screenshot: 04_meal_plan_modal_opened.png)
+    - Header: 'Calorias: 0' (meta: 3159 kcal) ❌
+    - Café da Manhã pós treino (07:00): Total 0 kcal P: 0g C: 0g G: 0g ❌
+    - Alimentos individuais: 'Aveia em flocos finos: 0 kcal P: 0g', 'Ovo cozido: 0 kcal P: 0g' ❌
+    - Lanche da Manhã (10:00): 'Frutas vermelhas: 0 kcal P: 0g', 'Castanha do Pará: 0 kcal P: 0g' ❌
+    - CÓDIGO DO MODAL ESTÁ CORRETO (usa food.calories||food.kcal)
+    - DADOS NÃO EXISTEM: Plano foi criado ANTES da correção do MealPlanEditor.js que salva nutricionais
+    - Solução: Profissional precisa editar e re-salvar plano, ou criar novo plano
+    
+    ✅ TESTE 2 PASSOU - Minha Agenda:
+    - Página 'Minha Agenda' carrega perfeitamente ✅
+    - Título 'Minha Agenda' e subtítulo 'Consultas e lembretes' exibidos ✅
+    - Botão 'Adicionar Lembrete' VISÍVEL e HABILITADO ✅
+    - Menu lateral funcional com link para agenda ✅
+    - Screenshots: 30_agenda_page.png, 31_add_reminder_button.png
+    
+    ═══════════════════════════════════════════════════════════════════
+    🔍 ANÁLISE DETALHADA
+    ═══════════════════════════════════════════════════════════════════
+    
+    Card 'Plano Alimentar Ativo' - FUNCIONA:
+    ✅ Card verde exibido com título 'Plano Alimentar (do Pré-Plano)'
+    ✅ Badge calorias: '3159 kcal' (correto - vem de daily_targets)
+    ✅ Badge proteína: 'P: 129g' (correto - vem de daily_targets)
+    ✅ Botão 'Ver Plano Completo' visível e clicável
+    ✅ Resumo de 3 refeições exibido (Café da Manhã, Lanche, Almoço)
+    
+    MealPlanViewerModal - CÓDIGO CORRETO, DADOS FALTANDO:
+    ✅ Modal abre corretamente quando botão clicado
+    ✅ Título: 'Plano Alimentar (do Pré-Plano)'
+    ✅ Badge: '6 refeições'
+    ✅ Tabs: 'Refeições' e 'Observações'
+    ✅ Refeições expansíveis com ícones (Coffee, Apple, Sun)
+    ✅ Código calcula: food.calories || food.kcal || 0 (linha 75)
+    ❌ Resultado: 0 porque food.calories e food.kcal não existem no banco
+    ✅ Seção 'Total da Refeição' implementada (linha 109-125)
+    ❌ Mas mostra 0 porque não há dados nutricionais nos alimentos
+    
+    ═══════════════════════════════════════════════════════════════════
+    ⚠️ AÇÕES REQUERIDAS PARA MAIN AGENT
+    ═══════════════════════════════════════════════════════════════════
+    
+    🔴 PRIORIDADE 1 - FirstAccessModal Logic:
+    - Modificar PatientDashboard.js checkFirstAccess() (linha 32-39)
+    - ATUAL: Mostra modal se localStorage não existe
+    - PROBLEMA: Modal aparece toda vez quando anamnesisStatus === 'complete'
+    - SOLUÇÃO PROPOSTA:
+      1. Adicionar flag separada para modal de sucesso: 'anamnesis_complete_modal_${user.id}'
+      2. Quando anamnesis === 'complete', checar se já viu modal de sucesso
+      3. Se já viu, não mostrar modal mesmo que anamnesis esteja completa
+      4. OU: Remover modal de sucesso completamente e usar apenas AnamneseBanner
+    
+    🔴 PRIORIDADE 2 - Preencher Calorias em Plano Existente:
+    - Opção A: Profissional edita plano de kelly e salva novamente (MealPlanEditor agora salva calorias)
+    - Opção B: Criar script de migração para preencher calorias em planos antigos
+    - Opção C: Criar novo plano para kelly com dados nutricionais
+    - NOTA: Novos planos criados após a correção terão calorias automaticamente
+    
+    🟡 PRIORIDADE 3 - Dashboard Profissional (Issue anterior):
+    - Ainda não resolvido: wylkem.nutri.ufpa@gmail.com tem role 'admin' ao invés de 'professional'
+    - Verificar role no Supabase profiles table
+    
+    ℹ️ CONFIRMADO FUNCIONANDO:
+    - Login paciente ✅
+    - Card plano ativo ✅
+    - Modal abre ✅
+    - Minha Agenda ✅
+    - Botão Adicionar Lembrete ✅
+    
+    Screenshots: 01_patient_dashboard_loaded.png, 02_modal_blocker_visible.png, 03_plan_card_visible.png, 04_meal_plan_modal_opened.png, 30_agenda_page.png, 31_add_reminder_button.png"
     
     ═══════════════════════════════════════════════════════════════════
     📊 RESUMO DOS RESULTADOS
