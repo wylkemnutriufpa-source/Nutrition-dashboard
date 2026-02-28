@@ -116,11 +116,15 @@ const PatientDashboard = () => {
     return goals[goal] || goal || 'Não definido';
   };
 
-  const tips = [
-    'Lembre-se de beber água ao longo do dia',
-    'Evite pular refeições',
-    'Inclua vegetais em todas as refeições principais'
+  // Dicas padrão (fallback quando não tem personalizadas)
+  const defaultTips = [
+    { title: 'Lembre-se de beber água ao longo do dia', type: 'general' },
+    { title: 'Evite pular refeições', type: 'general' },
+    { title: 'Inclua vegetais em todas as refeições principais', type: 'general' }
   ];
+
+  // Combinar dicas personalizadas com as padrão
+  const allTips = personalizedTips.length > 0 ? personalizedTips : defaultTips;
 
   if (loading) {
     return (
