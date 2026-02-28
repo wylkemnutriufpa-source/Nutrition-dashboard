@@ -30,6 +30,7 @@ const PatientDashboard = () => {
   }, [user]);
 
   const checkFirstAccess = () => {
+    // Só mostra modal se NUNCA foi visto E anamnese não está completa
     const hasSeenModal = localStorage.getItem(`first_access_modal_${user.id}`);
     if (!hasSeenModal) {
       setShowFirstAccessModal(true);
@@ -40,12 +41,6 @@ const PatientDashboard = () => {
   const handleStartAnamnesis = () => {
     navigate('/patient/anamnesis');
   };
-
-  useEffect(() => {
-    if (user) {
-      loadPatientData();
-    }
-  }, [user]);
 
   const loadPatientData = async () => {
     setLoading(true);
