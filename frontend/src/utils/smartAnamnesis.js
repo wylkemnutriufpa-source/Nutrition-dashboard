@@ -81,12 +81,12 @@ const VARIATION_NAMES = [
  * Gera um pré-plano alimentar inteligente baseado na anamnese
  * @param {Object} anamnesis - Dados da anamnese do paciente
  * @param {Object} patient - Dados do paciente (peso, altura, objetivo, etc)
- * @param {number} variation - Número da variação (1-4), default 1
+ * @param {number} variation - Número da variação (1-6), default 1
  * @returns {Object} Pré-plano com refeições, alimentos indicados e a evitar
  */
 export const generateSmartMealPlan = (anamnesis, patient, variation = 1) => {
-  // Garantir que a variação está entre 1 e 4
-  const varIndex = Math.max(0, Math.min(3, (variation - 1)));
+  // Garantir que a variação está entre 1 e 6
+  const varIndex = Math.max(0, Math.min(5, (variation - 1)));
   
   const plan = {
     meals: [
