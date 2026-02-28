@@ -190,7 +190,7 @@ const MealPlanViewerModal = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6">
           <div className="flex items-start justify-between">
