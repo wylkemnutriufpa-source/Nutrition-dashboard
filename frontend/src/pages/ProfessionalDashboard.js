@@ -22,6 +22,12 @@ const ProfessionalDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showPlanModal, setShowPlanModal] = useState(false);
+  const [globalTips, setGlobalTips] = useState([]);
+  const [globalTasks, setGlobalTasks] = useState([]);
+  const [newTip, setNewTip] = useState('');
+  const [newTask, setNewTask] = useState('');
+  const [addingTip, setAddingTip] = useState(false);
+  const [addingTask, setAddingTask] = useState(false);
   const [stats, setStats] = useState({
     activePatients: 0,
     totalPatients: 0,
