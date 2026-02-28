@@ -5,12 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
 import { 
   Users, Calendar, TrendingUp, Loader2, Utensils, Eye, Edit, ArrowRight, FileText,
-  ClipboardList, Apple, Clock, Bell, CheckCircle2, AlertTriangle, Activity, Target
+  ClipboardList, Apple, Clock, Bell, CheckCircle2, AlertTriangle, Activity, Target,
+  Lightbulb, Plus, Trash2, X
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getProfessionalStats } from '@/lib/supabase';
+import { getProfessionalStats, createGlobalTip, getGlobalTips, deleteGlobalTip, createGlobalTask, getGlobalTasks, deleteGlobalTask } from '@/lib/supabase';
 import { toast } from 'sonner';
 import MealPlanViewerModal from '@/components/MealPlanViewerModal';
 
