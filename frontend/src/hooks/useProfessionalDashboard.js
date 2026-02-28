@@ -30,17 +30,16 @@ export const useProfessionalDashboard = (professionalId) => {
   });
   const [attentionAlerts, setAttentionAlerts] = useState([]);
   const [chartData, setChartData] = useState({ labels: [], values: [] });
-  const [isLoadingRef, setIsLoadingRef] = useState(false); // Controle de loading
 
   /**
    * Carrega dados do dashboard
    */
   const loadDashboardData = useCallback(async () => {
-    if (!professionalId || isLoadingRef) {
-      return; // Evita múltiplas chamadas simultâneas
+    if (!professionalId) {
+      setLoading(false);
+      return;
     }
 
-    setIsLoadingRef(true);
     setLoading(true);
     setError(null);
 
@@ -93,9 +92,8 @@ export const useProfessionalDashboard = (professionalId) => {
       setError(err.message || 'Erro ao carregar dados');
     } finally {
       setLoading(false);
-      setIsLoadingRef(false);
     }
-  }, [professionalId, isLoadingRef]);
+  }, [professionalId]);
 
   /**
    * Recarregar dados
