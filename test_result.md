@@ -396,7 +396,7 @@ frontend:
     implemented: true
     working: false
     file: "frontend/src/components/MealPlanViewerModal.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/PatientDashboard.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: false
     status_history:
@@ -409,6 +409,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ FALHOU (28/Fev/2026 - Re-teste kelly@com/123456): ISSUE 1 - Modal 'Anamnese Completa!' AINDA aparece no dashboard mesmo após login anterior (localStorage check não está funcionando). Paciente tem que clicar 'Entendi' toda vez que faz login. ISSUE 2 - Modal abre com sucesso após fechar modal bloqueador, MAS todas as calorias mostram '0 kcal'. Verificado: Header mostra 'Calorias: 0 (meta: 3159 kcal)', todos os alimentos mostram '0 kcal P: 0g', Total da Refeição mostra '0 kcal'. CAUSA RAIZ: Plano existente foi criado ANTES da correção no MealPlanEditor.js (linha 559-565) que salva dados nutricionais. Código do modal está CORRETO (food.calories||food.kcal), mas os dados não existem no plano salvo. Screenshots: 02_modal_blocker_visible.png, 04_meal_plan_modal_opened.png. PRECISA: (1) Corrigir lógica do FirstAccessModal para não aparecer repetidamente, (2) Profissional precisa criar novo plano para kelly ou re-salvar plano existente para preencher calorias."
+      - working: false
+        agent: "testing"
+        comment: "❌ TESTE FINAL (28/Fev/2026 - Re-teste kelly@com/123456): ISSUE CRÍTICA PERSISTE - Modal 'Anamnese Completa!' CONTINUA aparecendo a cada login. LocalStorage check em PatientDashboard.js (linhas 38-58) usa key `anamnesis_complete_modal_${user.id}` mas o modal reaparece toda vez. Possível causa: localStorage sendo limpo, user.id mudando, ou lógica de verificação com race condition. ✅ SUCESSO PARCIAL: Após fechar modal bloqueador, MealPlanViewerModal ABRE PERFEITAMENTE. Modal exibe: Título 'Plano Alimentar (do Pré-Plano)', Badge '6 refeições', Tabs 'Refeições' e 'Observações' funcionais. Refeições visíveis: 'Café da Manhã pos treino (07:00)', 'Lanche da Manhã (10:00)'. Header mostra: Calorias 0 (meta 3159 kcal), Proteína 0g (meta 129g), Carboidratos 0g (meta 225g), Gordura 0g (meta 198g). Todos alimentos individuais mostram '0 kcal, P: 0g'. Total da Refeição mostra '0 kcal, P: 0g, C: 0g, G: 0g'. ⚠️ CALORIAS 0 É ESPERADO conforme nota do usuário - plano criado antes da correção. CONCLUSÃO: Modal funciona corretamente SEM BLOQUEIO após fechar FirstAccessModal. Issue real: FirstAccessModal localStorage fix NÃO está funcionando. Screenshots: modal_blocker_aparecer.png, meal_plan_modal_full_view.png, meal_plan_modal_scrolled.png."
 
   - task: "Botão Acessar Planos no Dashboard Profissional"
     implemented: true
