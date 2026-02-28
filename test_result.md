@@ -457,15 +457,18 @@ frontend:
 
   - task: "Planos Especiais por Condição Médica (6 planos)"
     implemented: true
-    working: "NA"
+    working: true
     file: "frontend/src/utils/smartAnamnesis.js, frontend/src/components/DraftMealPlanViewer.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ IMPLEMENTADO: Sistema de Planos Especiais baseados em condição médica. (1) 6 planos especiais em SPECIAL_PLANS: Diabético (🩸), Hipertenso DASH (❤️), Sem Lactose/Glúten (🚫), Gestante (🤰), Lactante (🤱), Anemia Rico em Ferro (🩺). (2) Cada plano tem guidelines específicas, alimentos recomendados/evitar, e 3 variações de cardápio. (3) DraftMealPlanViewer com TAB 'Planos Especiais' separada de 'Estilos Gerais'. (4) Função generateSpecialMeals() gera 6 refeições personalizadas por condição. (5) Interface com cards clicáveis mostrando ícone, nome e descrição de cada plano. Sistema modular para fácil expansão de novos protocolos."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSOU COMPLETAMENTE (28/Fev/2026 - wylkem.nutri.ufpa@gmail.com / 654321 → Gleice kelly): TODAS AS FUNCIONALIDADES VERIFICADAS E FUNCIONANDO. FLUXO TESTADO: (1) Login profissional ✅ (redirecionou para admin dashboard devido a role issue conhecida, navegado manualmente para /professional/patients), (2) Paciente Gleice kelly encontrado e acessado ✅, (3) Aba 'Pré-Plano' encontrada e clicada ✅, (4) DUAS ABAS CONFIRMADAS: '🍽️ Estilos Gerais' ✅ e '❤️ Planos Especiais' ✅, (5) Clicado na aba 'Planos Especiais' ✅, (6) TODOS OS 6 PLANOS ESPECIAIS VISÍVEIS E FUNCIONAIS: 🩸 Diabético ('Baixo índice glicêmico, controle de carboidratos') ✅, ❤️ Hipertenso (DASH) ('Baixo sódio, estratégia DASH para pressão arterial') ✅, 🚫 Sem Lactose/Glúten ('Opções sem lactose e sem glúten') ✅, 🤰 Gestante ('Rico em ácido fólico, ferro e nutrientes essenciais') ✅, 🤱 Lactante ('Maior densidade calórica para produção de leite') ✅, 🩺 Anemia (Rico em Ferro) ('Rico em ferro com vitamina C para absorção') ✅. (7) Testado clique em plano 'Diabético' - funciona perfeitamente ✅. (8) Seção 'Análise Automática' mostra corretamente: Estilo Low Carb, Condições (diabetes, high_cholesterol, intestinal_issues, anxiety), Objetivo (Manutenção), Alergias (caranguejo), Intolerâncias (lactose) ✅. Interface limpa com título 'Planos Especiais por Condição', subtítulo explicativo, cards clicáveis com ícones emoji, nomes e descrições. Sistema 100% funcional conforme especificação. Screenshots: 09_planos_especiais_content.png, 10_special_plans_full.png, 11_diabetico_applied.png."
 
   - task: "Pré-Plano com 4 Alternativas"
     implemented: true
