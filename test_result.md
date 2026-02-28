@@ -484,9 +484,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Correção Calorias no Modal de Visualização"
+    - "FirstAccessModal Logic Fix"
+    - "Plano Alimentar - Preencher Calorias em Planos Existentes"
     - "Correção Planos Ativos no Dashboard Profissional"
-    - "Importação Anamnese → Avaliação Física"
   stuck_tasks:
     - "Dashboard Profissional - Role/Permission Issue"
   test_all: false
