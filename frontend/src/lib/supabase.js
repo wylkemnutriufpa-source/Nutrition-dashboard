@@ -1359,23 +1359,26 @@ export const deleteChecklistTask = async (taskId) => {
 
 // ==================== PATIENT MENU CONFIG ====================
 
-// Menu COMPLETO padrão para pacientes (inclui todos os itens)
+// Menu SIMPLIFICADO padrão para pacientes (nova estrutura)
 export const DEFAULT_PATIENT_MENU = [
-  // Itens fixos (sempre no topo)
+  // 🏠 Dashboard - Visão rápida
   { id: 'dashboard', name: 'Dashboard', icon: 'Home', route: '/patient/dashboard', visible: true, order: 1, fixed: true },
-  { id: 'agenda', name: 'Minha Agenda', icon: 'Bell', route: '/patient/agenda', visible: true, order: 2, fixed: false },
-  // Itens da seção "Meu Projeto"
-  { id: 'meal-plan', name: 'Meu Plano', icon: 'Calendar', route: '/patient/meal-plan', visible: true, order: 3 },
-  { id: 'avaliacao-fisica', name: 'Avaliação Física', icon: 'Activity', route: '/patient/avaliacao-fisica', visible: true, order: 4 },
-  { id: 'tarefas', name: 'Minhas Tarefas', icon: 'ClipboardList', route: '/patient/tarefas', visible: true, order: 5 },
-  { id: 'feedbacks', name: 'Meus Feedbacks', icon: 'MessageSquare', route: '/patient/feedbacks', visible: true, order: 6 },
-  { id: 'receitas', name: 'Minhas Receitas', icon: 'ChefHat', route: '/patient/receitas', visible: true, order: 7 },
-  { id: 'lista-compras', name: 'Lista de Compras', icon: 'ShoppingCart', route: '/patient/lista-compras', visible: true, order: 8 },
-  { id: 'suplementos', name: 'Suplementos', icon: 'Pill', route: '/patient/suplementos', visible: true, order: 9 },
-  { id: 'dicas', name: 'Dicas', icon: 'Lightbulb', route: '/patient/dicas', visible: true, order: 10 },
-  { id: 'jornada', name: 'Minha Jornada', icon: 'TrendingUp', route: '/patient/jornada', visible: true, order: 11 },
-  // Calculadoras
-  { id: 'calculadoras', name: 'Calculadoras', icon: 'Calculator', route: '/patient/calculators', visible: true, order: 12 }
+  // 🚀 Minha Jornada - CORAÇÃO DO APP (Principal)
+  { id: 'minha-jornada', name: 'Minha Jornada', icon: 'Rocket', route: '/patient/minha-jornada', visible: true, order: 2, fixed: true, highlight: true },
+  // 📅 Minha Agenda
+  { id: 'agenda', name: 'Minha Agenda', icon: 'Calendar', route: '/patient/agenda', visible: true, order: 3 },
+  // 🥗 Meu Plano
+  { id: 'meal-plan', name: 'Meu Plano', icon: 'Utensils', route: '/patient/meal-plan', visible: true, order: 4 },
+  // 📚 Biblioteca (agrupa receitas, lista, suplementos, calculadoras)
+  { id: 'biblioteca', name: 'Biblioteca', icon: 'Book', route: '/patient/biblioteca', visible: true, order: 5 },
+  // Itens secundários (podem ser ocultados ou acessados via biblioteca)
+  { id: 'avaliacao-fisica', name: 'Avaliação Física', icon: 'Activity', route: '/patient/avaliacao-fisica', visible: false, order: 6 },
+  { id: 'feedbacks', name: 'Meus Feedbacks', icon: 'MessageSquare', route: '/patient/feedbacks', visible: false, order: 7 },
+  { id: 'receitas', name: 'Minhas Receitas', icon: 'ChefHat', route: '/patient/receitas', visible: false, order: 8 },
+  { id: 'lista-compras', name: 'Lista de Compras', icon: 'ShoppingCart', route: '/patient/lista-compras', visible: false, order: 9 },
+  { id: 'suplementos', name: 'Suplementos', icon: 'Pill', route: '/patient/suplementos', visible: false, order: 10 },
+  { id: 'dicas', name: 'Dicas', icon: 'Lightbulb', route: '/patient/dicas', visible: false, order: 11 },
+  { id: 'calculadoras', name: 'Calculadoras', icon: 'Calculator', route: '/patient/calculadoras', visible: false, order: 12 }
 ];
 
 // Buscar configuração do menu do paciente
