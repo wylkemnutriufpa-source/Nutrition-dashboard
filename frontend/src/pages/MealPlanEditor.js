@@ -306,7 +306,7 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
             </div>
           </div>
           <div className="flex gap-2">
-            {onRemoveMeal && (
+            {onRemoveMeal && userType !== 'patient' && (
               <Button
                 onClick={() => onRemoveMeal(meal.id)}
                 variant="ghost"
@@ -316,16 +316,18 @@ const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateM
                 <Trash2 size={16} />
               </Button>
             )}
-            <Button
-              data-testid={`duplicate-meal-${meal.id}`}
-              onClick={() => onDuplicateMeal(meal.id)}
-              variant="outline"
-              size="sm"
-              className="text-teal-700 border-teal-700 hover:bg-teal-50"
-            >
-              <Copy size={16} className="mr-2" />
-              Duplicar
-            </Button>
+            {userType !== 'patient' && (
+              <Button
+                data-testid={`duplicate-meal-${meal.id}`}
+                onClick={() => onDuplicateMeal(meal.id)}
+                variant="outline"
+                size="sm"
+                className="text-teal-700 border-teal-700 hover:bg-teal-50"
+              >
+                <Copy size={16} className="mr-2" />
+                Duplicar
+              </Button>
+            )}
           </div>
         </div>
         <div className="mt-4 flex gap-6 text-sm bg-white p-3 rounded-lg border border-gray-200">
