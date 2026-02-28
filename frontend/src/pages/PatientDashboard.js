@@ -30,10 +30,11 @@ const PatientDashboard = () => {
 
   // Verificar modal de primeiro acesso APENAS para anamnese incompleta
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && !hasCheckedFirstAccess) {
       checkFirstAccess();
+      setHasCheckedFirstAccess(true);
     }
-  }, [user, loading, anamnesis]);
+  }, [user, loading, hasCheckedFirstAccess]);
 
   const checkFirstAccess = () => {
     // Só mostra modal se anamnese NÃO está completa e nunca viu o modal
