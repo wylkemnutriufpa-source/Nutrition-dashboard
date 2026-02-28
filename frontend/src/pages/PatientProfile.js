@@ -916,11 +916,11 @@ const PatientProfile = () => {
     notes: ''
   });
 
-  const loadPatientData = useCallback(async () => {
+  const loadPatientData = useCallback(async (forceRefresh = false) => {
     if (!id || !profile) return;
     
-    // Evitar recarregar se já tem dados (cache simples)
-    if (patient && patient.id === id) {
+    // Só usar cache se forceRefresh não for passado
+    if (!forceRefresh && patient && patient.id === id) {
       setLoading(false);
       return;
     }
