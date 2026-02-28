@@ -526,33 +526,42 @@ const DraftMealPlanViewer = ({
               </div>
 
               <div className="space-y-2">
-                {meal.foods?.map((food, foodIndex) => (
-                  <div key={foodIndex} className="flex items-center gap-2">
-                    {editing ? (
-                      <>
-                        <Input
-                          value={food}
-                          onChange={(e) => updateFoodInMeal(meal.id, foodIndex, e.target.value)}
-                          placeholder="Nome do alimento"
-                          className="flex-1"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeFoodFromMeal(meal.id, foodIndex)}
-                          className="text-red-600"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 size={14} className="text-green-600" />
-                        <span className="text-sm text-gray-700">{food}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {meal.foods?.map((food, foodIndex) => {
+                  // Handle both string and object format for foods
+                  const foodName = typeof food === 'string' ? food : food?.name || '';
+                  const foodQuantity = typeof food === 'object' && food?.quantity ? `${food.quantity} ${food.unit || ''}`.trim() : '';
+                  
+                  return (
+                    <div key={foodIndex} className="flex items-center gap-2">
+                      {editing ? (
+                        <>
+                          <Input
+                            value={foodName}
+                            onChange={(e) => updateFoodInMeal(meal.id, foodIndex, e.target.value)}
+                            placeholder="Nome do alimento"
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFoodFromMeal(meal.id, foodIndex)}
+                            className="text-red-600"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 size={14} className="text-green-600" />
+                          <span className="text-sm text-gray-700">
+                            {foodName}
+                            {foodQuantity && <span className="text-gray-500 ml-1">({foodQuantity})</span>}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 {editing && (
                   <Button
                     variant="outline"
