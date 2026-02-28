@@ -21,6 +21,7 @@ const PatientDashboard = () => {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showFirstAccessModal, setShowFirstAccessModal] = useState(false);
   const [showPlanModal, setShowPlanModal] = useState(false);
+  const [hasCheckedFirstAccess, setHasCheckedFirstAccess] = useState(false);
 
   useEffect(() => {
     if (user) {
