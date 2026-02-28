@@ -224,6 +224,16 @@ const PatientListaCompras = () => {
     <Layout title="Lista de Compras" userType="patient">
       <div className="max-w-3xl mx-auto space-y-6">
         
+        {/* Botão Voltar */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/patient/biblioteca')}
+          className="mb-2"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar para Biblioteca
+        </Button>
+
         {/* Header */}
         <Card className="bg-gradient-to-br from-teal-500 to-green-500 text-white">
           <CardContent className="pt-6">
