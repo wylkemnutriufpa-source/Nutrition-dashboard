@@ -171,7 +171,16 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
       console.log('🔍 Buscando dados para importar...');
       console.log('📋 Patient recebido:', patient);
       
-      // Buscar anamnese
+      // Se não tiver dados do paciente atualizados, tentar atualizar primeiro
+      if (onRefreshPatient && (!patient?.current_weight && !patient?.height)) {
+        console.log('🔄 Paciente sem dados, tentando refresh...');
+        await onRefreshPatient();
+        toast.info('Atualizando dados do paciente...');
+        // Aguardar um pouco para o state atualizar
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      // Buscar anamnese diretamente do banco
       const { data: anamnesis, error } = await getAnamnesis(patientId);
       console.log('📋 Anamnese encontrada:', anamnesis);
       if (error) {
@@ -194,17 +203,19 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
         updates.goal_weight = patient.goal_weight;
       }
       
-      // 2. Dados da anamnese (complementar)
+      // 2. Dados da anamnese (complementar ou se paciente não tem)
       if (anamnesis) {
         console.log('📋 Campos da anamnese:', Object.keys(anamnesis));
         
-        // Peso
-        if (!updates.weight) {
-          updates.weight = anamnesis.current_weight || anamnesis.weight || anamnesis.peso;
+        // Peso - usar da anamnese se não tiver do paciente
+        if (!updates.weight && (anamnesis.current_weight || anamnesis.weight)) {
+          updates.weight = anamnesis.current_weight || anamnesis.weight;
+          console.log('✅ Peso da anamnese:', updates.weight);
         }
         // Altura  
-        if (!updates.height) {
-          updates.height = anamnesis.height || anamnesis.altura;
+        if (!updates.height && anamnesis.height) {
+          updates.height = anamnesis.height;
+          console.log('✅ Altura da anamnese:', updates.height);
         }
         // Circunferências
         if (anamnesis.waist_circumference) updates.waist = anamnesis.waist_circumference;
