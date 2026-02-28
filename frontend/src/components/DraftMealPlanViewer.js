@@ -24,7 +24,8 @@ const DraftMealPlanViewer = ({
   onUseAsOfficial,
   onSaveAsDraft,
   loading,
-  patientId 
+  patientId,
+  anamnesis // Recebe anamnese para detecção automática
 }) => {
   const [editing, setEditing] = useState(false);
   const [editedPlan, setEditedPlan] = useState(null);
@@ -36,6 +37,9 @@ const DraftMealPlanViewer = ({
 
   // Carregar planos especiais
   const specialPlans = getAllSpecialPlans();
+
+  // Detectar condições automaticamente da anamnese
+  const { detectedConditions, recommendations } = detectConditionsFromAnamnesis(anamnesis, null);
 
   useEffect(() => {
     if (draftPlan) {
