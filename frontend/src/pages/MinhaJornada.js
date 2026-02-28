@@ -182,7 +182,20 @@ const MinhaJornada = () => {
   const handleToggleTask = async (taskId, completed) => {
     try {
       await toggleChecklistTask(taskId, !completed);
-      setTasks(tasks.map(t => t.id === taskId ? { ...t, completed: !completed } : t));
+      const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, completed: !completed } : t);
+      setTasks(updatedTasks);
+      
+      // Recalcular inteligência
+      computeIntelligence({
+        tasks: updatedTasks,
+        tips,
+        feedbacks,
+        agenda: [],
+        plan: patientStats?.activePlan,
+        anamnesis: patientStats?.anamnesis,
+        patientData: patientStats?.profile
+      });
+      
       if (!completed) {
         toast.success('🎉 Ótimo trabalho!');
       }
