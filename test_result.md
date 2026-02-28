@@ -394,9 +394,9 @@ frontend:
 
   - task: "Modal Visualizar Plano Alimentar"
     implemented: true
-    working: "BLOCKED"
+    working: false
     file: "frontend/src/components/MealPlanViewerModal.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/PatientDashboard.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -406,6 +406,9 @@ frontend:
       - working: "BLOCKED"
         agent: "testing"
         comment: "❌ BLOQUEADO (28/Fev/2026 - Teste com kelly@com/123456): Modal de visualização NÃO pode ser testado completamente porque modal 'Anamnese Completa!' aparece no dashboard do paciente bloqueando interação com botão 'Ver Plano Completo'. DESCOBERTO: Paciente tem 'Plano Alimentar (do Pré-Plano)' visível com 3159 kcal e P: 129g no card. Botão 'Ver Plano Completo' encontrado mas click interceptado por overlay (div.fixed.inset-0.z-50.bg-black/80). CÓDIGO REVISADO: MealPlanViewerModal.js implementação correta - linhas 28-36 calculam totais (calories, protein, carbs, fat), linhas 75-103 exibem calorias por alimento usando food.calories||food.kcal. ISSUE REAL: Modal 'Anamnese Completa!' está incorretamente aparecendo e bloqueando UI do dashboard paciente. Screenshots: patient_dashboard.png mostra modal bloqueador."
+      - working: false
+        agent: "testing"
+        comment: "❌ FALHOU (28/Fev/2026 - Re-teste kelly@com/123456): ISSUE 1 - Modal 'Anamnese Completa!' AINDA aparece no dashboard mesmo após login anterior (localStorage check não está funcionando). Paciente tem que clicar 'Entendi' toda vez que faz login. ISSUE 2 - Modal abre com sucesso após fechar modal bloqueador, MAS todas as calorias mostram '0 kcal'. Verificado: Header mostra 'Calorias: 0 (meta: 3159 kcal)', todos os alimentos mostram '0 kcal P: 0g', Total da Refeição mostra '0 kcal'. CAUSA RAIZ: Plano existente foi criado ANTES da correção no MealPlanEditor.js (linha 559-565) que salva dados nutricionais. Código do modal está CORRETO (food.calories||food.kcal), mas os dados não existem no plano salvo. Screenshots: 02_modal_blocker_visible.png, 04_meal_plan_modal_opened.png. PRECISA: (1) Corrigir lógica do FirstAccessModal para não aparecer repetidamente, (2) Profissional precisa criar novo plano para kelly ou re-salvar plano existente para preencher calorias."
 
   - task: "Botão Acessar Planos no Dashboard Profissional"
     implemented: true
