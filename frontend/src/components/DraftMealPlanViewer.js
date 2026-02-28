@@ -11,7 +11,7 @@ import {
   AlertCircle, CheckCircle2, RefreshCw, ArrowRight, Download, Loader2, Heart
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getAllSpecialPlans, generateSpecialMeals } from '@/utils/smartAnamnesis';
+import { getAllSpecialPlans, generateSpecialMeals, detectConditionsFromAnamnesis } from '@/utils/smartAnamnesis';
 
 /**
  * DraftMealPlanViewer - Exibe e edita o pré-plano gerado pela anamnese
