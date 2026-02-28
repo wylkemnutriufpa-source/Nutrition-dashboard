@@ -10,14 +10,8 @@ import { FileText, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
  * Informa que o plano só será elaborado após preencher toda a anamnese
  */
 const FirstAccessModal = ({ show, onClose, onStartAnamnesis, anamnesisStatus }) => {
-  const [open, setOpen] = useState(show);
-
-  useEffect(() => {
-    setOpen(show);
-  }, [show]);
-
+  // Controle interno do estado do modal
   const handleClose = () => {
-    setOpen(false);
     if (onClose) onClose();
   };
 
@@ -28,10 +22,12 @@ const FirstAccessModal = ({ show, onClose, onStartAnamnesis, anamnesisStatus }) 
 
   const isComplete = anamnesisStatus === 'complete';
   const isDraft = anamnesisStatus === 'draft';
-  const isIncomplete = !anamnesisStatus || anamnesisStatus === 'incomplete';
+
+  // Se não deve mostrar, retorna null
+  if (!show) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={show} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
