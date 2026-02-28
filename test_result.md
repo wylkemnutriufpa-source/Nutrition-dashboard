@@ -504,16 +504,19 @@ frontend:
         comment: "✅ PASSOU (28/Fev/2026 - kelly@com): Página 'Minha Agenda' carrega perfeitamente. Link 'Minha Agenda' encontrado no menu lateral e funciona. Página exibe título 'Minha Agenda', subtítulo 'Consultas e lembretes', e card 'Próximos Compromissos' com mensagem 'Nenhum compromisso futuro' (correto para conta sem lembretes). Botão 'Adicionar Lembrete' ENCONTRADO, VISÍVEL e HABILITADO. Screenshots: 30_agenda_page.png, 31_add_reminder_button.png. Funcionalidade completa e pronta para uso."
 
   - task: "Menu Simplificado do Paciente (5 itens)"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "frontend/src/lib/supabase.js (DEFAULT_PATIENT_MENU), frontend/src/components/Sidebar.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ FALHOU (28/Fev/2026 - kelly@com): Menu simplificado NÃO está implementado para este paciente. ESPERADO: 5 itens (Dashboard, Minha Jornada, Minha Agenda, Meu Plano, Biblioteca). ENCONTRADO: 11 itens expandidos (Dashboard, Minha Jornada, Dicas, Minha Agenda, Meu Plano, Minhas Tarefas, Meus Feedbacks, Minhas Receitas, Lista de Compras, Suplementos, Calculadoras). Item 'Biblioteca' AUSENTE do menu. PROBLEMA: Configuração patient_menu_config não está usando DEFAULT_PATIENT_MENU. Itens secundários (Receitas, Lista, Suplementos, Calculadoras) deveriam estar ocultos e acessíveis apenas via Biblioteca. Código do menu simplificado existe em supabase.js (linhas 1402-1421), mas não está sendo aplicado ao paciente kelly@com. Screenshots: 03_dashboard_sidebar.png mostra menu expandido incorretamente."
+      - working: true
+        agent: "testing"
+        comment: "✅✅✅ PASSOU COMPLETAMENTE (28/Fev/2026 - APÓS RESET DO BANCO - kelly@com/123456): MENU SIMPLIFICADO FUNCIONANDO PERFEITAMENTE! FLUXO TESTADO: (1) Página inicial acessada ✅, (2) Clicado em 'Paciente' ✅, (3) Login kelly@com/123456 realizado ✅, (4) Dashboard carregado ✅, (5) 🎯🎯🎯 MENU LATERAL VERIFICADO - EXATAMENTE 5 ITENS ENCONTRADOS: (1) Dashboard ✅, (2) Minha Jornada ✅, (3) Minha Agenda ✅, (4) Meu Plano ✅, (5) Biblioteca ✅. PROBLEMA ANTERIOR RESOLVIDO: Menu agora mostra apenas 5 itens ao invés dos 11 itens expandidos do teste anterior. Itens secundários (Receitas, Lista de Compras, Suplementos, Calculadoras, Dicas, Tarefas, Feedbacks) foram REMOVIDOS do menu lateral e estão agora acessíveis via Biblioteca. Item 'Biblioteca' AGORA ESTÁ PRESENTE no menu (estava ausente no teste anterior). RESET DO BANCO APLICOU CORRETAMENTE O DEFAULT_PATIENT_MENU. Screenshots: 05_sidebar_menu.png mostra menu simplificado de 5 itens. Funcionalidade 100% operacional conforme especificação."
   
   - task: "Página Minha Jornada"
     implemented: true
