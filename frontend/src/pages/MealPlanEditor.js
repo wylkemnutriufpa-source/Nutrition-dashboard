@@ -180,7 +180,7 @@ const SortableFood = ({ food, onRemove, onUpdate, allFoods }) => {
   );
 };
 
-const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, onUpdateMealName, onUpdateMealTime, onUpdateMeal, onRemoveMeal, allFoods }) => {
+const MealSection = ({ meal, onAddFood, onRemoveFood, onUpdateFood, onDuplicateMeal, onUpdateMealName, onUpdateMealTime, onUpdateMeal, onRemoveMeal, allFoods, userType = 'professional' }) => {
   const [isAddingFood, setIsAddingFood] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFoodId, setSelectedFoodId] = useState(null);
@@ -1075,6 +1075,7 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
                 onUpdateMealTime={updateMealTime}
                 onUpdateMeal={updateMeal}
                 onRemoveMeal={removeMeal}
+                userType={userType}
               />
             ))}
             
