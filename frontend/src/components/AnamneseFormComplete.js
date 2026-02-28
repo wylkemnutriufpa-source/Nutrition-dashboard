@@ -175,6 +175,32 @@ const AnamneseFormComplete = ({
     return () => clearTimeout(timer);
   }, [data, hasChanges]);
 
+  // Função para excluir anamnese e começar nova
+  const handleDeleteAnamnesis = async () => {
+    if (!anamnesis?.id) return;
+    
+    setDeleting(true);
+    try {
+      const { error } = await deleteAnamnesis(anamnesis.id);
+      if (error) throw error;
+      
+      toast.success('Anamnese excluída! Você pode começar uma nova.');
+      setShowDeleteDialog(false);
+      setData({});
+      setHasChanges(false);
+      
+      // Recarregar dados
+      if (onUpdate) {
+        await onUpdate();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir anamnese:', error);
+      toast.error('Erro ao excluir anamnese');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const getSectionIcon = (section) => {
     switch (section) {
       case 'clinical': return <Heart size={16} />;
