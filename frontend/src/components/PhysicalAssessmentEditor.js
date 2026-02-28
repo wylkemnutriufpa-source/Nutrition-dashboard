@@ -168,25 +168,45 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
   // Carregar dados da anamnese e do paciente para pré-preencher
   const loadFromAnamnesis = async () => {
     try {
+      console.log('🔍 Buscando dados para importar...');
+      console.log('📋 Patient recebido:', patient);
+      
+      // Buscar anamnese
       const { data: anamnesis, error } = await getAnamnesis(patientId);
+      console.log('📋 Anamnese encontrada:', anamnesis);
       if (error) {
         console.warn('Erro ao buscar anamnese:', error);
       }
 
-      // Mapear campos da anamnese para a avaliação física
+      // Mapear campos para a avaliação física
       const updates = {};
       
-      // Dados do paciente (peso, altura, etc)
-      if (patient?.current_weight) updates.weight = patient.current_weight;
-      if (patient?.weight) updates.weight = updates.weight || patient.weight;
-      if (patient?.height) updates.height = patient.height;
-      if (patient?.goal_weight) updates.goal_weight = patient.goal_weight;
+      // 1. Dados do paciente (prioridade)
+      if (patient?.current_weight) {
+        updates.weight = patient.current_weight;
+        console.log('✅ Peso do paciente:', patient.current_weight);
+      }
+      if (patient?.height) {
+        updates.height = patient.height;
+        console.log('✅ Altura do paciente:', patient.height);
+      }
+      if (patient?.goal_weight) {
+        updates.goal_weight = patient.goal_weight;
+      }
       
-      // Dados da anamnese se existirem
+      // 2. Dados da anamnese (complementar)
       if (anamnesis) {
-        // Campos diretos
-        if (anamnesis.weight) updates.weight = updates.weight || anamnesis.weight;
-        if (anamnesis.height) updates.height = updates.height || anamnesis.height;
+        console.log('📋 Campos da anamnese:', Object.keys(anamnesis));
+        
+        // Peso
+        if (!updates.weight) {
+          updates.weight = anamnesis.current_weight || anamnesis.weight || anamnesis.peso;
+        }
+        // Altura  
+        if (!updates.height) {
+          updates.height = anamnesis.height || anamnesis.altura;
+        }
+        // Circunferências
         if (anamnesis.waist_circumference) updates.waist = anamnesis.waist_circumference;
         if (anamnesis.hip_circumference) updates.hip = anamnesis.hip_circumference;
         if (anamnesis.neck_circumference) updates.neck = anamnesis.neck_circumference;
@@ -201,33 +221,31 @@ const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCre
         }
         if (anamnesis.heart_rate) updates.heart_rate = anamnesis.heart_rate;
         
-        // Campos que podem estar na anamnese com outros nomes
-        if (anamnesis.current_weight) updates.weight = updates.weight || anamnesis.current_weight;
-        if (anamnesis.peso) updates.weight = updates.weight || anamnesis.peso;
-        if (anamnesis.altura) updates.height = updates.height || anamnesis.altura;
-        if (anamnesis.cintura) updates.waist = updates.waist || anamnesis.cintura;
-        if (anamnesis.quadril) updates.hip = updates.hip || anamnesis.quadril;
-        
-        // Gordura corporal se existir
-        if (anamnesis.body_fat) updates.body_fat_percentage = anamnesis.body_fat;
-        if (anamnesis.gordura_corporal) updates.body_fat_percentage = anamnesis.gordura_corporal;
+        // Goal weight da anamnese
+        if (!updates.goal_weight && anamnesis.goal_weight) {
+          updates.goal_weight = anamnesis.goal_weight;
+        }
       }
       
-      // Calcular IMC se tiver peso e altura
+      // 3. Calcular IMC se tiver peso e altura
       if (updates.weight && updates.height) {
-        const heightM = updates.height / 100;
-        updates.bmi = (updates.weight / (heightM * heightM)).toFixed(1);
+        const heightM = parseFloat(updates.height) / 100;
+        updates.bmi = (parseFloat(updates.weight) / (heightM * heightM)).toFixed(1);
+        console.log('✅ IMC calculado:', updates.bmi);
       }
+
+      console.log('📊 Updates a aplicar:', updates);
 
       if (Object.keys(updates).length > 0) {
         setFormData(prev => ({ ...prev, ...updates }));
         const fields = Object.keys(updates);
-        toast.success(`✅ ${fields.length} campos importados: ${fields.slice(0, 3).join(', ')}${fields.length > 3 ? '...' : ''}`);
+        toast.success(`✅ ${fields.length} campos importados: ${fields.join(', ')}`);
       } else {
-        toast.info('Nenhum dado encontrado. Verifique se o paciente tem peso/altura cadastrados.');
+        console.warn('⚠️ Nenhum dado encontrado');
+        toast.warning('Nenhum dado encontrado. Preencha peso/altura na Anamnese primeiro.');
       }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      console.error('❌ Erro ao carregar dados:', error);
       toast.error('Erro ao carregar dados');
     }
   };
