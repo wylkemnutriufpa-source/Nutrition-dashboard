@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import ChecklistSimple from '@/components/ChecklistSimple';
 import FirstAccessModal, { AnamneseBanner } from '@/components/FirstAccessModal';
 import MealPlanViewerModal from '@/components/MealPlanViewerModal';
+import EmergencyButton from '@/components/EmergencyButton';
 
 const PatientDashboard = () => {
   const { user, profile } = useAuth();
