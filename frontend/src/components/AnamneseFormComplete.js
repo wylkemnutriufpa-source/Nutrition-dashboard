@@ -45,7 +45,7 @@ const AnamneseFormComplete = ({
   // Calcular progresso da anamnese
   const calculateProgress = () => {
     const fields = {
-      clinical: ['medical_conditions', 'no_medical_conditions', 'allergies', 'food_intolerances'],
+      clinical: ['medical_conditions', 'no_medical_conditions', 'allergies', 'food_intolerances', 'current_weight', 'height'],
       lifestyle: ['smoking', 'alcohol', 'sleep_hours', 'stress_level', 'water_intake'],
       nutrition: ['meals_per_day', 'food_preference', 'favorite_foods'],
       sports: ['exercises_regularly', 'physical_activity_level', 'sports_goal']
