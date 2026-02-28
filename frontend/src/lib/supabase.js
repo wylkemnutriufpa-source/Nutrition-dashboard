@@ -2607,11 +2607,15 @@ export const getProfessionalDashboardData = async (professionalId) => {
         goal_weight,
         professional_id
       `)
-      .eq('role', 'patient')
-      .eq('professional_id', professionalId)
+      .eq('professional_id', professionalId) // Remove filtro de role - não existe
       .order('name');
 
-    if (patientsError) throw patientsError;
+    if (patientsError) {
+      console.error('❌ Erro na query profiles:', patientsError);
+      throw patientsError;
+    }
+
+    console.log('✅ Pacientes encontrados:', patients?.length || 0);
 
     // 2. Para cada paciente, buscar estatísticas agregadas
     const enrichedPatients = await Promise.all(
