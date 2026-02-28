@@ -741,6 +741,45 @@ export const toggleChecklistEntry = async (templateId, patientId, date, complete
   return { data, error };
 };
 
+
+// Buscar feedbacks do paciente
+export const getPatientFeedbacks = async (patientId) => {
+  try {
+    const { data, error } = await supabase
+      .from('feedbacks')
+      .select('*')
+      .eq('patient_id', patientId)
+      .order('created_at', { ascending: false })
+      .limit(10);
+    
+    return { data: data || [], error };
+  } catch (err) {
+    console.error('Erro ao buscar feedbacks:', err);
+    return { data: [], error: err };
+  }
+};
+
+// Enviar resposta de feedback do paciente
+export const sendFeedbackReply = async (feedbackId, replyText) => {
+  try {
+    const { data, error } = await supabase
+      .from('feedbacks')
+      .update({ 
+        patient_response: replyText,
+        patient_response_at: new Date().toISOString()
+      })
+      .eq('id', feedbackId)
+      .select()
+      .single();
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Erro ao enviar resposta:', err);
+    return { data: null, error: err };
+  }
+};
+
+
 // Calcular aderência simples (para o resumo do paciente)
 export const getChecklistAdherence = async (patientId, days = 7) => {
   // Para MVP simples, apenas contar tarefas completas vs totais
