@@ -52,11 +52,73 @@ const ProfessionalDashboard = () => {
       const isAdmin = profile?.role === 'admin';
       const data = await getProfessionalStats(user.id, isAdmin);
       setStats(data);
+      
+      // Carregar dicas e tarefas globais
+      const [tipsRes, tasksRes] = await Promise.all([
+        getGlobalTips(user.id),
+        getGlobalTasks(user.id)
+      ]);
+      setGlobalTips(tipsRes.data || []);
+      setGlobalTasks(tasksRes.data || []);
     } catch (error) {
       console.error('Error loading stats:', error);
       toast.error('Erro ao carregar estatísticas');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Funções para Dicas Globais
+  const handleAddTip = async () => {
+    if (!newTip.trim()) return;
+    setAddingTip(true);
+    try {
+      const { data, error } = await createGlobalTip(user.id, newTip);
+      if (error) throw error;
+      setGlobalTips([data, ...globalTips]);
+      setNewTip('');
+      toast.success('Dica criada! Aparecerá para todos os pacientes.');
+    } catch (error) {
+      toast.error('Erro ao criar dica');
+    } finally {
+      setAddingTip(false);
+    }
+  };
+
+  const handleDeleteTip = async (tipId) => {
+    try {
+      await deleteGlobalTip(tipId);
+      setGlobalTips(globalTips.filter(t => t.id !== tipId));
+      toast.success('Dica removida');
+    } catch (error) {
+      toast.error('Erro ao remover dica');
+    }
+  };
+
+  // Funções para Tarefas Globais
+  const handleAddTask = async () => {
+    if (!newTask.trim()) return;
+    setAddingTask(true);
+    try {
+      const { data, error } = await createGlobalTask(user.id, newTask);
+      if (error) throw error;
+      setGlobalTasks([...globalTasks, data]);
+      setNewTask('');
+      toast.success('Tarefa criada! Aparecerá no checklist dos pacientes.');
+    } catch (error) {
+      toast.error('Erro ao criar tarefa');
+    } finally {
+      setAddingTask(false);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteGlobalTask(taskId);
+      setGlobalTasks(globalTasks.filter(t => t.id !== taskId));
+      toast.success('Tarefa removida');
+    } catch (error) {
+      toast.error('Erro ao remover tarefa');
     }
   };
 
