@@ -51,6 +51,19 @@ const CalculatorsList = ({ userType = 'visitor' }) => {
   return (
     <Layout title="Ferramentas" userType={userType}>
       <div data-testid="calculators-list" className="max-w-5xl mx-auto">
+        
+        {/* Botão Voltar - apenas para pacientes */}
+        {userType === 'patient' && (
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/patient/biblioteca')}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para Biblioteca
+          </Button>
+        )}
+        
         <p className="text-gray-600 mb-8">Ferramentas para ajudá-lo em sua jornada de saúde</p>
         
         {/* Projeto Biquíni Branco Destacado */}
