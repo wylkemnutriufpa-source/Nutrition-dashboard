@@ -282,6 +282,108 @@ const AnamneseFormComplete = ({
       {/* PARTE CLÍNICA */}
       {currentSection === 'clinical' && (
         <div className="space-y-4">
+          {/* Dados Antropométricos - NOVO */}
+          <Card className="border-teal-200 bg-teal-50/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity size={20} className="text-teal-600" />
+                Dados Antropométricos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <Label>Peso Atual (kg) *</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={data.current_weight || ''}
+                    onChange={(e) => handleChange('current_weight', parseFloat(e.target.value) || '')}
+                    placeholder="Ex: 75.5"
+                    className="bg-white"
+                  />
+                </div>
+                <div>
+                  <Label>Altura (cm) *</Label>
+                  <Input
+                    type="number"
+                    value={data.height || ''}
+                    onChange={(e) => handleChange('height', parseFloat(e.target.value) || '')}
+                    placeholder="Ex: 170"
+                    className="bg-white"
+                  />
+                </div>
+                <div>
+                  <Label>Peso Meta (kg)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={data.goal_weight || ''}
+                    onChange={(e) => handleChange('goal_weight', parseFloat(e.target.value) || '')}
+                    placeholder="Ex: 68"
+                    className="bg-white"
+                  />
+                </div>
+                <div>
+                  <Label>IMC (calculado)</Label>
+                  <Input
+                    type="text"
+                    value={data.current_weight && data.height ? 
+                      (data.current_weight / Math.pow(data.height / 100, 2)).toFixed(1) : ''}
+                    disabled
+                    className="bg-gray-100"
+                    placeholder="Automático"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                <div>
+                  <Label>Circunferência Cintura (cm)</Label>
+                  <Input
+                    type="number"
+                    value={data.waist_circumference || ''}
+                    onChange={(e) => handleChange('waist_circumference', parseFloat(e.target.value) || '')}
+                    placeholder="Ex: 85"
+                    className="bg-white"
+                  />
+                </div>
+                <div>
+                  <Label>Circunferência Quadril (cm)</Label>
+                  <Input
+                    type="number"
+                    value={data.hip_circumference || ''}
+                    onChange={(e) => handleChange('hip_circumference', parseFloat(e.target.value) || '')}
+                    placeholder="Ex: 100"
+                    className="bg-white"
+                  />
+                </div>
+                <div>
+                  <Label>Pressão Arterial</Label>
+                  <Input
+                    type="text"
+                    value={data.blood_pressure || ''}
+                    onChange={(e) => handleChange('blood_pressure', e.target.value)}
+                    placeholder="Ex: 120/80"
+                    className="bg-white"
+                  />
+                </div>
+                <div>
+                  <Label>Freq. Cardíaca (bpm)</Label>
+                  <Input
+                    type="number"
+                    value={data.heart_rate || ''}
+                    onChange={(e) => handleChange('heart_rate', parseInt(e.target.value) || '')}
+                    placeholder="Ex: 72"
+                    className="bg-white"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-3">
+                * Esses dados serão usados para calcular necessidades nutricionais e poderão ser importados na Avaliação Física
+              </p>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader><CardTitle>Histórico Médico</CardTitle></CardHeader>
             <CardContent className="space-y-6">
