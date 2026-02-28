@@ -487,6 +487,74 @@ test_plan:
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "testing"
+    message: "🧪 TESTES DAS CORREÇÕES COMPLETADOS (28/Fev/2026)
+    
+    ═══════════════════════════════════════════════════════════════════
+    📊 RESUMO DOS RESULTADOS
+    ═══════════════════════════════════════════════════════════════════
+    
+    ❌ TESTE 1 FALHOU - Dashboard Profissional:
+    PROBLEMA CRÍTICO: Usuário wylkem.nutri.ufpa@gmail.com é tratado como ADMIN não PROFESSIONAL
+    - Login redirecionou para /admin/dashboard (Painel Administrativo)
+    - Seção 'Planos Alimentares Ativos' NÃO encontrada
+    - Dashboard mostra: Total de Profissionais: 2, Total de Pacientes: 15
+    - Este é dashboard de administrador, não de profissional
+    - AÇÃO: Verificar role no Supabase profiles table
+    
+    ✅ TESTE 2 PASSOU - Importação de Dados:
+    - Paciente kelly encontrado e perfil acessado
+    - Aba Anamnese: campos peso/altura detectados ✅
+    - Aba Av. Física: Botão 'Carregar dados da Anamnese' encontrado ✅
+    - Importação funcional: exibiu toast 'Nenhum dado encontrado. Preencha peso/altura na Anamnese primeiro' ✅
+    - Sistema trata corretamente ausência de dados
+    
+    ❌ TESTE 3 BLOQUEADO - Modal Visualização Paciente:
+    - Login paciente kelly@com bem-sucedido ✅
+    - 'Plano Alimentar (do Pré-Plano)' visível com 3159 kcal, P: 129g ✅
+    - Botão 'Ver Plano Completo' encontrado ✅
+    - 'Minha Agenda' visível no menu lateral ✅
+    - PROBLEMA: Modal 'Anamnese Completa!' aparece no dashboard bloqueando clique no botão
+    - Overlay (div.fixed.inset-0.z-50.bg-black/80) intercepta pointer events
+    - NÃO foi possível abrir modal de visualização para verificar calorias nas refeições
+    
+    ═══════════════════════════════════════════════════════════════════
+    🔍 ANÁLISE DE CÓDIGO (Verificação Manual)
+    ═══════════════════════════════════════════════════════════════════
+    
+    MealPlanViewerModal.js - IMPLEMENTAÇÃO CORRETA:
+    ✅ Linha 28-36: calculateMealTotals() usa food.calories || food.kcal
+    ✅ Linha 75-103: Exibe calorias por alimento ({foodCalories.toFixed(0)} kcal)
+    ✅ Linha 109-125: Mostra totais da refeição (calories, protein, carbs, fat)
+    ✅ Linha 214-243: Header do modal mostra resumo nutricional do dia
+    
+    ProfessionalDashboard.js - IMPLEMENTAÇÃO CORRETA:
+    ✅ Linha 160-228: Seção 'Planos Alimentares Ativos' implementada
+    ✅ Linha 179-224: Lista planos com botões Ver e Editar
+    ✅ Código funcional, mas usuário tem role incorreta
+    
+    ═══════════════════════════════════════════════════════════════════
+    ⚠️ AÇÕES REQUERIDAS PARA MAIN AGENT
+    ═══════════════════════════════════════════════════════════════════
+    
+    🔴 PRIORIDADE 1 - User Role Issue:
+    - Verificar no Supabase: SELECT id, email, role FROM profiles WHERE email='wylkem.nutri.ufpa@gmail.com'
+    - Role deve ser 'professional' não 'admin'
+    - Corrigir role no banco de dados
+    - Re-testar após correção
+    
+    🔴 PRIORIDADE 2 - Modal Bloqueador:
+    - Investigar PatientDashboard.js: Por que modal 'Anamnese Completa!' aparece?
+    - Modal deve aparecer apenas quando anamnese é concluída pela primeira vez
+    - Modal não deve bloquear interação com dashboard
+    - Verificar lógica de exibição do modal (condições, estado)
+    
+    ℹ️ INFORMAÇÃO:
+    - Importação de dados: FUNCIONANDO ✅
+    - Calorias no modal: CÓDIGO CORRETO (não testado end-to-end devido a bloqueio) ✅
+    - Dashboard profissional: CÓDIGO CORRETO (não acessível devido a role incorreta) ❌
+    
+    Screenshots salvos: dashboard_error.png, anamnese_tab.png, av_fisica_form.png, patient_dashboard.png"
   - agent: "main"
     message: "✅ CORREÇÕES IMPLEMENTADAS (28/Fev/2026)
     
