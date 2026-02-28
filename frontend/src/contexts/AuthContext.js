@@ -131,7 +131,7 @@ export const AuthProvider = ({ children }) => {
         authListenerRef.current = null;
       }
     };
-  }, [checkUser, handleSignIn, handleSignOut]);
+  }, []); // Removido dependências para evitar loops
 
   const logout = async () => {
     try {
