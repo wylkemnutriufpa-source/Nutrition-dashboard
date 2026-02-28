@@ -2842,7 +2842,7 @@ export const getPatientInstancesWithSource = async (patientId, type = 'checklist
       return { data, error };
     } else if (type === 'tip') {
       const { data, error } = await supabase
-        .from('personalized_tips')
+        .from('tips')
         .select(`
           *,
           source_template:professional_templates(id, title, type)
@@ -2864,7 +2864,7 @@ export const getPatientInstancesWithSource = async (patientId, type = 'checklist
  */
 export const disableTemplateForPatient = async (patientId, instanceId, type = 'checklist') => {
   try {
-    const table = type === 'tip' ? 'personalized_tips' : 'checklist_tasks';
+    const table = type === 'tip' ? 'tips' : 'checklist_tasks';
     
     const { error } = await supabase
       .from(table)
@@ -2883,7 +2883,7 @@ export const disableTemplateForPatient = async (patientId, instanceId, type = 'c
  * Marcar instância como customizada
  */
 export const markInstanceAsCustomized = async (instanceId, type = 'checklist') => {
-  const table = type === 'tip' ? 'personalized_tips' : 'checklist_tasks';
+  const table = type === 'tip' ? 'tips' : 'checklist_tasks';
   
   const { error } = await supabase
     .from(table)
