@@ -333,18 +333,55 @@ const PatientDashboard = () => {
           {/* Checklist Diário */}
           <ChecklistSimple patientId={user?.id} isPatientView={true} />
 
-          {/* Dicas */}
+          {/* Dicas Personalizadas */}
           <Card>
-            <CardHeader>
-              <CardTitle>Dicas do Nutricionista</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-amber-500" />
+                Dicas do Nutricionista
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {tips.map((tip, index) => (
-                  <div key={index} className="p-3 bg-teal-50 border-l-4 border-teal-700 rounded">
-                    <p className="text-sm text-gray-700">{tip}</p>
+              <div className="space-y-3 max-h-[350px] overflow-y-auto">
+                {/* Dicas de Avaliação Física (destaque) */}
+                {personalizedTips.filter(t => t.source === 'assessment' || t.type === 'assessment').slice(0, 3).map((tip, index) => (
+                  <div key={`assessment-${index}`} className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <Star className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="text-xs font-semibold text-purple-600 uppercase">Baseado na sua avaliação</span>
+                        <p className="text-sm text-gray-700 mt-1">{tip.tip || tip.title}</p>
+                      </div>
+                    </div>
                   </div>
                 ))}
+                
+                {/* Dicas de Anamnese */}
+                {personalizedTips.filter(t => t.source === 'anamnesis' || t.type === 'anamnesis').slice(0, 3).map((tip, index) => (
+                  <div key={`anamnesis-${index}`} className="p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-l-4 border-teal-500 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <Sparkles className="h-4 w-4 text-teal-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="text-xs font-semibold text-teal-600 uppercase">Personalizada para você</span>
+                        <p className="text-sm text-gray-700 mt-1">{tip.tip || tip.title}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Dicas Gerais (quando não tem personalizadas) */}
+                {personalizedTips.length === 0 && defaultTips.map((tip, index) => (
+                  <div key={index} className="p-3 bg-gray-50 border-l-4 border-gray-300 rounded">
+                    <p className="text-sm text-gray-600">{tip.title}</p>
+                  </div>
+                ))}
+
+                {/* Mensagem se não tem dicas */}
+                {personalizedTips.length === 0 && (
+                  <p className="text-xs text-gray-400 text-center mt-2">
+                    Complete sua anamnese e avaliação física para receber dicas personalizadas
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
