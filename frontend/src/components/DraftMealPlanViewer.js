@@ -30,6 +30,12 @@ const DraftMealPlanViewer = ({
   const [editedPlan, setEditedPlan] = useState(null);
   const [saving, setSaving] = useState(false);
   const [currentVariation, setCurrentVariation] = useState(draftPlan?.variation || 1);
+  const [planCategory, setPlanCategory] = useState('general'); // 'general' ou 'special'
+  const [selectedSpecialPlan, setSelectedSpecialPlan] = useState(null);
+  const [specialVariation, setSpecialVariation] = useState(0);
+
+  // Carregar planos especiais
+  const specialPlans = getAllSpecialPlans();
 
   useEffect(() => {
     if (draftPlan) {
@@ -60,11 +66,51 @@ const DraftMealPlanViewer = ({
 
   const handleRegenerateVariation = (variation) => {
     setCurrentVariation(variation);
+    setPlanCategory('general');
+    setSelectedSpecialPlan(null);
     if (onRegenerate) {
       onRegenerate(variation);
     }
   };
 
+  const handleSelectSpecialPlan = (plan) => {
+    setSelectedSpecialPlan(plan);
+    setPlanCategory('special');
+    setSpecialVariation(0);
+    
+    // Gerar refeições do plano especial
+    const specialMeals = generateSpecialMeals(plan.id, 0);
+    
+    if (specialMeals && editedPlan) {
+      const updatedPlan = {
+        ...editedPlan,
+        meals: specialMeals,
+        specialPlan: plan.id,
+        planType: 'special',
+        reasoning: `## ${plan.icon} Plano Especial: ${plan.name}\n\n${plan.description}\n\n### Diretrizes:\n${plan.guidelines.map(g => `- ${g}`).join('\n')}\n\n### Alimentos a Evitar:\n${plan.avoid.join(', ')}\n\n### Alimentos Preferidos:\n${plan.prefer.join(', ')}`
+      };
+      setEditedPlan(updatedPlan);
+      if (onUpdate) onUpdate(updatedPlan);
+      toast.success(`${plan.icon} Plano ${plan.name} aplicado!`);
+    }
+  };
+
+  const handleRegenerateSpecialVariation = () => {
+    if (!selectedSpecialPlan) return;
+    
+    const newVariation = (specialVariation + 1) % 3;
+    setSpecialVariation(newVariation);
+    
+    const specialMeals = generateSpecialMeals(selectedSpecialPlan.id, newVariation);
+    if (specialMeals && editedPlan) {
+      const updatedPlan = { ...editedPlan, meals: specialMeals };
+      setEditedPlan(updatedPlan);
+      if (onUpdate) onUpdate(updatedPlan);
+      toast.success(`Variação ${newVariation + 1} gerada!`);
+    }
+  };
+
+  // Estilos gerais (existentes)
   const variationLabels = [
     { id: 1, label: 'Clássico Brasileiro', icon: '🍽️', description: 'Plano tradicional e equilibrado' },
     { id: 2, label: 'Prático e Rápido', icon: '⚡', description: 'Refeições rápidas e simples' },
