@@ -532,9 +532,8 @@ const populateMeals = (meals, recommendedFoods, goal, varIndex = 0, restrictions
  * Gera raciocínio/explicação do plano
  */
 const generateReasoning = (conditions, goal, restrictions, variation = 1) => {
-  const variationNames = ['Clássico', 'Prático', 'Proteico', 'Low Carb'];
   let reasoning = `Este pré-plano foi gerado automaticamente com base na anamnese do paciente.\n\n`;
-  reasoning += `**Estilo do plano:** ${variationNames[variation - 1] || 'Clássico'}\n`;
+  reasoning += `**Estilo do plano:** ${VARIATION_NAMES[variation - 1] || 'Clássico Brasileiro'}\n`;
   
   if (conditions.length > 0) {
     reasoning += `**Condições identificadas:** ${conditions.join(', ')}\n`;
