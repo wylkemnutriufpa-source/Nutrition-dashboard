@@ -2730,6 +2730,298 @@ export const getPatientDashboardStats = async (patientId) => {
     console.error('Erro ao buscar stats do paciente:', error);
     return {
       checklist_completion_7d: 0,
+
+
+// ==================== TEMPLATES GLOBAIS ====================
+
+/**
+ * Buscar templates do profissional por tipo
+ */
+export const getProfessionalTemplates = async (professionalId, type = null) => {
+  try {
+    let query = supabase
+      .from('professional_templates')
+      .select('*')
+      .eq('professional_id', professionalId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (type) {
+      query = query.eq('type', type);
+    }
+
+    const { data, error } = await query;
+    return { data, error };
+  } catch (error) {
+    console.error('Erro ao buscar templates:', error);
+    return { data: [], error };
+  }
+};
+
+/**
+ * Criar novo template
+ */
+export const createTemplate = async (professionalId, templateData) => {
+  const { data, error } = await supabase
+    .from('professional_templates')
+    .insert({
+      professional_id: professionalId,
+      ...templateData
+    })
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Atualizar template e suas instâncias
+ */
+export const updateTemplate = async (templateId, updates) => {
+  try {
+    // Chamar função SQL que atualiza template + instâncias
+    const { data, error } = await supabase.rpc('update_template_instances', {
+      p_template_id: templateId,
+      p_new_title: updates.title,
+      p_new_content: updates.content || updates.description || ''
+    });
+
+    if (error) throw error;
+
+    return { data, error: null, updatedCount: data };
+  } catch (error) {
+    console.error('Erro ao atualizar template:', error);
+    return { data: null, error };
+  }
+};
+
+/**
+ * Deletar template
+ */
+export const deleteTemplate = async (templateId) => {
+  const { error } = await supabase
+    .from('professional_templates')
+    .delete()
+    .eq('id', templateId);
+  
+  return { error };
+};
+
+/**
+ * Sincronizar templates para um paciente
+ */
+export const syncTemplatesForPatient = async (patientId) => {
+  try {
+    const { data, error } = await supabase.rpc('sync_templates_for_patient', {
+      p_patient_id: patientId
+    });
+
+    return { data, error };
+  } catch (error) {
+    console.error('Erro ao sincronizar templates:', error);
+    return { data: null, error };
+  }
+};
+
+/**
+ * Buscar instâncias do paciente com informação do template
+ */
+export const getPatientInstancesWithSource = async (patientId, type = 'checklist') => {
+  try {
+    if (type === 'checklist' || type === 'task') {
+      const { data, error } = await supabase
+        .from('checklist_tasks')
+        .select(`
+          *,
+          source_template:professional_templates(id, title, type)
+        `)
+        .eq('patient_id', patientId)
+        .eq('is_disabled', false)
+        .order('created_at', { ascending: false });
+
+      return { data, error };
+    } else if (type === 'tip') {
+      const { data, error } = await supabase
+        .from('personalized_tips')
+        .select(`
+          *,
+          source_template:professional_templates(id, title, type)
+        `)
+        .eq('patient_id', patientId)
+        .eq('is_disabled', false)
+        .order('created_at', { ascending: false });
+
+      return { data, error };
+    }
+  } catch (error) {
+    console.error('Erro ao buscar instâncias:', error);
+    return { data: [], error };
+  }
+};
+
+/**
+ * Desativar template para um paciente específico
+ */
+export const disableTemplateForPatient = async (patientId, instanceId, type = 'checklist') => {
+  try {
+    const table = type === 'tip' ? 'personalized_tips' : 'checklist_tasks';
+    
+    const { error } = await supabase
+      .from(table)
+      .update({ is_disabled: true })
+      .eq('id', instanceId)
+      .eq('patient_id', patientId);
+
+    return { error };
+  } catch (error) {
+    console.error('Erro ao desativar item:', error);
+    return { error };
+  }
+};
+
+/**
+ * Marcar instância como customizada
+ */
+export const markInstanceAsCustomized = async (instanceId, type = 'checklist') => {
+  const table = type === 'tip' ? 'personalized_tips' : 'checklist_tasks';
+  
+  const { error } = await supabase
+    .from(table)
+    .update({ is_customized: true })
+    .eq('id', instanceId);
+
+  return { error };
+};
+
+/**
+ * Contar quantos pacientes usam um template
+ */
+export const countTemplateInstances = async (templateId) => {
+  try {
+    const { data, error } = await supabase.rpc('count_template_instances', {
+      p_template_id: templateId
+    });
+
+    return { data: data || 0, error };
+  } catch (error) {
+    console.error('Erro ao contar instâncias:', error);
+    return { data: 0, error };
+  }
+};
+
+// ==================== SISTEMA DE EMERGÊNCIA (SOS) ====================
+
+/**
+ * Criar feedback de emergência
+ */
+export const createEmergencyFeedback = async (patientId, professionalId, feedbackData) => {
+  const { data, error } = await supabase
+    .from('feedbacks')
+    .insert({
+      patient_id: patientId,
+      professional_id: professionalId,
+      message: feedbackData.message,
+      category: feedbackData.category,
+      type: 'emergency',
+      priority: 'high',
+      status: 'open'
+    })
+    .select()
+    .single();
+
+  return { data, error };
+};
+
+/**
+ * Buscar emergências do profissional
+ */
+export const getProfessionalEmergencies = async (professionalId, statusFilter = 'open') => {
+  try {
+    let query = supabase
+      .from('feedbacks')
+      .select(`
+        *,
+        patient:profiles!feedbacks_patient_id_fkey(id, name, email)
+      `)
+      .eq('professional_id', professionalId)
+      .eq('type', 'emergency')
+      .order('created_at', { ascending: false });
+
+    if (statusFilter) {
+      query = query.eq('status', statusFilter);
+    }
+
+    const { data, error } = await query;
+    return { data, error };
+  } catch (error) {
+    console.error('Erro ao buscar emergências:', error);
+    return { data: [], error };
+  }
+};
+
+/**
+ * Contar emergências abertas do profissional
+ */
+export const countOpenEmergencies = async (professionalId) => {
+  try {
+    const { count, error } = await supabase
+      .from('feedbacks')
+      .select('*', { count: 'exact', head: true })
+      .eq('professional_id', professionalId)
+      .eq('type', 'emergency')
+      .eq('status', 'open');
+
+    return { data: count || 0, error };
+  } catch (error) {
+    console.error('Erro ao contar emergências:', error);
+    return { data: 0, error };
+  }
+};
+
+/**
+ * Atualizar status de feedback/emergência
+ */
+export const updateFeedbackStatus = async (feedbackId, status) => {
+  const { data, error } = await supabase
+    .from('feedbacks')
+    .update({ status })
+    .eq('id', feedbackId)
+    .select()
+    .single();
+
+  return { data, error };
+};
+
+/**
+ * Buscar todos os feedbacks do profissional (normais + emergências)
+ */
+export const getAllProfessionalFeedbacks = async (professionalId, filters = {}) => {
+  try {
+    let query = supabase
+      .from('feedbacks')
+      .select(`
+        *,
+        patient:profiles!feedbacks_patient_id_fkey(id, name, email)
+      `)
+      .eq('professional_id', professionalId)
+      .order('created_at', { ascending: false });
+
+    if (filters.type) {
+      query = query.eq('type', filters.type);
+    }
+
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+
+    const { data, error } = await query;
+    return { data, error };
+  } catch (error) {
+    console.error('Erro ao buscar feedbacks:', error);
+    return { data: [], error };
+  }
+};
+
       checklist_today: 0,
       last_weight_update: null,
       responded_feedbacks_7d: 0,
