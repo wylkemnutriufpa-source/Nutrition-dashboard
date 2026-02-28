@@ -376,6 +376,22 @@ frontend:
         agent: "main"
         comment: "✅ IMPLEMENTADO: (1) addNewMeal() - adiciona refeição vazia, (2) removeMeal() - remove refeição (mínimo 1), (3) updateMealName() - edita nome inline com botões Save/Cancel, (4) updateMealTime() - edita horário com input time, (5) MealSection component modificado com controles de edição inline, (6) Botão 'Adicionar Nova Refeição' no final da lista. Profissional pode criar quantas refeições quiser, editar títulos/horários, e gerenciar completamente."
 
+  - task: "Importação Anamnese → Avaliação Física"
+    implemented: true
+    working: true
+    file: "frontend/src/components/PhysicalAssessmentEditor.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ MELHORIA: Importação Anamnese → Avaliação Física - loadPatientData agora aceita parâmetro forceRefresh para atualizar dados do paciente. PhysicalAssessmentEditor recebe callback onRefreshPatient. Quando anamnese é salva, dados são atualizados antes de importar."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSOU (28/Fev/2026 - Teste com kelly@com): Botão 'Carregar dados da Anamnese' encontrado e funcional na aba 'Av. Física'. FLUXO TESTADO: (1) Login profissional → (2) Pacientes → (3) Selecionado paciente kelly → (4) Aba Anamnese verificada (campos peso/altura detectados no HTML) → (5) Aba Av. Física → (6) Clicado 'Nova Avaliação' → (7) Botão 'Carregar dados da Anamnese' encontrado no formulário → (8) Clique executado → (9) Toast exibido: 'Nenhum dado encontrado. Preencha peso/altura na Anamnese primeiro'. FUNCIONAMENTO CORRETO: Sistema detecta ausência de dados e exibe mensagem apropriada. PhysicalAssessmentEditor.js linhas 169-262 implementam loadFromAnamnesis() corretamente buscando dados do paciente e anamnese. Screenshots: anamnese_tab.png, av_fisica_form.png. Minor Note: Botão só aparece após clicar 'Nova Avaliação' (não está visível na tela inicial da aba)."
+
+
   - task: "Modal Visualizar Plano Alimentar"
     implemented: true
     working: "BLOCKED"
