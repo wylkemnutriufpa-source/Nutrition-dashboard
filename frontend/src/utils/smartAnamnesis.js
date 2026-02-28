@@ -3,49 +3,79 @@
  * Gera pré-plano alimentar e recomendações baseado nas respostas do paciente
  */
 
-// Arrays de alimentos alternativos para criar variações
+// Arrays de alimentos alternativos para criar variações (6 estilos diferentes)
 const MEAL_VARIATIONS = {
   breakfast: [
-    // Variação 1 - Clássico
+    // Variação 1 - Clássico Brasileiro
     ['Aveia com frutas', 'Ovos mexidos', 'Pão integral', 'Café sem açúcar'],
-    // Variação 2 - Prático
+    // Variação 2 - Prático e Rápido
     ['Tapioca com queijo branco', 'Vitamina de frutas com whey', 'Chá verde'],
     // Variação 3 - Proteico
     ['Omelete de claras com legumes', 'Pão de batata doce', 'Iogurte natural', 'Café'],
     // Variação 4 - Low Carb
-    ['Ovos cozidos', 'Abacate', 'Queijo minas', 'Chá de ervas']
+    ['Ovos cozidos', 'Abacate', 'Queijo minas', 'Chá de ervas'],
+    // Variação 5 - Mediterrâneo
+    ['Pão sírio integral', 'Homus', 'Tomate cereja', 'Azeite', 'Chá de hortelã'],
+    // Variação 6 - Fitness
+    ['Panqueca de banana e aveia', 'Whey protein', 'Frutas vermelhas', 'Café']
   ],
   morning_snack: [
     ['Frutas frescas', 'Castanhas (porção pequena)'],
     ['Iogurte grego com granola', 'Água de coco'],
     ['Banana com pasta de amendoim'],
-    ['Mix de oleaginosas', 'Maçã']
+    ['Mix de oleaginosas', 'Maçã'],
+    ['Iogurte natural com mel', 'Nozes'],
+    ['Shake proteico', 'Frutas cítricas']
   ],
   lunch: [
+    // Variação 1 - Clássico Brasileiro
     ['Arroz integral', 'Feijão', 'Frango grelhado', 'Salada de folhas', 'Azeite'],
+    // Variação 2 - Prático
     ['Quinoa', 'Lentilha', 'Peixe assado', 'Legumes no vapor', 'Azeite'],
+    // Variação 3 - Proteico
     ['Batata doce', 'Grão de bico', 'Carne magra', 'Salada colorida', 'Azeite'],
-    ['Arroz 7 grãos', 'Feijão preto', 'Salmão grelhado', 'Brócolis', 'Azeite']
+    // Variação 4 - Low Carb
+    ['Couve-flor refogada', 'Feijão preto', 'Salmão grelhado', 'Brócolis', 'Azeite'],
+    // Variação 5 - Mediterrâneo
+    ['Cuscuz marroquino', 'Lentilha', 'Frango ao limão', 'Salada grega', 'Azeite extra virgem'],
+    // Variação 6 - Fitness
+    ['Arroz integral', 'Feijão branco', 'Peito de frango grelhado', 'Mix de vegetais', 'Azeite']
   ],
   afternoon_snack: [
     ['Iogurte natural', 'Frutas'],
     ['Sanduíche integral com peito de peru', 'Suco natural'],
     ['Crepioca com banana', 'Chá gelado'],
-    ['Smoothie de frutas vermelhas', 'Torrada integral']
+    ['Smoothie de frutas vermelhas', 'Torrada integral'],
+    ['Húmus com palitos de cenoura', 'Água com limão'],
+    ['Barra de proteína caseira', 'Café gelado sem açúcar']
   ],
   dinner: [
     ['Proteína magra (frango/peixe)', 'Legumes grelhados', 'Salada verde'],
     ['Omelete de legumes', 'Salada completa', 'Sopa de legumes'],
     ['Peixe ao forno', 'Purê de abóbora', 'Aspargos grelhados'],
-    ['Frango desfiado', 'Abobrinha refogada', 'Salada com tomate']
+    ['Frango desfiado', 'Abobrinha refogada', 'Salada com tomate'],
+    ['Sardinha assada', 'Ratatouille', 'Pão integral torrado'],
+    ['Tilápia grelhada', 'Batata doce assada', 'Salada de rúcula']
   ],
   supper: [
     ['Chá calmante', 'Frutas leves (maçã, pera)'],
     ['Leite morno', 'Biscoitos integrais'],
     ['Iogurte com mel', 'Camomila'],
-    ['Queijo cottage com frutas secas']
+    ['Queijo cottage com frutas secas'],
+    ['Chá de erva-cidreira', 'Kiwi'],
+    ['Leite vegetal morno', 'Castanha do Pará']
   ]
 };
+
+// Nomes dos estilos de variação
+const VARIATION_NAMES = [
+  'Clássico Brasileiro',
+  'Prático e Rápido', 
+  'Proteico',
+  'Low Carb',
+  'Mediterrâneo',
+  'Fitness'
+];
 
 /**
  * Gera um pré-plano alimentar inteligente baseado na anamnese
