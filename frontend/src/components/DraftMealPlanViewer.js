@@ -64,10 +64,12 @@ const DraftMealPlanViewer = ({
   };
 
   const variationLabels = [
-    { id: 1, label: 'Clássico', icon: '🍽️', description: 'Plano tradicional e equilibrado' },
-    { id: 2, label: 'Prático', icon: '⚡', description: 'Refeições rápidas e simples' },
+    { id: 1, label: 'Clássico Brasileiro', icon: '🍽️', description: 'Plano tradicional e equilibrado' },
+    { id: 2, label: 'Prático e Rápido', icon: '⚡', description: 'Refeições rápidas e simples' },
     { id: 3, label: 'Proteico', icon: '💪', description: 'Foco em proteínas e ganho muscular' },
-    { id: 4, label: 'Low Carb', icon: '🥑', description: 'Baixo carboidrato' }
+    { id: 4, label: 'Low Carb', icon: '🥑', description: 'Baixo carboidrato' },
+    { id: 5, label: 'Mediterrâneo', icon: '🫒', description: 'Estilo mediterrâneo com azeite' },
+    { id: 6, label: 'Fitness', icon: '🏋️', description: 'Ideal para treino intenso' }
   ];
 
   const handleSave = () => {
