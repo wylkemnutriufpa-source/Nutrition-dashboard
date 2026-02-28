@@ -122,6 +122,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ RE-TESTED POST P0 FIXES (26/Feb/2026): Backend API fully verified after P0 supabase.js fixes. All 3 endpoints continue working perfectly: GET /api/ returns 'Hello World' ✅, POST /api/status creates status check with valid UUID & timestamp ✅, GET /api/status returns proper list ✅. Service running stable on supervisor (pid 497, uptime active), MongoDB integration working, logs clean with no errors. Test ID: e25948e9-c05a-4141-a86b-36aa470035c6 created successfully. P0 frontend fixes did not impact backend functionality - system remains stable."
+      - working: true
+        agent: "testing"
+        comment: "✅ BACKEND API VERIFICATION COMPLETE (28/Feb/2026): Re-tested all 3 backend API endpoints as requested. ALL TESTS PASSED: (1) GET /api/ returns {'message': 'Hello World'} ✅, (2) POST /api/status creates status check with valid UUID 'afd15956-0c8d-4513-8205-e5e1849fdd34' and timestamp '2026-02-28T12:32:31.170224Z' ✅, (3) GET /api/status returns status checks list with proper structure ✅. Backend service running stable on https://personalized-diet-ai-1.preview.emergentagent.com/api. MongoDB integration working perfectly. No errors detected. Backend API is production-ready."
 
 frontend:
   - task: "Checklist Diário MVP"
