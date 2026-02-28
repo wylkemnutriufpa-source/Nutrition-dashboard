@@ -25,9 +25,15 @@ const PatientDashboard = () => {
   useEffect(() => {
     if (user) {
       loadPatientData();
-      checkFirstAccess();
     }
   }, [user]);
+
+  // Verificar modal de primeiro acesso APÓS dados carregarem
+  useEffect(() => {
+    if (user && !loading && anamnesis !== null) {
+      checkFirstAccess();
+    }
+  }, [user, loading, anamnesis]);
 
   const checkFirstAccess = () => {
     // Verificar se já viu o modal de primeiro acesso
@@ -43,7 +49,7 @@ const PatientDashboard = () => {
         localStorage.setItem(`anamnesis_complete_modal_${user.id}`, 'true');
       }
     } else {
-      // Se anamnese não está completa, mostra modal de primeiro acesso
+      // Se anamnese não está completa, mostra modal de primeiro acesso (apenas uma vez)
       if (!hasSeenFirstModal) {
         setShowFirstAccessModal(true);
         localStorage.setItem(`first_access_modal_${user.id}`, 'true');
