@@ -164,7 +164,24 @@ export const signIn = async (email, password) => {
 };
 
 export const signOut = async () => {
-  return await supabase.auth.signOut();
+  try {
+    // Limpar localStorage ANTES do signOut
+    localStorage.removeItem('fitjourney_user_type');
+    localStorage.removeItem('fitjourney_user_email');
+    localStorage.removeItem('fitjourney_user_id');
+    localStorage.removeItem('fitjourney_patient_id');
+    localStorage.removeItem('fitjourney_patient_name');
+    
+    // Fazer signOut no Supabase
+    const result = await supabase.auth.signOut();
+    
+    console.log('✅ Logout completo');
+    return result;
+  } catch (error) {
+    console.error('❌ Erro no signOut:', error);
+    // Mesmo com erro, garantir limpeza local
+    return { data: null, error };
+  }
 };
 
 export const updatePassword = async (newPassword) => {
