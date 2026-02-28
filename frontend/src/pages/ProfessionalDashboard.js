@@ -467,6 +467,125 @@ const ProfessionalDashboard = () => {
           </Card>
         </div>
 
+        {/* Seção de Dicas e Tarefas Globais */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Dicas Globais */}
+          <Card className="border-amber-200">
+            <CardHeader className="pb-3 bg-gradient-to-r from-amber-50 to-yellow-50">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Lightbulb className="h-5 w-5 text-amber-600" />
+                Dicas para Pacientes
+                <Badge className="bg-amber-100 text-amber-700 ml-auto">
+                  {globalTips.length} ativas
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <p className="text-xs text-gray-500 mb-3">
+                Dicas criadas aqui aparecem para TODOS os seus pacientes
+              </p>
+              
+              {/* Form para adicionar dica */}
+              <div className="flex gap-2 mb-4">
+                <Input
+                  value={newTip}
+                  onChange={(e) => setNewTip(e.target.value)}
+                  placeholder="Digite uma dica..."
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddTip()}
+                />
+                <Button 
+                  onClick={handleAddTip} 
+                  disabled={addingTip || !newTip.trim()}
+                  className="bg-amber-600 hover:bg-amber-700"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Lista de dicas */}
+              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                {globalTips.length === 0 ? (
+                  <p className="text-center text-gray-400 py-4 text-sm">
+                    Nenhuma dica criada ainda
+                  </p>
+                ) : (
+                  globalTips.map((tip) => (
+                    <div key={tip.id} className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg">
+                      <Lightbulb className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                      <span className="flex-1 text-sm text-gray-700">{tip.tip}</span>
+                      <button
+                        onClick={() => handleDeleteTip(tip.id)}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tarefas Globais (Checklist) */}
+          <Card className="border-teal-200">
+            <CardHeader className="pb-3 bg-gradient-to-r from-teal-50 to-cyan-50">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ClipboardList className="h-5 w-5 text-teal-600" />
+                Checklist Diário
+                <Badge className="bg-teal-100 text-teal-700 ml-auto">
+                  {globalTasks.length} tarefas
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <p className="text-xs text-gray-500 mb-3">
+                Tarefas que aparecem no checklist de TODOS os seus pacientes
+              </p>
+              
+              {/* Form para adicionar tarefa */}
+              <div className="flex gap-2 mb-4">
+                <Input
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  placeholder="Ex: Beber 2L de água..."
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
+                />
+                <Button 
+                  onClick={handleAddTask} 
+                  disabled={addingTask || !newTask.trim()}
+                  className="bg-teal-600 hover:bg-teal-700"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Lista de tarefas */}
+              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                {globalTasks.length === 0 ? (
+                  <p className="text-center text-gray-400 py-4 text-sm">
+                    Nenhuma tarefa criada ainda
+                  </p>
+                ) : (
+                  globalTasks.map((task, idx) => (
+                    <div key={task.id} className="flex items-center gap-2 p-2 bg-teal-50 rounded-lg">
+                      <span className="text-teal-600 font-medium text-sm">{idx + 1}.</span>
+                      <span className="flex-1 text-sm text-gray-700">{task.title}</span>
+                      <button
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Atalhos Rápidos */}
         <Card>
           <CardHeader>
