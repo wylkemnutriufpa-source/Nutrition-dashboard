@@ -453,14 +453,39 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Modal Visualizar Plano Alimentar"
-    - "Botão Acessar Planos no Dashboard Profissional"
-    - "PDF Export com customName e observations"
+    - "Correção Calorias no Modal de Visualização"
+    - "Correção Planos Ativos no Dashboard Profissional"
+    - "Importação Anamnese → Avaliação Física"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "✅ CORREÇÕES IMPLEMENTADAS (28/Fev/2026)
+    
+    1. CORREÇÃO: Calorias no Modal de Visualização
+    - MealPlanEditor.js agora salva dados nutricionais (calories, kcal, protein, carbs, fat) em cada alimento
+    - Antes: alimentos só tinham foodId, quantity, unit
+    - Agora: inclui valores nutricionais calculados no momento de salvar
+    
+    2. CORREÇÃO: Planos Ativos no Dashboard Profissional
+    - Corrigido query em getProfessionalStats() que usava join incorreto profiles!patient_id
+    - Agora: busca planos ativos primeiro, depois busca pacientes separadamente por ID
+    - Resolve problema de patient: null nos botões Ver/Editar
+    
+    3. MELHORIA: Importação Anamnese → Avaliação Física
+    - loadPatientData agora aceita parâmetro forceRefresh para atualizar dados do paciente
+    - PhysicalAssessmentEditor recebe callback onRefreshPatient
+    - Quando anamnese é salva, dados são atualizados antes de importar
+    
+    ARQUIVOS MODIFICADOS:
+    - /app/frontend/src/pages/MealPlanEditor.js (salvar calorias)
+    - /app/frontend/src/lib/supabase.js (query planos ativos)
+    - /app/frontend/src/pages/PatientProfile.js (forceRefresh)
+    - /app/frontend/src/components/PhysicalAssessmentEditor.js (callback refresh)
+    
+    PRONTO PARA TESTE"
   - agent: "main"
     message: "✅ IMPLEMENTAÇÕES COMPLETADAS (Tarefas 1, 2 e 3)
     
