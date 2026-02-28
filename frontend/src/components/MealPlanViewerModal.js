@@ -256,7 +256,7 @@ const MealPlanViewerModal = ({
             </TabsList>
           </div>
           
-          <ScrollArea className="flex-1 h-[350px]">
+          <ScrollArea className="flex-1 min-h-[300px] max-h-[50vh]">
             <div className="p-4">
               <TabsContent value="refeicoes" className="mt-0">
                 {meals.length > 0 ? (
