@@ -22,6 +22,8 @@ import PatientListaCompras from '@/pages/PatientListaCompras';
 import PatientSuplementos from '@/pages/PatientSuplementos';
 import PatientDicas from '@/pages/PatientDicas';
 import PatientJornada from '@/pages/PatientJornada';
+import MinhaJornada from '@/pages/MinhaJornada';
+import Biblioteca from '@/pages/Biblioteca';
 import PatientAgenda from '@/pages/PatientAgenda';
 import PatientAvaliacaoFisica from '@/pages/PatientAvaliacaoFisica';
 import CalculatorsList from '@/pages/CalculatorsList';
