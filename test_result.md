@@ -490,11 +490,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "FirstAccessModal Logic Fix"
-    - "Plano Alimentar - Preencher Calorias em Planos Existentes"
-    - "Correção Planos Ativos no Dashboard Profissional"
+    - "Dashboard Profissional - Correção de Role (Admin vs Professional)"
+    - "Verificar Variações do Pré-Plano (6 estilos)"
+    - "Dicas Personalizadas do Nutricionista"
   stuck_tasks:
-    - "Dashboard Profissional - Role/Permission Issue"
+    - "Dashboard Profissional - Role/Permission Issue (CRÍTICO)"
   test_all: false
   test_priority: "high_first"
 
