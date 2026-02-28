@@ -235,6 +235,17 @@ const AnamneseFormComplete = ({
                 )}
               </div>
               <div className="flex gap-2">
+                {/* Botão excluir (somente profissional e se existe anamnese) */}
+                {!isPatientView && anamnesis?.id && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <Trash2 size={14} className="mr-2" /> Excluir
+                  </Button>
+                )}
                 {!isPatientView && professionalInfo && (
                   <Button 
                     variant="outline" 
