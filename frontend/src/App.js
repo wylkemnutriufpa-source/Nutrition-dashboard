@@ -236,6 +236,11 @@ function App() {
                   <CalculatorsList userType="patient" />
                 </ProtectedRoute>
               } />
+              <Route path="/patient/calculadoras" element={
+                <ProtectedRoute allowedTypes={['patient']}>
+                  <CalculatorsList userType="patient" />
+                </ProtectedRoute>
+              } />
               <Route path="/patient/calculator/weight" element={
                 <ProtectedRoute allowedTypes={['patient']}>
                   <WeightCalculator userType="patient" />
