@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { 
   Flame, Trophy, Target, Calendar, MessageSquare, Lightbulb,
   CheckCircle2, Circle, Sparkles, TrendingUp, Clock, Star,
-  Send, ChevronRight, Zap, Heart, Award
+  Send, ChevronRight, Zap, Heart, Award, Brain, AlertCircle, ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,6 +20,14 @@ import {
   getPatientPersonalizedTips, getPatientAppointments, 
   getPatientFeedbacks, sendFeedbackReply, getPatientStats
 } from '@/lib/supabase';
+import {
+  computeAdherenceScore,
+  generateSmartAlerts,
+  pickNextBestAction,
+  pickDailyTip,
+  hasSufficientData,
+  getInsufficientDataMessage
+} from '@/utils/patientIntelligence';
 
 // Sugestões de hábitos saudáveis
 const DEFAULT_HABITS = [
