@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Pill, Clock, AlertCircle, CheckCircle2, Info,
-  Sun, Moon, Coffee, Utensils, Loader2
+  Sun, Moon, Coffee, Utensils, Loader2, ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
 const PatientSuplementos = () => {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [supplements, setSupplements] = useState([]);
