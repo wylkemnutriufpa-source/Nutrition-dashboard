@@ -674,7 +674,13 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, isPatientView, patientIdParam, planIdParam]); // useCallback dependencies
+
+  // useEffect para carregar dados (CORRIGIDO)
+  useEffect(() => {
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, patientIdParam, planIdParam]); // Apenas IDs, não funções
 
   // Função para carregar draft como plano
   const handleUseDraft = async () => {
