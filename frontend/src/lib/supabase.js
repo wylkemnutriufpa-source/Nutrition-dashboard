@@ -484,6 +484,19 @@ export const saveAnamnesisDraft = async (patientId, professionalId, updates) => 
   }
 };
 
+
+// Excluir anamnese (para começar nova)
+export const deleteAnamnesis = async (anamnesisId) => {
+  const { data, error } = await supabase
+    .from('anamnesis')
+    .delete()
+    .eq('id', anamnesisId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+
 // ==================== DRAFT MEAL PLAN (PRÉ-PLANO) ====================
 
 /**
