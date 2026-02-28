@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Sparkles, Plus, Trash2, Edit, Save, X, Clock, Lightbulb, 
-  AlertCircle, CheckCircle2, RefreshCw, ArrowRight, Download, Loader2
+  AlertCircle, CheckCircle2, RefreshCw, ArrowRight, Download, Loader2, Heart
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getAllSpecialPlans, generateSpecialMeals } from '@/utils/smartAnamnesis';
 
 /**
  * DraftMealPlanViewer - Exibe e edita o pré-plano gerado pela anamnese
