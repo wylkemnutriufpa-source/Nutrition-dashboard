@@ -13,14 +13,15 @@ const AdminBar = () => {
   const location = useLocation();
   const { profile } = useAuth();
 
-  // Só mostrar se for admin E estiver fora do painel admin
+  // Só mostrar se for admin E estiver fora do painel admin E não estiver na tela de login
   const isAdmin = profile?.role === 'admin';
   const isInAdminArea = location.pathname.startsWith('/admin');
-  const shouldShow = isAdmin && !isInAdminArea;
+  const isInLoginPage = location.pathname === '/';
+  const shouldShow = isAdmin && !isInAdminArea && !isInLoginPage;
 
   useEffect(() => {
-    console.log('🔴 AdminBar:', { isAdmin, isInAdminArea, shouldShow, path: location.pathname });
-  }, [isAdmin, isInAdminArea, shouldShow, location.pathname]);
+    console.log('🔴 AdminBar:', { isAdmin, isInAdminArea, isInLoginPage, shouldShow, path: location.pathname });
+  }, [isAdmin, isInAdminArea, isInLoginPage, shouldShow, location.pathname]);
 
   if (!shouldShow) {
     return null;
