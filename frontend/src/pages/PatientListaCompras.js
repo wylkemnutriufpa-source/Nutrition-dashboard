@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,13 +8,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { 
   ShoppingCart, Plus, Trash2, CheckCircle2, Circle, 
   Apple, Beef, Milk, Wheat, Leaf, Fish, Egg,
-  Download, Share2, Loader2, RefreshCw
+  Download, Share2, Loader2, RefreshCw, ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPatientMealPlan } from '@/lib/supabase';
 
 const PatientListaCompras = () => {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [mealPlan, setMealPlan] = useState(null);
