@@ -1206,7 +1206,7 @@ const PatientProfile = () => {
               patient={patient}
               professionalInfo={{ name: profile?.name, email: profile?.email }}
               isPatientView={false}
-              onUpdate={loadPatientData}
+              onUpdate={() => loadPatientData(true)}
               onComplete={handleGenerateDraftPlan}
             />
           </TabsContent>
