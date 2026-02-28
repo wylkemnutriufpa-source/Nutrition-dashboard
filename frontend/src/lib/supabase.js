@@ -2584,3 +2584,158 @@ export const compareAssessments = (current, previous) => {
   
   return comparison;
 };
+
+
+// ==================== DASHBOARD PROFISSIONAL INTELIGENTE ====================
+
+/**
+ * Busca dados completos para o dashboard do profissional
+ * Query otimizada com agregações
+ */
+export const getProfessionalDashboardData = async (professionalId) => {
+  try {
+    // 1. Buscar todos os pacientes
+    const { data: patients, error: patientsError } = await supabase
+      .from('profiles')
+      .select(`
+        id,
+        name,
+        email,
+        last_login,
+        created_at,
+        current_weight,
+        goal_weight,
+        professional_id
+      `)
+      .eq('role', 'patient')
+      .eq('professional_id', professionalId)
+      .order('name');
+
+    if (patientsError) throw patientsError;
+
+    // 2. Para cada paciente, buscar estatísticas agregadas
+    const enrichedPatients = await Promise.all(
+      (patients || []).map(async (patient) => {
+        const stats = await getPatientDashboardStats(patient.id);
+        return {
+          ...patient,
+          stats
+        };
+      })
+    );
+
+    return {
+      data: enrichedPatients,
+      error: null
+    };
+  } catch (error) {
+    console.error('Erro ao buscar dados do dashboard:', error);
+    return { data: [], error };
+  }
+};
+
+/**
+ * Busca estatísticas agregadas de um paciente específico
+ */
+export const getPatientDashboardStats = async (patientId) => {
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  try {
+    // Checklist completion (últimos 7 dias)
+    const { data: checklistTasks } = await supabase
+      .from('checklist_tasks')
+      .select('completed')
+      .eq('patient_id', patientId)
+      .gte('created_at', sevenDaysAgo.toISOString());
+
+    const totalTasks = checklistTasks?.length || 0;
+    const completedTasks = checklistTasks?.filter(t => t.completed).length || 0;
+    const checklistCompletion7d = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    // Checklist hoje
+    const todayStart = new Date(today);
+    todayStart.setHours(0, 0, 0, 0);
+    const { data: todayTasks } = await supabase
+      .from('checklist_tasks')
+      .select('completed')
+      .eq('patient_id', patientId)
+      .gte('created_at', todayStart.toISOString());
+
+    const checklistToday = todayTasks?.filter(t => t.completed).length || 0;
+
+    // Última atualização de peso
+    const { data: weightUpdates } = await supabase
+      .from('weight_history')
+      .select('created_at')
+      .eq('patient_id', patientId)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const lastWeightUpdate = weightUpdates?.[0]?.created_at || null;
+
+    // Feedbacks respondidos (últimos 7 dias)
+    const { data: feedbacks } = await supabase
+      .from('feedbacks')
+      .select('patient_response, created_at')
+      .eq('patient_id', patientId)
+      .gte('created_at', sevenDaysAgo.toISOString());
+
+    const respondedFeedbacks7d = feedbacks?.filter(f => f.patient_response).length || 0;
+
+    // Último feedback
+    const { data: lastFeedback } = await supabase
+      .from('feedbacks')
+      .select('created_at')
+      .eq('patient_id', patientId)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const daysSinceLastFeedback = lastFeedback?.[0]?.created_at
+      ? Math.floor((today - new Date(lastFeedback[0].created_at)) / (1000 * 60 * 60 * 24))
+      : 999;
+
+    // Próxima consulta
+    const { data: appointments } = await supabase
+      .from('appointments')
+      .select('date')
+      .eq('patient_id', patientId)
+      .gte('date', today.toISOString().split('T')[0])
+      .order('date')
+      .limit(1);
+
+    const hasUpcomingAppointment = appointments && appointments.length > 0;
+
+    // Plano ativo
+    const { data: activePlan } = await supabase
+      .from('meal_plans')
+      .select('id')
+      .eq('patient_id', patientId)
+      .eq('status', 'active')
+      .limit(1);
+
+    const hasActivePlan = activePlan && activePlan.length > 0;
+
+    return {
+      checklist_completion_7d: checklistCompletion7d,
+      checklist_today: checklistToday,
+      last_weight_update: lastWeightUpdate,
+      responded_feedbacks_7d: respondedFeedbacks7d,
+      days_since_last_feedback: daysSinceLastFeedback,
+      has_upcoming_appointment: hasUpcomingAppointment,
+      has_active_plan: hasActivePlan
+    };
+  } catch (error) {
+    console.error('Erro ao buscar stats do paciente:', error);
+    return {
+      checklist_completion_7d: 0,
+      checklist_today: 0,
+      last_weight_update: null,
+      responded_feedbacks_7d: 0,
+      days_since_last_feedback: 999,
+      has_upcoming_appointment: false,
+      has_active_plan: false
+    };
+  }
+};
