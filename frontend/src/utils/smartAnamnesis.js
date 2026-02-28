@@ -1350,6 +1350,7 @@ export {
   getSpecialPlan, 
   getAllSpecialPlans, 
   generateSpecialMeals,
+  detectConditionsFromAnamnesis,
   VARIATION_NAMES
 };
 
