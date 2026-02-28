@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Book, ShoppingCart, Pill, Calculator, ChefHat, 
-  Apple, Scale, Heart, ChevronRight, Sparkles
+  Apple, Scale, Heart, ChevronRight, Sparkles, ArrowLeft
 } from 'lucide-react';
 
 const Biblioteca = () => {
