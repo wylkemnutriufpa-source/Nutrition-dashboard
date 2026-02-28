@@ -10,7 +10,7 @@ from datetime import datetime
 import sys
 
 # Backend URL from frontend .env file
-BACKEND_URL = "https://personalized-diet-ai-1.preview.emergentagent.com"
+BACKEND_URL = "https://meal-plan-pro-8.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 def test_hello_world_endpoint():

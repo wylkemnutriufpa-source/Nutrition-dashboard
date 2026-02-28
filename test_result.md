@@ -118,13 +118,13 @@ backend:
         comment: "Backend básico FastAPI funcionando"
       - working: true
         agent: "testing"
-        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://personalized-diet-ai-1.preview.emergentagent.com with proper MongoDB integration."
+        comment: "✅ All backend API endpoints tested and working: GET /api/ (Hello World), POST /api/status (create status check), GET /api/status (list status checks). Created backend_test.py for comprehensive API testing. All 3/3 tests passed successfully. Backend service running correctly on https://meal-plan-pro-8.preview.emergentagent.com with proper MongoDB integration."
       - working: true
         agent: "testing"
         comment: "✅ RE-TESTED POST P0 FIXES (26/Feb/2026): Backend API fully verified after P0 supabase.js fixes. All 3 endpoints continue working perfectly: GET /api/ returns 'Hello World' ✅, POST /api/status creates status check with valid UUID & timestamp ✅, GET /api/status returns proper list ✅. Service running stable on supervisor (pid 497, uptime active), MongoDB integration working, logs clean with no errors. Test ID: e25948e9-c05a-4141-a86b-36aa470035c6 created successfully. P0 frontend fixes did not impact backend functionality - system remains stable."
       - working: true
         agent: "testing"
-        comment: "✅ BACKEND API VERIFICATION COMPLETE (28/Feb/2026): Re-tested all 3 backend API endpoints as requested. ALL TESTS PASSED: (1) GET /api/ returns {'message': 'Hello World'} ✅, (2) POST /api/status creates status check with valid UUID 'afd15956-0c8d-4513-8205-e5e1849fdd34' and timestamp '2026-02-28T12:32:31.170224Z' ✅, (3) GET /api/status returns status checks list with proper structure ✅. Backend service running stable on https://personalized-diet-ai-1.preview.emergentagent.com/api. MongoDB integration working perfectly. No errors detected. Backend API is production-ready."
+        comment: "✅ BACKEND API VERIFICATION COMPLETE (28/Feb/2026): Re-tested all 3 backend API endpoints as requested. ALL TESTS PASSED: (1) GET /api/ returns {'message': 'Hello World'} ✅, (2) POST /api/status creates status check with valid UUID 'afd15956-0c8d-4513-8205-e5e1849fdd34' and timestamp '2026-02-28T12:32:31.170224Z' ✅, (3) GET /api/status returns status checks list with proper structure ✅. Backend service running stable on https://meal-plan-pro-8.preview.emergentagent.com/api. MongoDB integration working perfectly. No errors detected. Backend API is production-ready."
 
 frontend:
   - task: "Checklist Diário MVP"
@@ -572,7 +572,7 @@ agent_communication:
     📋 TESTE SOLICITADO PELO USUÁRIO
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     Credenciais: wylkem.nutri.ufpa@gmail.com / 654321
     Paciente: Gleice kelly
     
@@ -734,7 +734,7 @@ agent_communication:
     📋 TESTES SOLICITADOS
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     
     TESTE 1: Modal de Plano com Scroll (Paciente kelly@com / 123456)
     TESTE 2: Dashboard Profissional (wylkem.nutri.ufpa@gmail.com / 654321)
@@ -901,7 +901,7 @@ agent_communication:
     📋 TESTE SOLICITADO PELO USUÁRIO
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     Credenciais: wylkem.nutri.ufpa@gmail.com / 654321
     Paciente: Gleice kelly
     
@@ -1118,7 +1118,7 @@ agent_communication:
     📋 TESTE SOLICITADO PELO USUÁRIO
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     Credenciais: kelly@com / 123456
     
     Objetivo: Verificar se modal 'Anamnese Completa!' NÃO aparece após correções
@@ -1551,7 +1551,7 @@ agent_communication:
     Teste realizado com sucesso seguindo exatamente o roteiro solicitado:
     
     FLUXO TESTADO:
-    1. ✅ Acesso à página inicial (https://personalized-diet-ai-1.preview.emergentagent.com)
+    1. ✅ Acesso à página inicial (https://meal-plan-pro-8.preview.emergentagent.com)
     2. ✅ Clique em 'Acessar Ferramentas' no card de Visitante
     3. ✅ Navegação para página de Ferramentas (CalculatorsList)
     4. ✅ Clique em 'Calculadora de Peso de Referência'
@@ -1994,7 +1994,7 @@ agent_communication:
        - All required fields present (id, client_name, timestamp)
     
     BACKEND STATUS:
-    ✅ Service running stable on https://personalized-diet-ai-1.preview.emergentagent.com/api
+    ✅ Service running stable on https://meal-plan-pro-8.preview.emergentagent.com/api
     ✅ MongoDB integration working correctly
     ✅ All data persistence functioning 
     ✅ UUID generation working
@@ -2010,7 +2010,7 @@ agent_communication:
     🎯 TESTE SOLICITADO PELO USUÁRIO - MODAL DE PLANO ALIMENTAR
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     Credenciais: kelly@com / 123456
     
     OBJETIVO: Verificar se modal 'Anamnese Completa!' NÃO aparece mais após correção
@@ -2118,7 +2118,7 @@ agent_communication:
     📋 TESTE SOLICITADO PELO USUÁRIO
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     Credenciais: kelly@com / 123456
     
     TESTE: Verificar menu simplificado do paciente com 5 itens:
@@ -2269,7 +2269,7 @@ agent_communication:
     📋 TESTE SOLICITADO PELO USUÁRIO
     ═══════════════════════════════════════════════════════════════════
     
-    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    URL: https://meal-plan-pro-8.preview.emergentagent.com
     Credenciais: kelly@com / 123456
     
     OBJETIVO: Verificar menu simplificado após reset do banco de dados

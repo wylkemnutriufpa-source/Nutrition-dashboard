@@ -1,161 +1,209 @@
 <analysis>**original_problem_statement:**
-O usuário forneceu uma análise detalhada de um projeto de Nutrition Dashboard e solicitou a implementação de correções e melhorias, seguindo uma ordem de prioridade (P0, P1, P2).
+O usuário solicitou uma série de melhorias e correções para uma plataforma de nutrição. As principais solicitações incluem:
 
-**PRODUCT REQUIREMENTS (P0 - CRÍTICOS):**
-1.  **Ajuste de RLS (Row Level Security):** Corrigir permissões em , , e  que impediam o salvamento de dados.
-2.  **Branding Persistido:** Migrar a funcionalidade de branding (logo, cores) do  para uma tabela no Supabase para que as configurações persistam entre sessões e dispositivos.
-3.  **Isolamento Multi-profissional:** Garantir que cada profissional só possa ver e gerenciar seus próprios pacientes, corrigindo uma grave falha de privacidade onde todos os profissionais viam todos os pacientes.
+1.  **Expansão do Pré-Plano de IA:** Aumentar a variedade dos planos alimentares gerados, adicionando mais 6 estilos gerais e 10 estilos para condições médicas específicas (Diabético, Hipertenso, etc.), com detecção automática baseada na anamnese.
+2.  **Melhoria da Experiência do Paciente (UX):** Simplificar o menu do paciente, criando uma página central Minha Jornada com checklist diário, progresso, dicas e feedbacks. Adicionar um botão Voltar nas páginas internas.
+3.  **Funcionalidades para o Profissional:** Adicionar uma seção no dashboard do profissional para criar e gerenciar Dicas Globais e Tarefas Globais (checklist) para todos os seus pacientes.
+4.  **Correções de Bugs Críticos:**
+    *   Resolver travamentos da aplicação que exigem atualização da página.
+    *   Corrigir um bug onde o perfil de administrador é desconectado ao navegar.
+    *   Garantir que os modais de visualização de plano tenham barra de rolagem e funcionem corretamente.
+    *   Impedir que o paciente edite ou duplique itens do plano alimentar.
+    *   Investigar por que dicas antigas/duplicadas continuam aparecendo e por que a análise da anamnese voltou para o inglês.
+    *   Corrigir instabilidade no layout das abas do painel do paciente.
 
-O usuário solicitou que o agente gerasse os SQLs necessários e atualizasse o código frontend para implementar essas correções.
-
-**User's preferred language**: Português. O próximo agente DEVE responder em português.
+**User's preferred language**: Português
 
 **what currently exists?**
-A aplicação é um Nutrition Dashboard construído com React, TailwindCSS, Shadcn UI no frontend, e Supabase para backend (PostgreSQL DB, Auth, Storage). O backend FastAPI é mínimo. A aplicação possui 4 roles de usuário (Admin, Profissional, Paciente, Visitante) com rotas protegidas. Muitas funcionalidades do profissional e do paciente estão implementadas, mas várias não foram testadas. O agente anterior focou em resolver os problemas críticos (P0), como a persistência do branding e, mais importante, o isolamento de dados entre diferentes profissionais (multi-tenant).
+A plataforma é uma aplicação full-stack (React/Supabase) funcional. Possui autenticação para profissionais e pacientes, gestão de pacientes, anamnese, avaliação física e um gerador de planos alimentares por IA com 6 estilos gerais e 10 planos para condições especiais. A interface do paciente foi reestruturada em torno de uma Jornada, e o profissional pode criar dicas e tarefas globais.
 
 **Last working item**:
--   **Last item agent was working:** O agente estava implementando a funcionalidade de exportação de relatórios em PDF (item P1-2). O usuário relatou que, após clicar no botão Exportar PDF, uma mensagem de sucesso aparecia, mas nenhum arquivo era baixado.
--   **Status:** 
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** Frontend testing agent. O agente deve verificar se clicar no botão Exportar PDF abre uma nova aba com o conteúdo do PDF gerado.
--   **User Testing Done:** Y (e reportou a falha)
+*   **Last item agent was working:** O agente estava trabalhando em uma lista de 9 correções solicitadas pelo usuário. A última ação específica foi tentar corrigir o layout das abas no painel do profissional () que se moviam ao clicar, alterando as classes do Tailwind de  para .
+*   **Status:** IN PROGRESS
+*   **Agent Testing Done:** N
+*   **Which testing method agent to use?** Frontend testing agent
+*   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: PDF export não funciona (P0 - HIGHEST priority)**
-    -   **Description:** Clicar em Exportar PDF não inicia o download. O log do console mostra o erro:  Isso ocorre porque o ambiente de preview da Emergent restringe downloads diretos de iframes.
-    -   **Attempted fixes:** O agente usou , que é bloqueado pelo sandbox.
-    -   **Next debug checklist:**
-        1.  Modificar todas as funções de exportação em .
-        2.  Substituir  por . Isso abrirá o PDF em uma nova aba do navegador, contornando a restrição de download direto do iframe.
-    -   **Why fix this issue and what will be achieved with the fix?** Permitir que os profissionais exportem relatórios essenciais dos pacientes, como anamnese e plano alimentar.
-    -   **Status:** 
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend
+*   **Issue 1:** Perfil de administrador desloga sozinho ao clicar em certas partes do app (P0).
+*   **Issue 2:** A aplicação trava ou congela, exigindo que a página seja atualizada (P0).
+*   **Issue 3:** A análise gerada para a anamnese está em inglês, em vez de português (P1).
+*   **Issue 4:** Dicas antigas ou duplicadas continuam sendo exibidas para o paciente (P1).
+*   **Issue 5:** As abas no painel do paciente se movem ou se reorganizam ao serem clicadas (P2).
+*   **Issue 6:** O checklist diário, embora funcional, está escondido e precisa de mais destaque na Minha Jornada (P2).
 
--   **Issue 2: Erros de carregamento de dados no Perfil do Paciente (P0)**
-    -   **Description:** O log do navegador (mensagem 392) mostra erros  e  ao tentar buscar dados das tabelas  e  quando a página de perfil do paciente é carregada. O agente anterior focou no erro de download e não investigou estes.
-    -   **Attempted fixes:** N/A. O agente corrigiu outros erros 400 anteriormente, mas estes são novos ou recorrentes.
-    -   **Next debug checklist:**
-        1.  Examinar a aba Network no console do desenvolvedor para inspecionar as requisições falhas para  e .
-        2.  Verificar as RLS (Row Level Security policies) para essas tabelas no Supabase para garantir que elas permitem as queries que o frontend está fazendo. Um erro  pode indicar que a RLS está ambígua e o Supabase não sabe se retorna  ou um erro.
-        3.  Verificar as funções  e  em  para garantir que as queries estão corretamente construídas.
-    -   **Why fix this issue and what will be achieved with the fix?** A página de perfil do paciente está parcialmente quebrada. Corrigir isso permitirá que os dados do paciente (plano alimentar, anamnese) sejam carregados e exibidos corretamente, o que também é um pré-requisito para que a exportação de PDF funcione com dados completos.
-    -   **Status:** 
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Frontend
+**Issues Detail:**
+*   **Issue 1: Perfil de administrador desloga sozinho**
+    *   **Attempted fixes:** Nenhum.
+    *   **Next debug checklist:**
+        1.  Identificar as ações/componentes específicos que causam o logout.
+        2.  Investigar chamadas inesperadas à função .
+        3.  Verificar  ou rotas protegidas que possam estar mal configuradas para o role 'admin'.
+    *   **Why fix this issue?** Bug crítico que impede o uso da conta de administrador.
+    *   **Status:** NOT STARTED
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** Frontend.
+    *   **Blocked on other issue:** None.
+
+*   **Issue 2: Aplicação travando ou congelando**
+    *   **Attempted fixes:** Uma correção foi tentada em um  no , mas o problema persiste.
+    *   **Next debug checklist:**
+        1.  Revisar sistematicamente os componentes principais (, , ) em busca de loops de re-renderização.
+        2.  Verificar  com dependências complexas (objetos/arrays).
+        3.  Perguntar ao usuário se o travamento ocorre em páginas ou ações específicas.
+    *   **Why fix this issue?** Torna a aplicação inutilizável.
+    *   **Status:** IN PROGRESS
+    *   **Is recurring issue?** Y
+    *   **Should Test frontend/backend/both after fix?** Frontend.
+    *   **Blocked on other issue:** None.
+
+*   **Issue 3: Análise da anamnese em inglês**
+    *   **Attempted fixes:** O agente verificou que os prompts no código estão em português, suspeitando de dados antigos no banco.
+    *   **Next debug checklist:**
+        1.  Gerar uma *nova* análise para confirmar se o problema persiste.
+        2.  Verificar o parâmetro de idioma () enviado para a função de IA em .
+    *   **Why fix this issue?** A aplicação é para um público de língua portuguesa.
+    *   **Status:** NOT STARTED
+    *   **Is recurring issue?** Y
+    *   **Should Test frontend/backend/both after fix?** Both.
+    *   **Blocked on other issue:** None.
+
+*   **Issue 4: Dicas duplicadas ou antigas**
+    *   **Attempted fixes:** O agente implementou a busca de dicas personalizadas e globais.
+    *   **Next debug checklist:**
+        1.  Verificar se alguma dica estática ainda está hardcoded em  ou .
+        2.  Confirmar se as dicas exibidas vêm exclusivamente das funções do Supabase.
+        3.  Considerar a implementação de uma função para o profissional arquivar/deletar dicas antigas de um paciente.
+    *   **Why fix this issue?** Causa confusão para o paciente.
+    *   **Status:** NOT STARTED
+    *   **Is recurring issue?** Y
+    *   **Should Test frontend/backend/both after fix?** Frontend.
+    *   **Blocked on other issue:** None.
+
+*   **Issue 5: Abas do painel do paciente se movendo**
+    *   **Attempted fixes:** O agente aplicou uma correção no arquivo errado ().
+    *   **Next debug checklist:**
+        1.  Identificar o componente correto no painel do paciente que contém as abas (provavelmente  ou ).
+        2.  Aplicar a correção de layout (ex: ) no arquivo correto.
+    *   **Why fix this issue?** É uma falha de UI que prejudica a experiência.
+    *   **Status:** IN PROGRESS
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** Frontend.
+    *   **Blocked on other issue:** None.
+
+*   **Issue 6: Checklist diário com pouca visibilidade**
+    *   **Attempted fixes:** O checklist foi centralizado na página Minha Jornada.
+    *   **Next debug checklist:**
+        1.  Discutir com o usuário uma nova proposta de layout para a página .
+        2.  Aumentar o destaque visual do componente  ou do bloco Progresso de Hoje.
+    *   **Why fix this issue?** Para alinhar com a estratégia do usuário de focar no engajamento diário.
+    *   **Status:** NOT STARTED
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** Frontend.
+    *   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1: Concluir implementação dos Relatórios PDF (P1)**
-    -   **Where to resume:** .
-    -   **What will be achieved with this?** Finalizar a implementação da exportação de PDF para as seções de Anamnese e Plano Alimentar, garantindo que os botões funcionem conforme o esperado.
-    -   **Status:** 
-    -   **Should Test frontend/backend/both after fix?** Frontend
-    -   **Blocked on something:** . Se os dados não carregarem, o PDF será gerado vazio.
+None.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks (P1):**
-    -   **P1-5: Gerenciamento de Conteúdo:** Criar as páginas de UI para que os profissionais possam criar, editar e deletar ,  e . As tabelas e RLS já foram criadas. Os arquivos a serem criados/modificados incluem , , e adicionar links no .
-    -   **P1-2 (continuação):** Adicionar botões Exportar PDF nas páginas de visualização de  e outros conteúdos.
-
--   **Future Tasks (P1):**
-    -   **P1-4: Real-time completo:** Expandir o uso de Supabase Subscriptions para atualizar outras partes da UI automaticamente, além das notificações.
+*   **Gerenciamento de Dicas Personalizadas:** Criar uma UI para o profissional poder editar e deletar as dicas personalizadas de cada paciente.
+*   **Exibição de Tarefas Globais:** Implementar a lógica para que o checklist do paciente seja populado com as  definidas pelo profissional.
 
 **Completed work in this session**
--   **Recently completed:**
-    -   **Isolamento Multi-profissional (P0):** Implementado com sucesso. As RLS foram corrigidas e as queries do frontend ajustadas. Agora, o usuário  (wylkem) vê todos os pacientes, enquanto o usuário  (joao) vê apenas os seus.
-    -   **Persistência de Branding (P0):** Migrado de  para a tabela  no Supabase, com upload de logo para o Supabase Storage.
-    -   **Correções de RLS (P0):** Várias políticas de RLS foram criadas e corrigidas para garantir a segurança e o isolamento dos dados.
-    -   **Sistema de Notificações (P1):** Um sistema básico foi implementado. Um ícone de sino aparece no cabeçalho para o profissional, e triggers no banco de dados criam notificações quando um paciente atualiza o peso ou completa uma tarefa do checklist.
-    -   **Página de Feedbacks (P1):** Criada a página  onde o profissional pode ver uma lista centralizada de todos os feedbacks enviados pelos seus pacientes.
-    -   **Correção de Bugs:** Resolvidos problemas de logout do admin e envio de feedbacks por parte do paciente.
-    -   **Relatórios PDF (P1 - iniciado):** Bibliotecas (, ) instaladas, arquivo  criado e botões de exportação adicionados à UI no perfil do paciente.
+- **Expansão do Plano Alimentar:** O gerador de planos foi expandido para 6 estilos gerais e 10 planos para condições especiais, com uma nova UI de abas e detecção automática de condições.
+- **Reestruturação da UX do Paciente:** O menu foi simplificado, e novas páginas como  e  foram criadas e implementadas. Um botão Voltar foi adicionado onde necessário.
+- **Novas Funcionalidades para o Profissional:** O dashboard do profissional agora inclui métricas de uso dos planos e uma seção para gerenciar dicas e tarefas globais (com criação das tabelas  e  no DB).
+- **Correções de Bugs:**
+    - Corrigida a falta de barra de rolagem no modal de visualização do plano.
+    - Adicionada a funcionalidade de excluir anamnese.
+    - O checklist diário foi aprimorado com um novo design e barra de progresso.
+    - Os botões de Duplicar e Exportar foram removidos da visualização do plano do paciente.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: Erros 406 e 400 no Perfil do Paciente**
-    -   **Debug checklist:** Inspecionar as queries para  e  na aba Network e revisar as políticas de RLS correspondentes no Supabase.
-    -   **Why to solve this issue and what will be achieved with this?** A página de perfil do paciente não carrega todos os dados, o que é uma funcionalidade central.
-    -   **Should Test frontend/backend/both after fix:** Frontend
-    -   **Is recurring issue?** Y
+Todos os problemas mencionados e ainda não resolvidos estão listados na seção .
+
+**Known issue recurrence from previous fork**
+- O travamento da aplicação e a análise da anamnese em inglês são problemas recorrentes nesta sessão.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Tailwind CSS, Shadcn UI
--   **Backend & DB:** Supabase (PostgreSQL, Auth, RLS, Storage, Realtime Subscriptions)
--   **PDF Generation:** , 
--   **Data Fetching:** 
+- **Frontend:** React, Tailwind CSS, Shadcn UI
+- **Backend/DB:** Supabase (PostgreSQL, Auth, RLS)
+- **Lógica Principal:** A maior parte da lógica de negócio, incluindo a geração de planos por IA, está no frontend em . As interações com o banco de dados estão centralizadas em .
 
 **key DB schema**
--   : { id, email, name, role ('admin' | 'professional' | 'patient') }
--   : { id, patient_id (fk->profiles.id), professional_id (fk->profiles.id) }
--   : { id, professional_id (fk->profiles.id), logo_url, primary_color, ... }
--   : { id, user_id (fk->profiles.id), type, title, message, is_read }
--   : { id, patient_id, current_weight, ... }
--   : { id, patient_id, completed, ... }
--   , ,  (novas tabelas de conteúdo)
+- : Dados de usuários e seus papéis ('professional', 'patient', 'admin').
+- : Formulários de histórico de saúde.
+- : Planos alimentares salvos.
+- : Comunicação entre profissional e paciente.
+- : Dicas globais criadas pelo profissional.
+- : Itens do checklist padrão criados pelo profissional.
 
 **changes in tech stack**
--   Adicionadas as bibliotecas  e  para geração de PDF no frontend.
+None.
 
 **All files of reference**
--   : (Criado) Lógica para gerar os diferentes tipos de relatórios em PDF.
--   : (Modificado) Adicionados botões de exportação de PDF nas abas de Anamnese e Plano Alimentar.
--   : (Modificado extensivamente) Contém toda a lógica de interação com o Supabase. Foram adicionadas e corrigidas várias funções.
--   : (Criado) Página para o profissional visualizar todos os feedbacks.
--   : (Criado) Componente do sino de notificação.
--   : (Modificado) Adicionado o  e corrigida a função de logout.
--   : (Modificado) Corrigido o bug no envio de feedbacks.
--   , , : (Criados) Arquivos com os scripts SQL executados para corrigir RLS e criar novas tabelas/funções/triggers.
+*   : Modificado extensivamente para adicionar novos estilos de planos e detecção de condições.
+*   : Modificado extensivamente com novas funções para , , feedbacks e atualização do menu padrão do paciente.
+*   : UI atualizada com abas e badges para os novos planos.
+*   : Novo arquivo criado para a experiência central do paciente.
+*   : Novo arquivo para agrupar funcionalidades secundárias.
+*   : Atualizado com seções de métricas e gerenciamento de conteúdo global.
+*   : Atualizado para adicionar scroll e modo somente leitura para pacientes.
+*   : Atualizado com um botão para deletar.
+*   : Atualizado com as novas rotas do paciente.
 
 **Areas that need refactoring**:
--   O arquivo  está com mais de 1300 linhas e concentra toda a comunicação com o Supabase. Seria benéfico refatorá-lo, dividindo a lógica em arquivos menores por contexto (ex: , , ).
+- O agente confundiu o dashboard do profissional com o do paciente ao tentar corrigir o bug das abas se movendo. É preciso ter atenção para aplicar correções nos arquivos corretos, verificando se a alteração é para a visão do profissional ou do paciente.
+
+**key api endpoints**
+As interações com o backend são feitas através da biblioteca cliente do Supabase, com funções encapsuladas em , não por uma API REST tradicional.
 
 **Critical Info for New Agent**
--   O teste de isolamento de dados deve ser feito usando as duas contas:  (admin, vê tudo) e  (professional, vê apenas seus dados).
--   O problema de download de PDF é uma limitação conhecida do ambiente de preview (iframe sandboxed). A solução é abrir o PDF em uma nova aba usando .
--   Preste atenção aos logs do console do navegador, pois eles contêm erros críticos (como os erros 400 e 406) que foram ignorados anteriormente e estão impedindo o funcionamento de partes da aplicação.
+- O usuário é o principal guia do projeto e fornece feedback claro e priorizado. Siga suas instruções.
+- O usuário pode executar queries SQL que você fornecer. Use isso para migrações de banco ou correções de dados.
+- A inteligência da aplicação reside na engenharia de prompts em .
+- O problema de travamento da aplicação é uma prioridade máxima e pode estar relacionado a re-renderizações infinitas.
+- Preste muita atenção para diferenciar os componentes/páginas do profissional e do paciente para evitar aplicar correções no lugar errado.
 
 **documents and test reports created in this job**
--   
--   
--   
--   
--   
--   
--   
--   
+- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** O botão de exportar PDF não está gerando o download.
-2.  **Agent:** Investigou e encontrou o erro de sandbox no console que impede o download.
-3.  **User:** Reportou que o logout de admin não funciona e o envio de feedback como paciente dá erro.
-4.  **Agent:** Corrigiu a função de logout e o componente de envio de feedback.
-5.  **User:** Confirmou que as correções de logout e feedback funcionaram.
-6.  **User:** Pediu para adicionar o botão de exportar PDF em várias seções (anamnese, plano alimentar, receitas).
-7.  **Agent:** Adicionou os botões de PDF nas seções solicitadas.
-8.  **User:** Reportou novamente que o PDF não faz download.
-9.  **Agent:** Re-investigou e confirmou (de novo) o erro de sandbox no console. Planeja corrigir abrindo em nova aba.
-10. **Pending:** O usuário está aguardando a correção da funcionalidade de exportação de PDF.
+1.  **User (msg 473):** Fornece uma nova lista de 9 correções, incluindo plano do paciente somente leitura, análise em inglês, dicas repetidas, remoção de exportação para o paciente, etc. (EM ANDAMENTO)
+2.  **User (msg 468):** Confirma que o SQL para resetar o menu do paciente foi executado com sucesso. (CONCLUÍDO)
+3.  **Agent (msg 467):** Fornece o SQL para o usuário executar, a fim de aplicar a nova estrutura de menu simplificada. (CONCLUÍDO)
+4.  **User (msg 422):** Propõe uma grande reestruturação da UX do paciente, com foco na Minha Jornada. (CONCLUÍDO)
+5.  **User (msg 373):** Pede para o agente continuar com a implementação dos planos especiais e confirma que irá rodar o SQL necessário. (CONCLUÍDO)
+6.  **User (msg 333):** Propõe a expansão dos planos alimentares com Planos Especiais baseados em condições médicas. (CONCLUÍDO)
+7.  **User (msg 174):** Fornece uma lista de feedback e solicitações, incluindo mais variedade nos planos, checklist diário, correção de modais sem scroll, etc. (A MAIORIA FOI CONCLUÍDA)
+8.  **User (msg 131):** PODE TESTAR - Autoriza o agente a rodar o teste de frontend. (CONCLUÍDO)
+9.  **Agent (msg 130):** Pergunta ao usuário se deve prosseguir com o teste do frontend. (CONCLUÍDO)
+10. **User (primeira mensagem):** Fornece o checklist inicial de implementação e contexto do projeto. (CONCLUÍDO)
 
 **Project Health Check:**
--   **Broken:**
-    -   A funcionalidade de exportação de PDF está quebrada.
-    -   Partes da página de Perfil do Paciente não carregam dados devido a erros 406/400 nas chamadas ao Supabase.
+- **Broken:**
+    - Gerenciamento de sessão do Admin (bug de logout).
+    - Performance da aplicação (bug de congelamento).
+    - Estabilidade do layout no painel do paciente (abas se movendo).
+- **Mocked:**
+    - Nenhum.
 
 **3rd Party Integrations**
--   Supabase (Auth, PostgreSQL, Storage, Realtime)
--    e  (para geração de PDF)
+*   Supabase — Usado para banco de dados (PostgreSQL), autenticação e armazenamento.
 
 **Testing status**
--   **Testing agent used after significant changes:** NO
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None
--   **Known regressions:** A página de perfil do paciente está com problemas para carregar dados (, ).
+- **Testing agent used after significant changes:** YES
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None
+- **Known regressions:**
+    - A linguagem da análise da anamnese regrediu para o inglês.
 
 **Credentials to test flow:**
--   **Admin:**  / 
--   **Professional:**  / 
+- **Profissional:**  / 
+- **Paciente:**  / 
 
 **What agent forgot to execute**
--   O agente identificou vários erros no console do navegador na mensagem 392 (,  para  e ), mas focou exclusivamente no erro Download is disallowed. Ele não investigou nem corrigiu os outros erros HTTP, que estão quebrando o carregamento de dados na página de perfil do paciente.</analysis>
+Da última lista de 9 itens do usuário, o agente começou a trabalhar, mas as questões mais críticas (logout do admin, congelamento da aplicação) ainda não foram investigadas. Além disso, a correção para o bug das abas se movendo foi aplicada ao arquivo errado.</analysis>
