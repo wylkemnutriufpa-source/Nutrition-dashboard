@@ -697,6 +697,78 @@ export const deleteChecklistTemplate = async (templateId) => {
   return { error };
 };
 
+
+// ==================== DICAS E TAREFAS GLOBAIS DO PROFISSIONAL ====================
+
+// Criar dica global (aparece para todos os pacientes do profissional)
+export const createGlobalTip = async (professionalId, tip) => {
+  const { data, error } = await supabase
+    .from('global_tips')
+    .insert({
+      professional_id: professionalId,
+      tip: tip,
+      is_active: true
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Buscar dicas globais do profissional
+export const getGlobalTips = async (professionalId) => {
+  const { data, error } = await supabase
+    .from('global_tips')
+    .select('*')
+    .eq('professional_id', professionalId)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+  return { data: data || [], error };
+};
+
+// Deletar dica global
+export const deleteGlobalTip = async (tipId) => {
+  const { error } = await supabase
+    .from('global_tips')
+    .update({ is_active: false })
+    .eq('id', tipId);
+  return { error };
+};
+
+// Criar tarefa global (aparece para todos os pacientes do profissional)
+export const createGlobalTask = async (professionalId, title) => {
+  const { data, error } = await supabase
+    .from('global_tasks')
+    .insert({
+      professional_id: professionalId,
+      title: title,
+      is_active: true
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Buscar tarefas globais do profissional
+export const getGlobalTasks = async (professionalId) => {
+  const { data, error } = await supabase
+    .from('global_tasks')
+    .select('*')
+    .eq('professional_id', professionalId)
+    .eq('is_active', true)
+    .order('order_index', { ascending: true });
+  return { data: data || [], error };
+};
+
+// Deletar tarefa global
+export const deleteGlobalTask = async (taskId) => {
+  const { error } = await supabase
+    .from('global_tasks')
+    .update({ is_active: false })
+    .eq('id', taskId);
+  return { error };
+};
+
+
 export const getChecklistEntries = async (patientId, startDate, endDate) => {
   const { data, error } = await supabase
     .from('checklist_entries')
