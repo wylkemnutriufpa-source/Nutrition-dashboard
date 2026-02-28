@@ -62,6 +62,10 @@ const PatientDashboard = () => {
       setPatientData(stats.profile);
       setActivePlan(stats.activePlan);
       setAnamnesis(stats.anamnesis);
+      
+      // Carregar dicas personalizadas
+      const { data: tips } = await getPatientPersonalizedTips(user.id);
+      setPersonalizedTips(tips || []);
     } catch (error) {
       console.error('Error loading patient data:', error);
       toast.error('Erro ao carregar dados');
