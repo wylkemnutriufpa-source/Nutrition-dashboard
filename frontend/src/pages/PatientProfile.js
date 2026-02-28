@@ -1224,6 +1224,7 @@ const PatientProfile = () => {
           <TabsContent value="pre-plano">
             <DraftMealPlanViewer
               draftPlan={draftPlan}
+              anamnesis={anamnesis}
               onUpdate={handleUpdateDraftPlan}
               onRegenerate={handleGenerateDraftPlan}
               onUseAsOfficial={handleUseAsOfficialPlan}
