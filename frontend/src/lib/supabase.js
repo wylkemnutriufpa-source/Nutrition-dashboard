@@ -1152,7 +1152,7 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
   // Pacientes com planos ativos
   let activePlansQuery = supabase
     .from('meal_plans')
-    .select('*, patient:profiles!patient_id(id, name, email)')
+    .select('*')
     .eq('is_active', true)
     .order('updated_at', { ascending: false })
     .limit(10);
@@ -1161,7 +1161,26 @@ export const getProfessionalStats = async (professionalId, isAdmin = false) => {
     activePlansQuery = activePlansQuery.eq('professional_id', professionalId);
   }
   
-  const { data: patientsWithActivePlans } = await activePlansQuery;
+  const { data: activePlansData } = await activePlansQuery;
+  
+  // Buscar dados dos pacientes separadamente para evitar problemas com joins
+  let patientsWithActivePlans = [];
+  if (activePlansData && activePlansData.length > 0) {
+    const patientIds = [...new Set(activePlansData.map(p => p.patient_id).filter(Boolean))];
+    
+    if (patientIds.length > 0) {
+      const { data: patientsData } = await supabase
+        .from('profiles')
+        .select('id, name, email')
+        .in('id', patientIds);
+      
+      // Mapear pacientes aos planos
+      patientsWithActivePlans = activePlansData.map(plan => ({
+        ...plan,
+        patient: patientsData?.find(p => p.id === plan.patient_id) || null
+      }));
+    }
+  }
   
   return {
     activePatients: totalPatients || 0,
