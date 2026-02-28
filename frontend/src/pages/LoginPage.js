@@ -13,12 +13,26 @@ import { signIn, signOut } from '@/lib/supabase';
 const LoginPage = () => {
   const navigate = useNavigate();
   const { branding } = useBranding();
-  const { profile } = useAuth();
+  const { profile, loading: authLoading, logout } = useAuth();
   const [loginType, setLoginType] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [pendingLogin, setPendingLogin] = useState(false);
+
+  // Redirecionar usuário já autenticado
+  useEffect(() => {
+    if (!authLoading && profile) {
+      const userType = localStorage.getItem('fitjourney_user_type');
+      if (profile.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (profile.role === 'professional') {
+        navigate('/professional/dashboard', { replace: true });
+      } else if (profile.role === 'patient') {
+        navigate('/patient/dashboard', { replace: true });
+      }
+    }
+  }, [profile, authLoading, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
