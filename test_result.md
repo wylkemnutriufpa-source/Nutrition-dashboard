@@ -497,6 +497,149 @@ test_plan:
 
 agent_communication:
   - agent: "testing"
+    message: "🧪 TESTE FINAL DO MODAL DE PLANO ALIMENTAR (28/Fev/2026 - TERCEIRA RODADA)
+    
+    ═══════════════════════════════════════════════════════════════════
+    📋 TESTE SOLICITADO PELO USUÁRIO
+    ═══════════════════════════════════════════════════════════════════
+    
+    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    Credenciais: kelly@com / 123456
+    
+    Objetivo: Verificar se modal 'Anamnese Completa!' NÃO aparece após correções
+    
+    ═══════════════════════════════════════════════════════════════════
+    ❌ RESULTADO: ISSUE CRÍTICA PERSISTE
+    ═══════════════════════════════════════════════════════════════════
+    
+    ISSUE: Modal 'Anamnese Completa!' CONTINUA aparecendo a cada login
+    
+    Fluxo testado:
+    1. ✅ Acesso à página inicial
+    2. ✅ Clique em 'Paciente'
+    3. ✅ Login com kelly@com / 123456
+    4. ❌ Modal 'Anamnese Completa!' APARECE (deveria NÃO aparecer)
+    5. ℹ️ Fechado modal clicando em 'Entendi'
+    6. ✅ Botão 'Ver Plano Completo' encontrado e clicado
+    7. ✅ MealPlanViewerModal abre sem bloqueio
+    8. ✅ Screenshot capturado
+    
+    ANÁLISE DO PROBLEMA:
+    - PatientDashboard.js linhas 38-58 implementa localStorage check
+    - Usa key: `anamnesis_complete_modal_\${user.id}`
+    - Lógica: se hasSeenCompleteModal não existe, mostra modal e seta flag
+    - PROBLEMA: Flag não está sendo persistida OU está sendo limpa OU user.id muda
+    - Possível race condition: modal é mostrado antes de verificar localStorage
+    - Possível causa: localStorage é limpo no logout ou navegação
+    
+    ═══════════════════════════════════════════════════════════════════
+    ✅ SUCESSO: MealPlanViewerModal Funciona Perfeitamente
+    ═══════════════════════════════════════════════════════════════════
+    
+    Após fechar o modal bloqueador, o MealPlanViewerModal abre SEM PROBLEMAS:
+    
+    Modal exibe corretamente:
+    ✅ Título: 'Plano Alimentar (do Pré-Plano)'
+    ✅ Badge: '6 refeições'
+    ✅ Header com resumo nutricional:
+       - Calorias: 0 (meta: 3159 kcal)
+       - Proteína: 0g (meta: 129g)
+       - Carboidratos: 0g (meta: 225g)
+       - Gordura: 0g (meta: 198g)
+    ✅ Tabs funcionais: 'Refeições' e 'Observações'
+    ✅ Refeições expansíveis com ícones
+    ✅ Meals visíveis:
+       - Café da Manhã pos treino (07:00)
+       - Lanche da Manhã (10:00)
+    ✅ Alimentos listados com detalhes:
+       - Aveia em flocos finos: 0 kcal, P: 0g
+       - Ovo cozido: 0 kcal, P: 0g
+       - Pão integral: 0 kcal, P: 0g
+       - Café preto: 0 kcal, P: 0g
+       - Frutas vermelhas (mix): 0 kcal, P: 0g
+       - Castanha do Pará: 0 kcal, P: 0g
+    ✅ Total da Refeição mostra: 0 kcal, P: 0g, C: 0g, G: 0g
+    
+    ⚠️ NOTA IMPORTANTE: Calorias mostram 0 kcal (ESPERADO)
+    - Conforme nota do usuário, plano foi criado ANTES da correção
+    - Dados nutricionais não existem no banco para este plano
+    - Novos planos criados terão calorias automaticamente
+    - Código do modal está CORRETO (usa food.calories || food.kcal || 0)
+    
+    ═══════════════════════════════════════════════════════════════════
+    📸 SCREENSHOTS CAPTURADOS
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ 01_patient_dashboard_after_login.png - Dashboard após login
+    ✅ 02_modal_blocker_still_visible.png - Modal bloqueador aparece
+    ✅ 03_plan_card_with_button.png - Card com botão 'Ver Plano Completo'
+    ✅ 05_meal_plan_modal_opened.png - Modal aberto (topo)
+    ✅ 06_meal_plan_modal_meals.png - Modal com meals visíveis
+    ✅ modal_blocker_aparecer.png - Confirmação do bloqueador
+    ✅ meal_plan_modal_full_view.png - Vista completa do modal
+    ✅ meal_plan_modal_scrolled.png - Modal scrolled (mais meals)
+    
+    ═══════════════════════════════════════════════════════════════════
+    🔴 AÇÕES REQUERIDAS PARA MAIN AGENT (URGENTE)
+    ═══════════════════════════════════════════════════════════════════
+    
+    PRIORIDADE 1 - CORRIGIR FirstAccessModal:
+    
+    Problema atual:
+    - localStorage key `anamnesis_complete_modal_\${user.id}` NÃO está persistindo
+    - Modal aparece a cada login mesmo após usuário clicar 'Entendi'
+    - Degradação de UX: paciente tem que fechar modal toda vez
+    
+    Investigação necessária:
+    1. Verificar se user.id é consistente entre logins
+    2. Verificar se localStorage está sendo limpo no logout
+    3. Verificar se há race condition na verificação (useEffect linha 32-36)
+    4. Considerar usar sessionStorage + database flag ao invés de apenas localStorage
+    5. Adicionar console.log para debug: user.id, hasSeenCompleteModal, localStorage keys
+    
+    Soluções propostas:
+    - OPÇÃO A: Usar database flag (coluna 'has_seen_complete_modal' em profiles)
+    - OPÇÃO B: Combinar localStorage + sessionStorage para evitar modal em mesma sessão
+    - OPÇÃO C: Adicionar timestamp check (só mostra modal se anamnese foi completa há menos de 1 dia)
+    - OPÇÃO D: Remover modal de 'Anamnese Completa!' completamente (usar apenas AnamneseBanner)
+    
+    RECOMENDAÇÃO: Usar OPÇÃO A (database flag) para persistência confiável
+    
+    ═══════════════════════════════════════════════════════════════════
+    ℹ️ CONFIRMADO FUNCIONANDO
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ Login paciente (kelly@com)
+    ✅ Dashboard carrega corretamente
+    ✅ Card 'Plano Alimentar Ativo' exibe informações corretas
+    ✅ Botão 'Ver Plano Completo' visível e funcional
+    ✅ MealPlanViewerModal abre sem bloqueio (após fechar FirstAccessModal)
+    ✅ Modal exibe todas refeições e tabs corretamente
+    ✅ Código do modal implementado corretamente
+    
+    ═══════════════════════════════════════════════════════════════════
+    📊 CONCLUSÃO
+    ═══════════════════════════════════════════════════════════════════
+    
+    RESULTADO GERAL: PARCIALMENTE FUNCIONAL
+    
+    ✅ MealPlanViewerModal: FUNCIONA PERFEITAMENTE
+       - Abre sem problemas
+       - Exibe todas informações corretamente
+       - Não há bloqueio de overlay (após fechar FirstAccessModal)
+       - Calorias 0 é esperado (plano antigo)
+    
+    ❌ FirstAccessModal: FIX NÃO FUNCIONOU
+       - LocalStorage check não está funcionando
+       - Modal aparece repetidamente
+       - Fix proposto não resolveu o problema
+       - Requer investigação mais profunda
+    
+    PRÓXIMOS PASSOS:
+    1. Main agent deve investigar localStorage persistence
+    2. Implementar solução mais robusta (database flag)
+    3. Re-testar após nova correção"
+  - agent: "testing"
     message: "🧪 TESTES DAS CORREÇÕES COMPLETADOS (28/Fev/2026 - SEGUNDA RODADA)
     
     ═══════════════════════════════════════════════════════════════════
