@@ -346,8 +346,164 @@ const MinhaJornada = () => {
           </CardContent>
         </Card>
 
+        {/* ========== PAINEL INTELIGENTE ========== */}
+        {!loading && (
+          <div className="space-y-6">
+            {/* Score de Aderência + Alertas */}
+            <Card className="border-2 border-indigo-200 shadow-lg bg-gradient-to-br from-white to-indigo-50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Brain className="h-6 w-6 text-indigo-600" />
+                  Painel Inteligente
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                
+                {intelligenceData.insufficient ? (
+                  /* Estado: Dados Insuficientes */
+                  <div className="text-center py-8">
+                    <div className="text-6xl mb-4">{intelligenceData.nextAction.icon}</div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {intelligenceData.nextAction.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                      {intelligenceData.nextAction.message}
+                    </p>
+                    {intelligenceData.nextAction.actionText && (
+                      <Button 
+                        onClick={() => intelligenceData.nextAction.actionLink && navigate(intelligenceData.nextAction.actionLink)}
+                        className="bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        {intelligenceData.nextAction.actionText}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    {/* Score de Aderência */}
+                    {intelligenceData.score && (
+                      <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">Score de Aderência</h3>
+                            <p className={`text-sm font-medium ${intelligenceData.score.levelColor}`}>
+                              {intelligenceData.score.levelLabel}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-4xl font-bold text-indigo-600">
+                              {intelligenceData.score.score}
+                            </div>
+                            <div className="text-xs text-gray-500">de 100</div>
+                          </div>
+                        </div>
+                        <Progress value={intelligenceData.score.score} className="h-3" />
+                      </div>
+                    )}
+
+                    {/* Alertas Inteligentes */}
+                    {intelligenceData.alerts.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4" />
+                          Alertas e Insights
+                        </h3>
+                        <div className="grid gap-3">
+                          {intelligenceData.alerts.map((alert) => (
+                            <div
+                              key={alert.id}
+                              className={`p-4 rounded-lg border-2 ${alert.color} transition-all hover:shadow-md`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <span className="text-2xl flex-shrink-0">{alert.icon}</span>
+                                <div className="flex-1">
+                                  <h4 className={`font-semibold ${alert.textColor} mb-1`}>
+                                    {alert.title}
+                                  </h4>
+                                  <p className="text-sm text-gray-700">
+                                    {alert.message}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Próximo Melhor Passo */}
+                    {intelligenceData.nextAction && !intelligenceData.nextAction.insufficient && (
+                      <div className={`${intelligenceData.nextAction.color} text-white rounded-xl p-6 shadow-lg`}>
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="text-4xl">{intelligenceData.nextAction.icon}</div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-bold mb-1">
+                              {intelligenceData.nextAction.title}
+                            </h3>
+                            <p className="text-white/90 text-sm">
+                              {intelligenceData.nextAction.description}
+                            </p>
+                          </div>
+                          {intelligenceData.nextAction.urgent && (
+                            <Badge className="bg-yellow-400 text-yellow-900 border-0">
+                              Urgente
+                            </Badge>
+                          )}
+                        </div>
+                        <Button
+                          onClick={() => {
+                            if (intelligenceData.nextAction.actionLink.startsWith('#')) {
+                              document.querySelector(intelligenceData.nextAction.actionLink)?.scrollIntoView({ behavior: 'smooth' });
+                            } else {
+                              navigate(intelligenceData.nextAction.actionLink);
+                            }
+                          }}
+                          className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold"
+                        >
+                          {intelligenceData.nextAction.actionText}
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Dica do Dia */}
+                    {intelligenceData.dailyTip && (
+                      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-6 border-2 border-amber-200">
+                        <div className="flex items-start gap-4">
+                          <div className="bg-amber-400 p-3 rounded-full flex-shrink-0">
+                            <Lightbulb className="h-6 w-6 text-amber-900" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="text-lg font-bold text-gray-900">
+                                💡 Dica do Dia
+                              </h3>
+                              {intelligenceData.dailyTip.isNew && (
+                                <Badge className="bg-green-500 text-white text-xs border-0">
+                                  Nova
+                                </Badge>
+                              )}
+                            </div>
+                            <h4 className="font-semibold text-amber-900 mb-2">
+                              {intelligenceData.dailyTip.title}
+                            </h4>
+                            <p className="text-gray-700 text-sm leading-relaxed">
+                              {intelligenceData.dailyTip.content}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* ========== CHECKLIST DIÁRIO (DESTAQUE PRINCIPAL) ========== */}
-        <Card className="border-3 border-teal-300 shadow-2xl ring-2 ring-teal-100">
+        <Card id="checklist" className="border-3 border-teal-300 shadow-2xl ring-2 ring-teal-100">
           <CardHeader className="bg-gradient-to-r from-teal-600 via-teal-700 to-teal-600 text-white rounded-t-lg pb-6">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3 text-2xl font-bold">
