@@ -238,23 +238,28 @@ const MinhaJornada = () => {
         </Card>
 
         {/* ========== CHECKLIST DIÁRIO (DESTAQUE PRINCIPAL) ========== */}
-        <Card className="border-2 border-teal-200 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-t-lg">
+        <Card className="border-3 border-teal-300 shadow-2xl ring-2 ring-teal-100">
+          <CardHeader className="bg-gradient-to-r from-teal-600 via-teal-700 to-teal-600 text-white rounded-t-lg pb-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <CheckCircle2 className="h-6 w-6" />
-                Checklist do Dia
+              <CardTitle className="flex items-center gap-3 text-2xl font-bold">
+                <CheckCircle2 className="h-7 w-7 animate-pulse" />
+                ✨ Checklist do Dia
               </CardTitle>
-              <Badge className="bg-white/20 text-white border-0">
+              <Badge className="bg-yellow-400 text-yellow-900 border-0 text-lg px-4 py-1 font-bold">
                 {completedTasks}/{totalTasks}
               </Badge>
             </div>
             <Progress 
               value={progressPercent} 
-              className="h-2 mt-3 bg-white/20" 
+              className="h-3 mt-4 bg-white/20 rounded-full" 
             />
+            <p className="text-white/90 mt-2 text-sm font-medium">
+              {progressPercent === 100 ? '🏆 Dia perfeito! Parabéns!' : 
+               progressPercent >= 50 ? '💪 Continue assim! Você está indo bem!' :
+               '🌟 Cada passo conta na sua jornada!'}
+            </p>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-6">
             {tasks.length === 0 ? (
               <div className="text-center py-8">
                 <Sparkles className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -265,29 +270,29 @@ const MinhaJornada = () => {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                 {tasks.map((task) => (
                   <div
                     key={task.id}
                     onClick={() => handleToggleTask(task.id, task.completed)}
                     className={`
-                      flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
+                      flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all transform hover:scale-[1.02] shadow-sm
                       ${task.completed 
-                        ? 'bg-green-50 border-green-300' 
-                        : 'bg-white border-gray-200 hover:border-teal-300 hover:bg-teal-50'
+                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400 shadow-green-100' 
+                        : 'bg-white border-gray-300 hover:border-teal-400 hover:bg-teal-50 hover:shadow-lg'
                       }
                     `}
                   >
                     {task.completed ? (
-                      <CheckCircle2 className="h-6 w-6 text-green-500 flex-shrink-0" />
+                      <CheckCircle2 className="h-8 w-8 text-green-600 flex-shrink-0 drop-shadow-sm" />
                     ) : (
-                      <Circle className="h-6 w-6 text-gray-300 flex-shrink-0" />
+                      <Circle className="h-8 w-8 text-gray-400 flex-shrink-0 hover:text-teal-500" />
                     )}
-                    <span className={`flex-1 ${task.completed ? 'line-through text-gray-400' : 'text-gray-700 font-medium'}`}>
+                    <span className={`flex-1 text-lg ${task.completed ? 'line-through text-gray-500' : 'text-gray-800 font-semibold'}`}>
                       {task.title}
                     </span>
                     {task.completed && (
-                      <Badge className="bg-green-100 text-green-700 border-0">✓</Badge>
+                      <Badge className="bg-green-500 text-white border-0 text-sm px-3 py-1">✓ Feito</Badge>
                     )}
                   </div>
                 ))}
