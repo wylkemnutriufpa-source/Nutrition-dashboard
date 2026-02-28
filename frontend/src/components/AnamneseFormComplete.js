@@ -866,6 +866,35 @@ const AnamneseFormComplete = ({
           </Card>
         </div>
       )}
+
+      {/* Dialog de Confirmação para Excluir */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle size={20} />
+              Excluir Anamnese
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir esta anamnese? Esta ação não pode ser desfeita.
+              Todos os dados preenchidos serão perdidos.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteAnamnesis}
+              disabled={deleting}
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 size={16} className="mr-2" />}
+              Excluir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
