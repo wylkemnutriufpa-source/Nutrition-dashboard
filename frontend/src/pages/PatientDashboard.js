@@ -434,6 +434,12 @@ const PatientDashboard = () => {
         patient={{ name: patientName }}
         readOnly={true}
       />
+
+      {/* Botão de Emergência (SOS) */}
+      <EmergencyButton 
+        patientId={user?.id}
+        professionalId={profile?.professional_id}
+      />
     </Layout>
   );
 };
