@@ -599,6 +599,141 @@ const SPECIAL_PLANS = {
 const SPECIAL_PLANS_ORDER = ['diabetico', 'hipertenso', 'intolerancia', 'gestante', 'lactante', 'anemia', 'renal', 'gastrite', 'colesterol', 'hipotireoidismo'];
 
 /**
+ * DETECÇÃO AUTOMÁTICA DE CONDIÇÕES
+ * Analisa dados da anamnese e retorna planos especiais recomendados
+ */
+const detectConditionsFromAnamnesis = (anamnesis, patient) => {
+  const detectedConditions = [];
+  const recommendations = [];
+
+  if (!anamnesis) return { detectedConditions, recommendations };
+
+  // Converter para minúsculas para comparação
+  const medicalConditions = (anamnesis.medical_conditions || anamnesis.conditions || [])
+    .map(c => (typeof c === 'string' ? c : c.condition || '').toLowerCase());
+  
+  const medications = (anamnesis.medications || '').toLowerCase();
+  const allergies = (anamnesis.allergies || []).map(a => a.toLowerCase());
+  const intolerances = (anamnesis.intolerances || anamnesis.food_intolerances || []).map(i => i.toLowerCase());
+  const symptoms = (anamnesis.symptoms || anamnesis.gastrointestinal_symptoms || '').toLowerCase();
+  const isPregnant = anamnesis.is_pregnant || anamnesis.pregnant;
+  const isBreastfeeding = anamnesis.is_breastfeeding || anamnesis.breastfeeding;
+
+  // 🩸 DIABETES
+  if (medicalConditions.some(c => c.includes('diabet') || c.includes('glicemia') || c.includes('insulina')) ||
+      medications.includes('metformina') || medications.includes('insulina') || medications.includes('glicose')) {
+    detectedConditions.push('diabetico');
+    recommendations.push({
+      planId: 'diabetico',
+      confidence: 'alta',
+      reason: 'Diabetes identificado na anamnese'
+    });
+  }
+
+  // ❤️ HIPERTENSÃO
+  if (medicalConditions.some(c => c.includes('hipertens') || c.includes('pressão alta') || c.includes('pressao alta')) ||
+      medications.includes('losartana') || medications.includes('atenolol') || medications.includes('enalapril') ||
+      medications.includes('hidroclorotiazida')) {
+    detectedConditions.push('hipertenso');
+    recommendations.push({
+      planId: 'hipertenso',
+      confidence: 'alta',
+      reason: 'Hipertensão identificada na anamnese'
+    });
+  }
+
+  // 🚫 INTOLERÂNCIAS
+  if (intolerances.some(i => i.includes('lactose') || i.includes('leite')) ||
+      intolerances.some(i => i.includes('gluten') || i.includes('glúten') || i.includes('celiac') || i.includes('celíac')) ||
+      allergies.some(a => a.includes('leite') || a.includes('gluten') || a.includes('glúten'))) {
+    detectedConditions.push('intolerancia');
+    recommendations.push({
+      planId: 'intolerancia',
+      confidence: 'alta',
+      reason: 'Intolerância a lactose/glúten identificada'
+    });
+  }
+
+  // 🤰 GESTANTE
+  if (isPregnant || medicalConditions.some(c => c.includes('gestante') || c.includes('grávida') || c.includes('gravida'))) {
+    detectedConditions.push('gestante');
+    recommendations.push({
+      planId: 'gestante',
+      confidence: 'alta',
+      reason: 'Gestação identificada'
+    });
+  }
+
+  // 🤱 LACTANTE
+  if (isBreastfeeding || medicalConditions.some(c => c.includes('amament') || c.includes('lactante') || c.includes('lactação'))) {
+    detectedConditions.push('lactante');
+    recommendations.push({
+      planId: 'lactante',
+      confidence: 'alta',
+      reason: 'Amamentação identificada'
+    });
+  }
+
+  // 🩺 ANEMIA
+  if (medicalConditions.some(c => c.includes('anemia') || c.includes('ferro baixo')) ||
+      medications.includes('sulfato ferroso') || medications.includes('ferro')) {
+    detectedConditions.push('anemia');
+    recommendations.push({
+      planId: 'anemia',
+      confidence: 'alta',
+      reason: 'Anemia identificada na anamnese'
+    });
+  }
+
+  // 🫘 DOENÇA RENAL
+  if (medicalConditions.some(c => c.includes('renal') || c.includes('rim') || c.includes('nefro') || c.includes('diálise') || c.includes('dialise')) ||
+      medications.includes('eritropoetina')) {
+    detectedConditions.push('renal');
+    recommendations.push({
+      planId: 'renal',
+      confidence: 'alta',
+      reason: 'Doença renal identificada'
+    });
+  }
+
+  // 🔥 GASTRITE/REFLUXO
+  if (medicalConditions.some(c => c.includes('gastrite') || c.includes('refluxo') || c.includes('úlcera') || c.includes('ulcera') || c.includes('azia')) ||
+      symptoms.includes('azia') || symptoms.includes('queimação') || symptoms.includes('refluxo') ||
+      medications.includes('omeprazol') || medications.includes('pantoprazol') || medications.includes('esomeprazol')) {
+    detectedConditions.push('gastrite');
+    recommendations.push({
+      planId: 'gastrite',
+      confidence: 'alta',
+      reason: 'Gastrite/Refluxo identificado'
+    });
+  }
+
+  // 🫀 COLESTEROL ALTO
+  if (medicalConditions.some(c => c.includes('colesterol') || c.includes('dislipidemia') || c.includes('triglicerídeo') || c.includes('triglicerideos')) ||
+      medications.includes('sinvastatina') || medications.includes('atorvastatina') || medications.includes('rosuvastatina')) {
+    detectedConditions.push('colesterol');
+    recommendations.push({
+      planId: 'colesterol',
+      confidence: 'alta',
+      reason: 'Colesterol alto identificado'
+    });
+  }
+
+  // 🦋 HIPOTIREOIDISMO
+  if (medicalConditions.some(c => c.includes('hipotireoid') || c.includes('tireoide') || c.includes('tireóide')) ||
+      medications.includes('levotiroxina') || medications.includes('puran') || medications.includes('euthyrox')) {
+    detectedConditions.push('hipotireoidismo');
+    recommendations.push({
+      planId: 'hipotireoidismo',
+      confidence: 'alta',
+      reason: 'Hipotireoidismo identificado'
+    });
+  }
+
+  return { detectedConditions, recommendations };
+};
+
+/**
  * Retorna configuração de um plano especial
  */
 const getSpecialPlan = (planId) => SPECIAL_PLANS[planId] || null;
