@@ -6,12 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Save, CheckCircle2, Activity, Heart, Utensils, Download } from 'lucide-react';
+import { Loader2, Save, CheckCircle2, Activity, Heart, Utensils, Download, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { updateAnamnesis, createAnamnesis, createAutomaticTips } from '@/lib/supabase';
+import { updateAnamnesis, createAnamnesis, createAutomaticTips, deleteAnamnesis } from '@/lib/supabase';
 import { generateAnamnesePDF } from '@/utils/pdfGenerator';
 import LiveTipsPreview from '@/components/LiveTipsPreview';
 import { generateAnamnesisTips } from '@/utils/dynamicTips';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 /**
  * AnamneseFormComplete - Formulário completo de anamnese
