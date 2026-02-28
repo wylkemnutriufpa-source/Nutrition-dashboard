@@ -28,33 +28,24 @@ const PatientDashboard = () => {
     }
   }, [user]);
 
-  // Verificar modal de primeiro acesso APÓS dados carregarem
+  // Verificar modal de primeiro acesso APENAS para anamnese incompleta
   useEffect(() => {
-    if (user && !loading && anamnesis !== null) {
+    if (user && !loading) {
       checkFirstAccess();
     }
   }, [user, loading, anamnesis]);
 
   const checkFirstAccess = () => {
-    // Verificar se já viu o modal de primeiro acesso
-    const hasSeenFirstModal = localStorage.getItem(`first_access_modal_${user.id}`);
-    // Verificar se já viu o modal de anamnese completa
-    const hasSeenCompleteModal = localStorage.getItem(`anamnesis_complete_modal_${user.id}`);
-    
-    // Se anamnese está completa
-    if (anamnesis?.status === 'complete') {
-      // Só mostra modal de "Parabéns" se nunca viu
-      if (!hasSeenCompleteModal) {
-        setShowFirstAccessModal(true);
-        localStorage.setItem(`anamnesis_complete_modal_${user.id}`, 'true');
-      }
-    } else {
-      // Se anamnese não está completa, mostra modal de primeiro acesso (apenas uma vez)
+    // Só mostra modal se anamnese NÃO está completa e nunca viu o modal
+    // Se anamnese está completa, não mostra modal (só banner se necessário)
+    if (anamnesis?.status !== 'complete') {
+      const hasSeenFirstModal = localStorage.getItem(`first_access_modal_${user.id}`);
       if (!hasSeenFirstModal) {
         setShowFirstAccessModal(true);
         localStorage.setItem(`first_access_modal_${user.id}`, 'true');
       }
     }
+    // Se anamnese está completa, nunca mostra modal - só o banner é exibido
   };
 
   const handleStartAnamnesis = () => {
