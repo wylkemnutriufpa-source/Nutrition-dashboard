@@ -82,7 +82,7 @@ const generateAssessmentTip = (assessment, patient, previousAssessment) => {
   return { title, content };
 };
 
-const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCreated }) => {
+const PhysicalAssessmentEditor = ({ patientId, professionalId, patient, onTipCreated, onRefreshPatient }) => {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
