@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,13 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   ChefHat, Clock, Users, Flame, Search, Heart, 
-  BookOpen, Star, Filter, Loader2, UtensilsCrossed
+  BookOpen, Star, Filter, Loader2, UtensilsCrossed, ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase, getVisibleRecipesForPatient } from '@/lib/supabase';
 
 const PatientReceitas = () => {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [recipes, setRecipes] = useState([]);
