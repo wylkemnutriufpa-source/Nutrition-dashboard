@@ -2730,7 +2730,15 @@ export const getPatientDashboardStats = async (patientId) => {
     console.error('Erro ao buscar stats do paciente:', error);
     return {
       checklist_completion_7d: 0,
-
+      checklist_today: 0,
+      last_weight_update: null,
+      responded_feedbacks_7d: 0,
+      days_since_last_feedback: 999,
+      has_upcoming_appointment: false,
+      has_active_plan: false
+    };
+  }
+};
 
 // ==================== TEMPLATES GLOBAIS ====================
 
