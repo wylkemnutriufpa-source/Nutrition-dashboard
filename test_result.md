@@ -378,27 +378,33 @@ frontend:
 
   - task: "Modal Visualizar Plano Alimentar"
     implemented: true
-    working: "NA"
-    file: "frontend/src/components/MealPlanViewerModal.js, frontend/src/pages/PatientProfile.js"
-    stuck_count: 0
+    working: "BLOCKED"
+    file: "frontend/src/components/MealPlanViewerModal.js, frontend/src/pages/PatientProfile.js, frontend/src/pages/PatientDashboard.js"
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ IMPLEMENTADO: (1) Criado MealPlanViewerModal.js com visualização completa do plano. (2) Modal exibe: header com resumo nutricional do dia, lista de refeições expansíveis, tab de observações. (3) Cada refeição mostra: nome, horário, alimentos com customName e observations. (4) Botões: Exportar PDF e Editar Plano. (5) PatientProfile atualizado para abrir modal ao clicar em 'Visualizar' ao invés de redirecionar."
+      - working: "BLOCKED"
+        agent: "testing"
+        comment: "❌ BLOQUEADO (28/Fev/2026 - Teste com kelly@com/123456): Modal de visualização NÃO pode ser testado completamente porque modal 'Anamnese Completa!' aparece no dashboard do paciente bloqueando interação com botão 'Ver Plano Completo'. DESCOBERTO: Paciente tem 'Plano Alimentar (do Pré-Plano)' visível com 3159 kcal e P: 129g no card. Botão 'Ver Plano Completo' encontrado mas click interceptado por overlay (div.fixed.inset-0.z-50.bg-black/80). CÓDIGO REVISADO: MealPlanViewerModal.js implementação correta - linhas 28-36 calculam totais (calories, protein, carbs, fat), linhas 75-103 exibem calorias por alimento usando food.calories||food.kcal. ISSUE REAL: Modal 'Anamnese Completa!' está incorretamente aparecendo e bloqueando UI do dashboard paciente. Screenshots: patient_dashboard.png mostra modal bloqueador."
 
   - task: "Botão Acessar Planos no Dashboard Profissional"
     implemented: true
-    working: "NA"
+    working: false
     file: "frontend/src/pages/ProfessionalDashboard.js, frontend/src/lib/supabase.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ IMPLEMENTADO: (1) Seção 'Planos Alimentares Ativos' adicionada no dashboard. (2) Lista pacientes com planos ativos com botões Ver e Editar. (3) getProfessionalStats() atualizada para retornar patientsWithActivePlans. (4) Design com cards verde mostrando nome do paciente, nome do plano e data de atualização."
+      - working: false
+        agent: "testing"
+        comment: "❌ FALHOU (28/Fev/2026 - Teste com wylkem.nutri.ufpa@gmail.com/654321): Seção 'Planos Alimentares Ativos' NÃO ENCONTRADA no dashboard. PROBLEMA CRÍTICO: Login redirecionou para /admin/dashboard ao invés de /professional/dashboard. Usuário wylkem.nutri.ufpa@gmail.com está sendo tratado como ADMIN ao invés de PROFESSIONAL. Dashboard exibido: 'Painel Administrativo' com 'Total de Profissionais: 2' e 'Total de Pacientes: 15', lista 'Profissionais Cadastrados' (wyl, Dr Joao silva). Este é um DASHBOARD DE ADMIN, não de PROFISSIONAL. ProfessionalDashboard.js código está correto (linha 160-228 tem seção 'Planos Alimentares Ativos'), mas usuário tem role/permissions incorretas. AÇÃO REQUERIDA: Verificar role do usuário wylkem.nutri.ufpa@gmail.com no Supabase - deve ser 'professional' não 'admin'. Screenshot: dashboard_error.png"
 
   - task: "PDF Export com customName e observations"
     implemented: true
