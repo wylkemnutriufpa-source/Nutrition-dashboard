@@ -350,9 +350,12 @@ const MealPlanViewerModal = ({
             Atualizado: {mealPlan.updated_at ? new Date(mealPlan.updated_at).toLocaleDateString('pt-BR') : 'N/A'}
           </p>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleExportPDF}>
-              <Download size={16} className="mr-2" /> Exportar PDF
-            </Button>
+            {/* Exportar PDF - apenas para profissionais */}
+            {!readOnly && (
+              <Button variant="outline" onClick={handleExportPDF}>
+                <Download size={16} className="mr-2" /> Exportar PDF
+              </Button>
+            )}
             {onEdit && !readOnly && (
               <Button className="bg-teal-700 hover:bg-teal-800" onClick={onEdit}>
                 <Edit size={16} className="mr-2" /> Editar Plano
