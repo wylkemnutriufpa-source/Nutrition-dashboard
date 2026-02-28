@@ -106,6 +106,22 @@ const AnamneseFormComplete = ({
         console.log('✅ Criada com sucesso:', result);
       }
       
+      // Atualizar perfil do paciente com dados antropométricos
+      if (cleanData.current_weight || cleanData.height || cleanData.goal_weight) {
+        try {
+          const { updatePatient } = await import('@/lib/supabase');
+          const patientUpdate = {};
+          if (cleanData.current_weight) patientUpdate.current_weight = cleanData.current_weight;
+          if (cleanData.height) patientUpdate.height = cleanData.height;
+          if (cleanData.goal_weight) patientUpdate.goal_weight = cleanData.goal_weight;
+          
+          await updatePatient(patientId, patientUpdate);
+          console.log('✅ Perfil do paciente atualizado com dados antropométricos');
+        } catch (profileError) {
+          console.warn('Aviso: Não foi possível atualizar perfil:', profileError);
+        }
+      }
+      
       toast.success(markComplete ? 'Anamnese concluída!' : 'Rascunho salvo!');
       setHasChanges(false);
       
