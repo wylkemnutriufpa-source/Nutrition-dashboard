@@ -459,7 +459,8 @@ test_plan:
     - "Correção Calorias no Modal de Visualização"
     - "Correção Planos Ativos no Dashboard Profissional"
     - "Importação Anamnese → Avaliação Física"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Dashboard Profissional - Role/Permission Issue"
   test_all: false
   test_priority: "high_first"
 
