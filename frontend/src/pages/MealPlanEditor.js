@@ -519,13 +519,10 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
     { ...mockMeals[4], foods: [] }
   ]);
 
-  useEffect(() => {
-    if (user) {
-      loadInitialData();
-    }
-  }, [user, patientIdParam, planIdParam]);
-
-  const loadInitialData = async () => {
+  // Mover loadInitialData para useCallback para evitar loops
+  const loadInitialData = useCallback(async () => {
+    if (!user) return;
+    
     setLoading(true);
     try {
       // Se for visualização do paciente, carregar seu plano
