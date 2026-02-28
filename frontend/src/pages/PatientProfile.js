@@ -1176,16 +1176,16 @@ const PatientProfile = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-8 bg-gray-100">
-            <TabsTrigger value="resumo">Resumo</TabsTrigger>
-            <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
-            <TabsTrigger value="avaliacao">Av. Física</TabsTrigger>
-            <TabsTrigger value="pre-plano">Pré-Plano</TabsTrigger>
-            <TabsTrigger value="plano">Plano</TabsTrigger>
-            <TabsTrigger value="checklist">Checklist</TabsTrigger>
-            <TabsTrigger value="receitas">Receitas</TabsTrigger>
-            <TabsTrigger value="recados">Recados</TabsTrigger>
-            <TabsTrigger value="projeto">Projeto</TabsTrigger>
+          <TabsList className="flex flex-wrap w-full bg-gray-100 gap-1 p-1">
+            <TabsTrigger value="resumo" className="flex-1 min-w-[80px]">Resumo</TabsTrigger>
+            <TabsTrigger value="anamnese" className="flex-1 min-w-[80px]">Anamnese</TabsTrigger>
+            <TabsTrigger value="avaliacao" className="flex-1 min-w-[80px]">Av. Física</TabsTrigger>
+            <TabsTrigger value="pre-plano" className="flex-1 min-w-[80px]">Pré-Plano</TabsTrigger>
+            <TabsTrigger value="plano" className="flex-1 min-w-[80px]">Plano</TabsTrigger>
+            <TabsTrigger value="checklist" className="flex-1 min-w-[80px]">Checklist</TabsTrigger>
+            <TabsTrigger value="receitas" className="flex-1 min-w-[80px]">Receitas</TabsTrigger>
+            <TabsTrigger value="recados" className="flex-1 min-w-[80px]">Recados</TabsTrigger>
+            <TabsTrigger value="projeto" className="flex-1 min-w-[80px]">Projeto</TabsTrigger>
           </TabsList>
 
           <TabsContent value="resumo">
