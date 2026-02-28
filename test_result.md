@@ -2065,3 +2065,162 @@ agent_communication:
     PRÓXIMOS PASSOS: Nenhum. Feature está pronta para produção.
     
     NENHUMA AÇÃO REQUERIDA PARA MAIN AGENT - TESTE CONCLUÍDO COM SUCESSO! 🎉"
+
+  - agent: "testing"
+    message: "🧪 TESTE MENU SIMPLIFICADO DO PACIENTE - 28/Fev/2026
+
+    ═══════════════════════════════════════════════════════════════════
+    📋 TESTE SOLICITADO PELO USUÁRIO
+    ═══════════════════════════════════════════════════════════════════
+    
+    URL: https://personalized-diet-ai-1.preview.emergentagent.com
+    Credenciais: kelly@com / 123456
+    
+    TESTE: Verificar menu simplificado do paciente com 5 itens:
+    - 🏠 Dashboard
+    - 🚀 Minha Jornada (destacado)
+    - 📅 Minha Agenda
+    - 🥗 Meu Plano
+    - 📚 Biblioteca
+    
+    E verificar páginas Minha Jornada e Biblioteca.
+    
+    ═══════════════════════════════════════════════════════════════════
+    ✅ TESTE CONCLUÍDO - RESULTADO PARCIAL
+    ═══════════════════════════════════════════════════════════════════
+    
+    1️⃣ LOGIN:
+    ✅ kelly@com / 123456 - Login realizado com sucesso
+    ✅ Modal de boas-vindas fechado automaticamente
+    ✅ Dashboard carregado corretamente
+    
+    2️⃣ MENU LATERAL - ⚠️ ISSUE ENCONTRADO:
+    Status: Menu EXPANDIDO aparecendo ao invés do SIMPLIFICADO
+    
+    ✅ Itens encontrados no menu (11 itens):
+       - Dashboard
+       - Minha Jornada
+       - Dicas
+       - Minha Agenda
+       - Meu Plano
+       - Minhas Tarefas
+       - Meus Feedbacks
+       - Minhas Receitas
+       - Lista de Compras
+       - Suplementos
+       - Calculadoras
+    
+    ❌ Item FALTANDO: Biblioteca
+    
+    🔍 PROBLEMA IDENTIFICADO:
+    - Menu simplificado esperado deveria ter APENAS 5 itens
+    - Menu atual mostra 11 itens (expandido com itens secundários)
+    - Item 'Biblioteca' ausente (deveria estar no menu simplificado)
+    - Itens como 'Receitas', 'Lista de Compras', 'Suplementos', 'Calculadoras'
+      deveriam estar OCULTOS e acessíveis apenas via Biblioteca
+    
+    CAUSA PROVÁVEL:
+    - Configuração de menu do paciente (patient_menu_config) não está usando
+      o DEFAULT_PATIENT_MENU ou foi customizada incorretamente
+    - Itens secundários têm visible=true ao invés de visible=false
+    - Item 'Biblioteca' pode não estar na configuração de menu deste paciente
+    
+    3️⃣ PÁGINA 'MINHA JORNADA':
+    ✅ Página acessível via link no menu
+    ✅ Título: 'Gleice Jornada de Transformação'
+    ✅ Progresso Circular: 0% exibido
+    ✅ Cards de métricas: Peso Inicial, Peso Atual, Meta, Perdido
+    ✅ Progresso para a Meta com barra visual
+    ✅ Abas: Evolução, Fotos, Tarefas
+    ✅ Histórico de Peso com opção de registrar peso
+    ✅ Dica motivacional exibida
+    
+    ⚠️ DIFERENÇA DO ESPERADO:
+    - Elementos esperados baseados em MinhaJornada.js (código):
+      ❌ 'Checklist de Hábitos' não encontrado com esse nome exato
+      ❌ 'Próximo Compromisso' não encontrado
+    - Página atual parece ser diferente do componente MinhaJornada.js
+    - Rota pode estar usando um componente alternativo
+    
+    4️⃣ PÁGINA 'BIBLIOTECA':
+    ✅ Página acessível (via navegação direta, já que link não estava no menu)
+    ✅ Título: 'Biblioteca - Todas as suas ferramentas em um só lugar'
+    ✅ TODOS os 4 cards encontrados:
+       ✅ Minhas Receitas
+       ✅ Lista de Compras
+       ✅ Suplementos
+       ✅ Calculadoras (badge 'Novo')
+    ✅ Seção 'Ferramentas Rápidas' com 3 atalhos
+    ✅ Dica sobre lista de compras exibida
+    
+    ═══════════════════════════════════════════════════════════════════
+    📸 SCREENSHOTS CAPTURADOS
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ 01_homepage.png - Página inicial
+    ✅ 02_login_form.png - Formulário de login
+    ✅ 03_dashboard_sidebar.png - Dashboard com menu lateral
+    ✅ 04_minha_jornada.png - Página Minha Jornada
+    ✅ 05_minha_jornada_scrolled.png - Minha Jornada scrolled
+    ✅ 06_biblioteca.png - Página Biblioteca
+    ✅ 07_biblioteca_scrolled.png - Biblioteca scrolled
+    
+    ═══════════════════════════════════════════════════════════════════
+    🔧 AÇÕES REQUERIDAS PARA MAIN AGENT
+    ═══════════════════════════════════════════════════════════════════
+    
+    PRIORIDADE ALTA:
+    
+    1. Corrigir Menu Simplificado do Paciente kelly@com:
+       - Menu atual tem 11 itens ao invés de 5
+       - Atualizar patient_menu_config para usar DEFAULT_PATIENT_MENU
+       - Garantir que apenas itens com visible=true e order 1-5 apareçam
+       - Adicionar item 'Biblioteca' no menu
+       - Ocultar itens secundários (Receitas, Lista de Compras, etc)
+       
+       SQL sugerido:
+       ```sql
+       -- Resetar configuração de menu para o padrão
+       DELETE FROM patient_menu_config WHERE patient_id = '<kelly_id>';
+       -- Ou atualizar com menu correto seguindo DEFAULT_PATIENT_MENU
+       ```
+    
+    2. Verificar Rota '/patient/minha-jornada':
+       - Confirmar se está usando componente MinhaJornada.js correto
+       - Página atual parece diferente do código revisado
+       - Verificar App.js para rota correta
+    
+    PRIORIDADE MÉDIA:
+    
+    3. Implementar Destaque Visual para 'Minha Jornada':
+       - Item deveria aparecer destacado no menu
+       - Adicionar highlight: true no DEFAULT_PATIENT_MENU (já existe no código)
+       - Verificar se CSS está aplicando estilo de destaque
+    
+    ═══════════════════════════════════════════════════════════════════
+    ✅ CONFIRMADO FUNCIONANDO
+    ═══════════════════════════════════════════════════════════════════
+    
+    ✅ Login de paciente
+    ✅ Sidebar renderizada corretamente
+    ✅ Página Minha Jornada carrega e funciona
+    ✅ Página Biblioteca carrega com todos os 4 cards
+    ✅ Todos os links do menu navegam corretamente
+    ✅ Componente Biblioteca.js implementado perfeitamente
+    ✅ Sem erros de console detectados
+    ✅ Sem overlays bloqueadores
+    
+    ═══════════════════════════════════════════════════════════════════
+    📊 RESUMO
+    ═══════════════════════════════════════════════════════════════════
+    
+    FUNCIONALIDADE: Parcialmente Implementada
+    - Biblioteca: ✅ 100% funcional
+    - Minha Jornada: ✅ Funcional (diferente do esperado)
+    - Menu Simplificado: ❌ Não implementado para este paciente
+    
+    ISSUE PRINCIPAL: Configuração de menu do paciente não está usando
+    menu simplificado de 5 itens conforme especificado.
+    
+    PRÓXIMO PASSO: Main agent deve atualizar patient_menu_config para
+    kelly@com usar o DEFAULT_PATIENT_MENU correto."
