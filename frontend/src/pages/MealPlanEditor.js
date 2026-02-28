@@ -834,23 +834,37 @@ const MealPlanEditor = ({ userType = 'professional' }) => {
 
     setSaving(true);
     try {
-      // Limpar dados dos alimentos antes de salvar (remover flags temporárias)
+      // Limpar dados dos alimentos antes de salvar - INCLUINDO DADOS NUTRICIONAIS
       const cleanedMeals = meals.map(meal => ({
         id: meal.id,
         name: meal.name,
         time: meal.time,
         color: meal.color || '#0F766E',
         observations: meal.observations || '',
-        foods: meal.foods.map(food => ({
-          id: food.id,
-          foodId: food.foodId || food.food_id || null,
-          food_id: food.foodId || food.food_id || null,
-          name: food.name || '',
-          customName: food.customName || '',
-          quantity: parseFloat(food.quantity) || 100,
-          unit: food.unit || 'g',
-          measure: food.measure || ''
-        }))
+        foods: meal.foods.map(food => {
+          // Encontrar dados nutricionais do alimento
+          const foodData = allFoods.find(f => f.id === food.foodId || f.id === food.food_id);
+          const quantity = parseFloat(food.quantity) || 100;
+          const multiplier = foodData ? quantity / foodData.porcao : 1;
+          
+          return {
+            id: food.id,
+            foodId: food.foodId || food.food_id || null,
+            food_id: food.foodId || food.food_id || null,
+            name: food.name || foodData?.name || '',
+            customName: food.customName || '',
+            quantity: quantity,
+            unit: food.unit || 'g',
+            measure: food.measure || '',
+            observations: food.observations || '',
+            // ✅ INCLUIR DADOS NUTRICIONAIS PARA EXIBIÇÃO NO MODAL
+            calories: foodData ? parseFloat((foodData.calorias * multiplier).toFixed(0)) : 0,
+            kcal: foodData ? parseFloat((foodData.calorias * multiplier).toFixed(0)) : 0,
+            protein: foodData ? parseFloat((foodData.proteina * multiplier).toFixed(1)) : 0,
+            carbs: foodData ? parseFloat((foodData.carboidrato * multiplier).toFixed(1)) : 0,
+            fat: foodData ? parseFloat((foodData.gordura * multiplier).toFixed(1)) : 0
+          };
+        })
       }));
 
       console.log('🔍 MEALS ORIGINAIS:', meals);
