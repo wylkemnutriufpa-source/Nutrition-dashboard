@@ -30,11 +30,24 @@ const PatientDashboard = () => {
   }, [user]);
 
   const checkFirstAccess = () => {
-    // Só mostra modal se NUNCA foi visto E anamnese não está completa
-    const hasSeenModal = localStorage.getItem(`first_access_modal_${user.id}`);
-    if (!hasSeenModal) {
-      setShowFirstAccessModal(true);
-      localStorage.setItem(`first_access_modal_${user.id}`, 'true');
+    // Verificar se já viu o modal de primeiro acesso
+    const hasSeenFirstModal = localStorage.getItem(`first_access_modal_${user.id}`);
+    // Verificar se já viu o modal de anamnese completa
+    const hasSeenCompleteModal = localStorage.getItem(`anamnesis_complete_modal_${user.id}`);
+    
+    // Se anamnese está completa
+    if (anamnesis?.status === 'complete') {
+      // Só mostra modal de "Parabéns" se nunca viu
+      if (!hasSeenCompleteModal) {
+        setShowFirstAccessModal(true);
+        localStorage.setItem(`anamnesis_complete_modal_${user.id}`, 'true');
+      }
+    } else {
+      // Se anamnese não está completa, mostra modal de primeiro acesso
+      if (!hasSeenFirstModal) {
+        setShowFirstAccessModal(true);
+        localStorage.setItem(`first_access_modal_${user.id}`, 'true');
+      }
     }
   };
 
