@@ -81,9 +81,14 @@ const MinhaJornada = () => {
         getPatientStats(user.id)
       ]);
 
-      setTasks(tasksRes.data || []);
-      setTips(tipsRes.data || []);
-      setPatientStats(statsRes);
+      const loadedTasks = tasksRes.data || [];
+      const loadedTips = tipsRes.data || [];
+      const loadedFeedbacks = feedbacksRes.data || [];
+      const loadedStats = statsRes;
+
+      setTasks(loadedTasks);
+      setTips(loadedTips);
+      setPatientStats(loadedStats);
       
       // Próximo compromisso
       const today = new Date();
@@ -94,11 +99,83 @@ const MinhaJornada = () => {
       setNextAppointment(upcoming[0] || null);
       
       // Feedbacks não respondidos
-      setFeedbacks((feedbacksRes.data || []).slice(0, 3));
+      setFeedbacks(loadedFeedbacks.slice(0, 3));
+
+      // Calcular dados do Painel Inteligente
+      computeIntelligence({
+        tasks: loadedTasks,
+        tips: loadedTips,
+        feedbacks: loadedFeedbacks,
+        agenda: appointmentsRes.data || [],
+        plan: loadedStats?.activePlan,
+        anamnesis: loadedStats?.anamnesis,
+        patientData: loadedStats?.profile
+      });
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Computar dados do Painel Inteligente
+  const computeIntelligence = (context) => {
+    try {
+      // Verificar se há dados suficientes
+      if (!hasSufficientData(context)) {
+        const insufficientMsg = getInsufficientDataMessage(context);
+        setIntelligenceData({
+          score: null,
+          alerts: [],
+          nextAction: insufficientMsg,
+          dailyTip: null,
+          insufficient: true
+        });
+        return;
+      }
+
+      // Calcular score
+      const scoreData = computeAdherenceScore({
+        tasks: context.tasks,
+        feedbacks: context.feedbacks,
+        agenda: context.agenda,
+        plan: context.plan
+      });
+
+      // Gerar alertas
+      const alerts = generateSmartAlerts({
+        score: scoreData.score,
+        tasks: context.tasks,
+        plan: context.plan,
+        tips: context.tips,
+        feedbacks: context.feedbacks,
+        agenda: context.agenda
+      });
+
+      // Próximo passo
+      const nextAction = pickNextBestAction({
+        tasks: context.tasks,
+        feedbacks: context.feedbacks,
+        agenda: context.agenda,
+        plan: context.plan,
+        anamnesis: context.anamnesis
+      });
+
+      // Dica do dia
+      const dailyTip = pickDailyTip({
+        tips: context.tips,
+        patientData: context.patientData
+      });
+
+      setIntelligenceData({
+        score: scoreData,
+        alerts,
+        nextAction,
+        dailyTip,
+        insufficient: false
+      });
+    } catch (error) {
+      console.error('Erro ao computar inteligência:', error);
     }
   };
 
